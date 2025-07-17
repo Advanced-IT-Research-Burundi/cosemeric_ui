@@ -182,4 +182,7 @@ export const useAuthStore = defineStore('auth', () => {
   persist: true // This will persist the store in localStorage
 });
 
+if(import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
+}
 export default useAuthStore;

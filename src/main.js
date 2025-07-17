@@ -7,12 +7,14 @@ import 'vue-toastification/dist/index.css'
 import './style.css'
 import App from './App.vue'
 import router from './router'
-
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 // Create app
 const app = createApp(App)
 
 // Add plugins
 const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
 app.use(pinia)
 app.use(router)
 
