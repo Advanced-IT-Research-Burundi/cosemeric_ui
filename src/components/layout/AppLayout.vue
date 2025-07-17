@@ -8,41 +8,50 @@
       </div>
       <nav class="nav-menu">
         <template v-for="(item, index) in menuItems" :key="index">
-          <div class="menu-section">
-            <div 
-              class="menu-header" 
-              :class="{ 'active': activeSection === index }"
-              @click="toggleSection(index)"
-            >
-              <i :class="item.icon || 'fas fa-folder'"></i>
-              <span v-if="!isCollapsed" class="title">{{ item.title }}</span>
-              <span v-if="!isCollapsed && item.children && item.children.length" class="arrow">
-                {{ activeSection === index ? '▼' : '▶' }}
-              </span>
-            </div>
-            <transition name="slide">
-              <div v-show="!isCollapsed && (activeSection === index) && item.children && item.children.length" class="submenu">
-                <router-link 
-                  v-for="(subItem, subIndex) in item.children" 
-                  :key="subIndex"
-                  :to="subItem.path"
-                  class="submenu-item"
-                  active-class="active"
+            <div class="menu-section">
+                <div 
+                class="menu-header" 
+                :class="{ 'active': activeSection === index }"
+                @click="toggleSection(index)"
                 >
-                  {{ subItem.title }}
-                </router-link>
-              </div>
-            </transition>
-          </div>
+                <i :class="item.icon || ''"></i>
+                <span v-if="!isCollapsed" class="title">{{ item.title }}</span>
+                </div>
+            </div>
         </template>
       </nav>
       <div class="sidebar-footer">
-        <button @click="toggleSidebar" class="toggle-btn">
-          {{ isCollapsed ? '→' : '←' }}
-        </button>
+        
       </div>
     </div>
     <div class="main-content">
+        <nav class="admin-header">
+          <div class="header-left">
+            <button @click="toggleSidebar" class="btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1>{{ currentRouteName }}</h1>
+          </div>
+          <div class="header-right">
+            <div class="user-profile" @click="toggleUserDropdown">
+              <div class="user-avatar">
+                {{ userInitials }}
+              </div>
+              <span class="user-name">{{ userName }}</span>
+              <i class="fas fa-chevron-down"></i>
+              
+              <div v-if="showUserDropdown" class="user-dropdown">
+                <div class="dropdown-item" @click="navigateToProfile">
+                  Mon Profil
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item logout" @click="handleLogout">
+                  Déconnexion
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
         <div>
            <router-view />
         </div>
@@ -52,52 +61,82 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth';
+
 export default {
   name: 'AppLayout',
   data() {
     return {
       isCollapsed: false,
       activeSection: null,
+      showUserDropdown: false,
       menuItems: [
         {
-          icon: '',
+          icon: 'fas fa-home',
           title: 'Tableau de bord',
           path: '/dashboard'
         },
         {
-          icon: '',
+          icon: 'fas fa-users',
           title: 'Membres',
           path: '/members'
         },
         {
-          icon: '',
+          icon: 'fas fa-money-bill',
           title: 'Cotisations',
           path: '/contributions'
         },
         {
-          icon: '',
+          icon: 'fas fa-sack-dollar',
           title: 'Crédits',
           path: '/credits'
         },
         {
-          icon: '',
+          icon: 'fas fa-headset',
           title: 'Assistance',
           path: '/assistance'
         },
         {
-          icon: '',
+          icon: 'fas fa-chart-line',
           title: 'Rapports',
           path: '/reports'
         },
         {
-          icon: '',
+          icon: 'fas fa-cog',
           title: 'Administration',
           path: '/admin'
         }
       ]
     };
   },
+  computed: {
+    currentRouteName() {
+      const route = this.$route;
+      const name = route.meta.title || route.name || '';
+      return this.capitalizeFirstLetter(name);
+    },
+    userInitials() {
+      const authStore = useAuthStore();
+      const user = authStore.user || {};
+      if (user.firstName && user.lastName) {
+        return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+      }
+      return 'U';
+    },
+    userName() {
+      const authStore = useAuthStore();
+      const user = authStore.user || {};
+      if (user.firstName && user.lastName) {
+        return `${user.firstName} ${user.lastName}`;
+      }
+      return 'Utilisateur';
+    }
+  },
   methods: {
+    capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
     },
@@ -106,6 +145,27 @@ export default {
         this.activeSection = null;
       } else {
         this.activeSection = index;
+      }
+    },
+    toggleUserDropdown() {
+      this.showUserDropdown = !this.showUserDropdown;
+    },
+    navigateToProfile() {
+      this.$router.push('/profile');
+      this.showUserDropdown = false;
+    },
+    async handleLogout() {
+      try {
+        const authStore = useAuthStore();
+        await authStore.logout();
+        this.$router.push('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
+    },
+    onClickOutside(event) {
+      if (!this.$el.contains(event.target)) {
+        this.showUserDropdown = false;
       }
     }
   }
@@ -186,7 +246,8 @@ body {
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: center !important;
+  gap: 10px;
   color: var(--text-light);
   font-weight: 500;
   transition: all var(--transition-speed) ease;
@@ -214,6 +275,8 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .menu-header .arrow {
@@ -266,7 +329,7 @@ body {
   cursor: pointer;
   color: var(--text-light);
   font-size: 1.25rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0;
   border-radius: 4px;
   transition: all var(--transition-speed) ease;
 }
@@ -290,6 +353,110 @@ body {
   margin-left: var(--sidebar-collapsed-width);
 }
 
+/* Admin Header Styles */
+.admin-header {
+  background: white;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.admin-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.header-right {
+  position: relative;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem !important;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.user-profile:hover {
+  background-color: #f5f5f5;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 1000;
+  margin-top: 8px;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #2c3e50;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item i {
+  width: 20px;
+  text-align: center;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #e9ecef;
+  margin: 0.25rem 0;
+}
+
+.logout {
+  color: #dc3545;
+}
+
+.logout:hover {
+  background-color: #fff5f5;
+}
+
 /* Header Styles */
 .app-header {
   height: var(--header-height);
@@ -307,7 +474,49 @@ body {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 24px;
+  width: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger-icon {
+  width: 100%;
+  height: 2px;
+  background-color: #2c3e50;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-btn:hover .hamburger-icon {
+  background-color: var(--primary-color);
+}
+
+/* Animation when sidebar is collapsed */
+.sidebar.collapsed + .main-content .hamburger-icon:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.sidebar.collapsed + .main-content .hamburger-icon:nth-child(2) {
+  opacity: 0;
+}
+
+.sidebar.collapsed + .main-content .hamburger-icon:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 .menu-toggle {

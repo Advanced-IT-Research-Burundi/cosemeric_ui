@@ -59,7 +59,7 @@ const routes = [
         children: [
           {
             path: '',
-            name: 'AllMembers',
+            name: 'Tous les Membres',
             component: AllMembers
           },
        

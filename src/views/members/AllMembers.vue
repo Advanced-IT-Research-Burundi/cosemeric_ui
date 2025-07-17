@@ -1,246 +1,240 @@
 <template>
-  <BaseView 
-    title="All Members"
-    subtitle="Manage your organization's members"
-  >
-    <template #actions>
-      <router-link to="/members/add" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i> Add Member
-      </router-link>
-    </template>
-
-    <!-- Search and Filter Bar -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="fas fa-search"></i>
-              </span>
-              <input 
-                type="text" 
-                v-model="searchQuery" 
-                class="form-control" 
-                placeholder="Search members..."
-                @keyup.enter="applyFilters"
-              >
-              <button 
-                class="btn btn-outline-secondary" 
-                type="button"
-                @click="clearSearch"
-              >
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <select v-model="statusFilter" class="form-select" @change="applyFilters">
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select v-model="sortBy" class="form-select" @change="applyFilters">
-              <option value="name_asc">Sort by Name (A-Z)</option>
-              <option value="name_desc">Sort by Name (Z-A)</option>
-              <option value="date_asc">Oldest First</option>
-              <option value="date_desc">Newest First</option>
-            </select>
-          </div>
+    <div class="container py-4 px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Membres</h1>
+            <button class="btn btn-primary" @click="addMember">
+                <i class="fas fa-plus me-2"></i>Ajouter un membre
+            </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Members Table -->
-    <div class="card">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Member</th>
-                <th>ID</th>
-                <th>Contact</th>
-                <th>Status</th>
-                <th>Join Date</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading">
-                <td colspan="6" class="text-center py-4">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="filteredMembers.length === 0">
-                <td colspan="6" class="text-center py-4">
-                  <div class="text-muted">
-                    <i class="fas fa-users-slash fa-2x mb-2"></i>
-                    <p class="mb-0">No members found</p>
-                    <button class="btn btn-link p-0" @click="resetFilters">
-                      Clear all filters
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr v-for="member in paginatedMembers" :key="member.id" class="cursor-pointer" @click="viewMember(member.id)">
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="avatar me-3">
-                      <img 
-                        v-if="member.avatar" 
-                        :src="member.avatar" 
-                        :alt="member.name"
-                        class="rounded-circle"
-                      >
-                      <div v-else class="avatar-text">
-                        {{ getInitials(member.name) }}
-                      </div>
-                    </div>
-                    <div>
-                      <h6 class="mb-0">{{ member.name }}</h6>
-                      <small class="text-muted">{{ member.memberId }}</small>
-                    </div>
-                  </div>
-                </td>
-                <td>{{ member.memberNumber }}</td>
-                <td>
-                  <div>{{ member.email }}</div>
-                  <small class="text-muted">{{ member.phone || 'No phone' }}</small>
-                </td>
-                <td>
-                  <span class="badge" :class="getStatusClass(member.status)">
-                    {{ formatStatus(member.status) }}
-                  </span>
-                </td>
-                <td>{{ formatDate(member.joinDate) }}</td>
-                <td class="text-end">
-                  <div class="btn-group" @click.stop>
-                    <button 
-                      class="btn btn-sm btn-outline-primary"
-                      @click.stop="viewMember(member.id)"
-                      title="View Details"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button 
-                      class="btn btn-sm btn-outline-secondary"
-                      @click.stop="editMember(member.id)"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button 
-                      class="btn btn-sm btn-outline-danger"
-                      @click.stop="confirmDelete(member)"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center p-3 border-top" v-if="filteredMembers.length > 0">
-          <div class="text-muted">
-            Showing <span class="fw-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to 
-            <span class="fw-semibold">{{ Math.min(currentPage * itemsPerPage, filteredMembers.length) }}</span> of 
-            <span class="fw-semibold">{{ filteredMembers.length }}</span> members
-          </div>
-          
-          <nav>
-            <ul class="pagination mb-0">
-              <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-                <button class="page-link" @click="currentPage--" :disabled="currentPage === 1">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-              </li>
-              
-              <li 
-                v-for="page in visiblePages" 
-                :key="page" 
-                class="page-item"
-                :class="{ 'active': page === currentPage }"
-              >
-                <button class="page-link" @click="currentPage = page">
-                  {{ page }}
-                </button>
-              </li>
-              
-              <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
-                <button 
-                  class="page-link" 
-                  @click="currentPage++" 
-                  :disabled="currentPage === totalPages"
+        <!-- Search and Filter Bar -->
+        <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    v-model="searchQuery" 
+                    class="form-control" 
+                    placeholder="Rechercher des membres..."
+                    @keyup.enter="applyFilters"
                 >
-                  <i class="fas fa-chevron-right"></i>
+                <button 
+                    class="btn btn-outline-secondary" 
+                    type="button"
+                    @click="clearSearch"
+                >
+                    <i class="fas fa-times"></i>
                 </button>
-              </li>
-            </ul>
-          </nav>
-          
-          <div class="d-flex align-items-center">
-            <label class="me-2 mb-0 text-muted">Rows per page:</label>
-            <select 
-              v-model="itemsPerPage" 
-              class="form-select form-select-sm" 
-              style="width: auto;"
-              @change="currentPage = 1"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select v-model="statusFilter" class="form-select" @change="applyFilters">
+                <option value="">Tous les statuts</option>
+                <option value="active">Actif</option>
+                <option value="inactive">Inactif</option>
+                <option value="pending">En attente</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select v-model="sortBy" class="form-select" @change="applyFilters">
+                <option value="name_asc">Trier par nom (A-Z)</option>
+                <option value="name_desc">Trier par nom (Z-A)</option>
+                <option value="date_asc">Plus ancien d'abord</option>
+                <option value="date_desc">Plus récent d'abord</option>
+                </select>
+            </div>
+            </div>
         </div>
-      </div>
-    </div>
+        </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" :class="{ 'show d-block': showDeleteModal }" tabindex="-1" v-if="showDeleteModal">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Confirm Deletion</h5>
-            <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to delete <strong>{{ memberToDelete?.name }}</strong>? This action cannot be undone.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" @click="showDeleteModal = false">
-              Cancel
-            </button>
-            <button type="button" class="btn btn-danger" @click="deleteMember" :disabled="deleting">
-              <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              {{ deleting ? 'Deleting...' : 'Delete' }}
-            </button>
-          </div>
+        <!-- Members Table -->
+        <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Membre</th>
+                    <th>ID</th>
+                    <th>Contact</th>
+                    <th>Statut</th>
+                    <th>Date d'adhésion</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="loading">
+                    <td colspan="6" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    </td>
+                </tr>
+                <tr v-else-if="filteredMembers.length === 0">
+                    <td colspan="6" class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-users-slash fa-2x mb-2"></i>
+                        <p class="mb-0">Aucun membre trouvé</p>
+                        <button class="btn btn-link p-0" @click="resetFilters">
+                        Réinitialiser les filtres
+                        </button>
+                    </div>
+                    </td>
+                </tr>
+                <tr v-for="member in paginatedMembers" :key="member.id" class="cursor-pointer" @click="viewMember(member.id)">
+                    <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar me-3">
+                        <img 
+                            v-if="member.avatar" 
+                            :src="member.avatar" 
+                            :alt="member.name"
+                            class="rounded-circle"
+                        >
+                        <div v-else class="avatar-text">
+                            {{ getInitials(member.name) }}
+                        </div>
+                        </div>
+                        <div>
+                        <h6 class="mb-0">{{ member.name }}</h6>
+                        <small class="text-muted">{{ member.memberId }}</small>
+                        </div>
+                    </div>
+                    </td>
+                    <td>{{ member.memberNumber }}</td>
+                    <td>
+                    <div>{{ member.email }}</div>
+                    <small class="text-muted">{{ member.phone || 'Aucun téléphone' }}</small>
+                    </td>
+                    <td>
+                    <span class="badge" :class="getStatusClass(member.status)">
+                        {{ formatStatus(member.status) }}
+                    </span>
+                    </td>
+                    <td>{{ formatDate(member.joinDate) }}</td>
+                    <td class="text-end">
+                    <div class="btn-group" @click.stop>
+                        <button 
+                        class="btn btn-sm btn-outline-primary"
+                        @click.stop="viewMember(member.id)"
+                        title="Voir les détails"
+                        >
+                        <i class="fas fa-eye"></i>
+                        </button>
+                        <button 
+                        class="btn btn-sm btn-outline-secondary"
+                        @click.stop="editMember(member.id)"
+                        title="Modifier"
+                        >
+                        <i class="fas fa-edit"></i>
+                        </button>
+                        <button 
+                        class="btn btn-sm btn-outline-danger"
+                        @click.stop="confirmDelete(member)"
+                        title="Supprimer"
+                        >
+                        <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center p-3 border-top" v-if="filteredMembers.length > 0">
+            <div class="text-muted">
+                Affichage de <span class="fw-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> à 
+                <span class="fw-semibold">{{ Math.min(currentPage * itemsPerPage, filteredMembers.length) }}</span> sur 
+                <span class="fw-semibold">{{ filteredMembers.length }}</span> membres
+            </div>
+            
+            <nav>
+                <ul class="pagination mb-0">
+                <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                    <button class="page-link" @click="currentPage--" :disabled="currentPage === 1">
+                    <i class="fas fa-chevron-left"></i>
+                    </button>
+                </li>
+                
+                <li 
+                    v-for="page in visiblePages" 
+                    :key="page" 
+                    class="page-item"
+                    :class="{ 'active': page === currentPage }"
+                >
+                    <button class="page-link" @click="currentPage = page">
+                    {{ page }}
+                    </button>
+                </li>
+                
+                <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                    <button 
+                    class="page-link" 
+                    @click="currentPage++" 
+                    :disabled="currentPage === totalPages"
+                    >
+                    <i class="fas fa-chevron-right"></i>
+                    </button>
+                </li>
+                </ul>
+            </nav>
+            
+            <div class="d-flex align-items-center">
+                <label class="me-2 mb-0 text-muted">Lignes par page :</label>
+                <select 
+                v-model="itemsPerPage" 
+                class="form-select form-select-sm" 
+                style="width: auto;"
+                @change="currentPage = 1"
+                >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                </select>
+            </div>
+            </div>
         </div>
-      </div>
-      <div class="modal-backdrop fade show" @click="showDeleteModal = false"></div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" :class="{ 'show d-block': showDeleteModal }" tabindex="-1" v-if="showDeleteModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer <strong>{{ memberToDelete?.name }}</strong> ? Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" @click="showDeleteModal = false">
+                Annuler
+                </button>
+                <button type="button" class="btn btn-danger" @click="deleteMember" :disabled="deleting">
+                <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                {{ deleting ? 'Suppression...' : 'Supprimer' }}
+                </button>
+            </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show" @click="showDeleteModal = false"></div>
+        </div>
     </div>
-  </BaseView>
+    
 </template>
 
 <script>
-import BaseView from '../BaseView.vue';
 
 export default {
   name: 'AllMembers',
-  components: {
-    BaseView
-  },
   data() {
     return {
       loading: false,
