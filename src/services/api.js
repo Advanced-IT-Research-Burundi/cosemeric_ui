@@ -52,7 +52,7 @@ apiClient.interceptors.response.use(
 );
 
 // API methods
-export default {
+export default  {
   // GET request
   get(resource, params = {}) {
     return apiClient.get(resource, { params });

@@ -114,8 +114,8 @@ export default {
     const errorMessage = ref('')
     
     const form = reactive({
-      email: '',
-      password: '',
+      email: 'nijeanlionel@gmail.com',
+      password: 'password',
       remember: false
     })
     
@@ -184,10 +184,10 @@ export default {
         })
         
         // Save token to localStorage if 'remember me' is checked
-        if (form.remember && response.data.token) {
-          localStorage.setItem('auth_token', response.data.token)
+        if (form.remember && response.access_token) {
+          localStorage.setItem('auth_token', response.access_token)
         }
-        
+        //console.log("token", response.access_token)
         // Redirect to dashboard
         router.push('/dashboard')
         

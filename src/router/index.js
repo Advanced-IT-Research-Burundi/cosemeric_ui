@@ -86,7 +86,7 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'Dashboard',
+        name: 'dashboard',
         component: Dashboard
       },
       // Members
@@ -269,7 +269,7 @@ router.beforeEach(async (to, from, next) => {
     
     // Check admin role if required
     if (to.meta.requiresAdmin && !authStore.isAdmin) {
-      return next({ name: 'Dashboard' })
+      return next({ name: 'dashboard' })
     }
     
     return next()
@@ -277,7 +277,7 @@ router.beforeEach(async (to, from, next) => {
   
   // Redirect to dashboard if user is already authenticated and trying to access guest pages
   if (to.meta.guest && authStore.isAuthenticated) {
-    return next({ name: 'Dashboard' })
+    return next({ name: 'dashboard' })
   }
   
   next()
