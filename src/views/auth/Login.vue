@@ -69,15 +69,15 @@
                     id="remember"
                     v-model="form.remember"
                   />
-                  <label class="form-check-label" for="remember">
+                  <small class="form-check-label" for="remember">
                     Se souvenir de moi
-                  </label>
+                  </small>
                 </div>
 
                 <!-- Bouton de connexion -->
                 <button
                   type="submit"
-                  class="btn btn-primary w-100 mb-3"
+                  class="btn btn-primary fs-6 w-100 mb-3"
                   :disabled="isLoading"
                 >
                   <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
@@ -126,6 +126,18 @@ export default {
 
     const togglePassword = () => {
       showPassword.value = !showPassword.value
+    }
+    
+    const clearError = (field) => {
+      if (field) {
+        errors[field] = ''
+      } else {
+        // Clear all errors
+        Object.keys(errors).forEach(key => {
+          errors[key] = ''
+        })
+        errorMessage.value = ''
+      }
     }
 
     const validateForm = () => {
@@ -210,6 +222,7 @@ export default {
       showPassword,
       errorMessage,
       togglePassword,
+      clearError,
       handleLogin
     }
   }
@@ -217,37 +230,4 @@ export default {
 </script>
 
 <style scoped>
-
-.form-control:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  border-radius: 8px;
-}
-
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
-}
-
-.text-primary {
-  color: #0d6efd !important;
-}
-
-.bg-light {
-  background-color: #f8f9fa !important;
-}
-
-.input-group .btn-outline-secondary {
-  border-color: #ced4da;
-}
-
-.input-group .btn-outline-secondary:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
-}
 </style>

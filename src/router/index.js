@@ -1,10 +1,51 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+import AppLayout from '../components/layout/AppLayout.vue'
 
 // Import your components
 import Home from '../views/Home.vue'
-import About from '../views/About.vue'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
+import PageNotFound from '../views/errors/PageNotFound.vue'
+
+// Lazy load components
+const Dashboard = () => import('../views/Dashboard.vue')
+
+// Members
+const AllMembers = () => import('../views/members/AllMembers.vue')
+// const AddMember = () => import('../views/members/AddMember.vue')
+// const MemberCategories = () => import('../views/members/Categories.vue')
+// const MemberImportExport = () => import('../views/members/ImportExport.vue')
+
+// // Contributions
+// const RecordPayment = () => import('../views/contributions/RecordPayment.vue')
+// const MonthlyTracking = () => import('../views/contributions/MonthlyTracking.vue')
+// const SemiAnnualUSD = () => import('../views/contributions/SemiAnnualUSD.vue')
+// const PaymentHistory = () => import('../views/contributions/PaymentHistory.vue')
+
+// // Credits
+// const NewApplications = () => import('../views/credits/NewApplications.vue')
+// const ApprovalQueue = () => import('../views/credits/ApprovalQueue.vue')
+// const ActiveLoans = () => import('../views/credits/ActiveLoans.vue')
+// const RepaymentTracking = () => import('../views/credits/RepaymentTracking.vue')
+
+// // Assistance
+// const NewRequests = () => import('../views/assistance/NewRequests.vue')
+// const PendingApprovals = () => import('../views/assistance/PendingApprovals.vue')
+// const AssistancePaymentHistory = () => import('../views/assistance/PaymentHistory.vue')
+// const AssistanceTypes = () => import('../views/assistance/AssistanceTypes.vue')
+
+// // Reports
+// const MonthlySummary = () => import('../views/reports/MonthlySummary.vue')
+// const FinancialStatements = () => import('../views/reports/FinancialStatements.vue')
+// const MemberReports = () => import('../views/reports/MemberReports.vue')
+// const ExportData = () => import('../views/reports/ExportData.vue')
+
+// // Administration
+// const UserManagement = () => import('../views/administration/UserManagement.vue')
+// const SystemSettings = () => import('../views/administration/SystemSettings.vue')
+// const AuditLogs = () => import('../views/administration/AuditLogs.vue')
+// const BackupRestore = () => import('../views/administration/BackupRestore.vue')
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -17,18 +58,7 @@ const requireAuth = (to, from, next) => {
 };
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About,
-    meta: { requiresAuth: true }
-  },
+  // Public routes
   {
     path: '/login',
     name: 'Login',
@@ -41,36 +71,216 @@ const routes = [
     component: Register,
     meta: { guest: true }
   },
+  // 404 route
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    name: 'PageNotFound',
+    component: PageNotFound,
+    meta: { title: 'Page non trouvée' }
+  },
+  // Authenticated routes
+  {
+    path: '/',
+    component: AppLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'Dashboard',
+        component: Dashboard
+      },
+      // Members
+      {
+        path: 'members',
+        children: [
+          {
+            path: '',
+            name: 'AllMembers',
+            component: AllMembers
+          },
+          // {
+          //   path: 'add',
+          //   name: 'AddMember',
+          //   component: AddMember
+          // },
+          // {
+          //   path: 'categories',
+          //   name: 'MemberCategories',
+          //   component: MemberCategories
+          // },
+          // {
+          //   path: 'import-export',
+          //   name: 'MemberImportExport',
+          //   component: MemberImportExport
+          // }
+        ]
+      },
+      // Contributions
+      // {
+      //   path: 'contributions',
+      //   children: [
+      //     {
+      //       path: 'record',
+      //       name: 'RecordPayment',
+      //       component: RecordPayment
+      //     },
+      //     {
+      //       path: 'monthly',
+      //       name: 'MonthlyTracking',
+      //       component: MonthlyTracking
+      //     },
+      //     {
+      //       path: 'semi-annual',
+      //       name: 'SemiAnnualUSD',
+      //       component: SemiAnnualUSD
+      //     },
+      //     {
+      //       path: 'history',
+      //       name: 'PaymentHistory',
+      //       component: PaymentHistory
+      //     }
+      //   ]
+      // },
+      // // Credits
+      // {
+      //   path: 'credits',
+      //   children: [
+      //     {
+      //       path: 'applications',
+      //       name: 'NewApplications',
+      //       component: NewApplications
+      //     },
+      //     {
+      //       path: 'approval',
+      //       name: 'ApprovalQueue',
+      //       component: ApprovalQueue
+      //     },
+      //     {
+      //       path: 'loans',
+      //       name: 'ActiveLoans',
+      //       component: ActiveLoans
+      //     },
+      //     {
+      //       path: 'repayments',
+      //       name: 'RepaymentTracking',
+      //       component: RepaymentTracking
+      //     }
+      //   ]
+      // },
+      // // Assistance
+      // {
+      //   path: 'assistance',
+      //   children: [
+      //     {
+      //       path: 'requests',
+      //       name: 'NewRequests',
+      //       component: NewRequests
+      //     },
+      //     {
+      //       path: 'approvals',
+      //       name: 'PendingApprovals',
+      //       component: PendingApprovals
+      //     },
+      //     {
+      //       path: 'payments',
+      //       name: 'AssistancePaymentHistory',
+      //       component: AssistancePaymentHistory
+      //     },
+      //     {
+      //       path: 'types',
+      //       name: 'AssistanceTypes',
+      //       component: AssistanceTypes
+      //     }
+      //   ]
+      // },
+      // // Reports
+      // {
+      //   path: 'reports',
+      //   children: [
+      //     {
+      //       path: 'monthly',
+      //       name: 'MonthlySummary',
+      //       component: MonthlySummary
+      //     },
+      //     {
+      //       path: 'financial',
+      //       name: 'FinancialStatements',
+      //       component: FinancialStatements
+      //     },
+      //     {
+      //       path: 'members',
+      //       name: 'MemberReports',
+      //       component: MemberReports
+      //     },
+      //     {
+      //       path: 'export',
+      //       name: 'ExportData',
+      //       component: ExportData
+      //     }
+      //   ]
+      // },
+      // // Administration
+      // {
+      //   path: 'admin',
+      //   children: [
+      //     {
+      //       path: 'users',
+      //       name: 'UserManagement',
+      //       component: UserManagement
+      //     },
+      //     {
+      //       path: 'settings',
+      //       name: 'SystemSettings',
+    ]
+  },
+  
+  // 404 - Keep this as last route
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'PageNotFound',
+    component: PageNotFound,
+    meta: { title: 'Page Not Found' }
   }
-];
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-});
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Always scroll to top when navigating to a new route
+    return { top: 0, behavior: 'smooth' }
+  }
+})
 
 // Navigation guard
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated');
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
   
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!isAuthenticated) {
-      next('/login');
-    } else {
-      next();
+  // Set page title
+  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : 'COSEMERIC'
+  
+  // Check if route requires authentication
+  if (to.meta.requiresAuth) {
+    if (!authStore.isAuthenticated) {
+      // Store the attempted URL and redirect to login
+      authStore.setReturnUrl(to.fullPath)
+      return next({ name: 'Login' })
     }
-  } else if (to.matched.some(record => record.meta.guest)) {
-    if (isAuthenticated) {
-      next('/');
-    } else {
-      next();
+    
+    // Check admin role if required
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      return next({ name: 'Dashboard' })
     }
-  } else {
-    next();
+    
+    return next()
   }
-});
+  
+  // Redirect to dashboard if user is already authenticated and trying to access guest pages
+  if (to.meta.guest && authStore.isAuthenticated) {
+    return next({ name: 'Dashboard' })
+  }
+  
+  next()
+})
 
 export default router;
