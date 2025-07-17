@@ -1,7 +1,7 @@
 <template>
-  <AppLayout>
-    <h3>Dashboard</h3>
-  </AppLayout>
+  <div>
+    <h1>BONJOUR LE MOINDE</h1>
+  </div>
 </template>
 
 <script>

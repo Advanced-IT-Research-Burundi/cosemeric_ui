@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { acceptHMRUpdate, defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';

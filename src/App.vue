@@ -1,14 +1,13 @@
 <template>
   <div id="app">
-    <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component }" v-if="!isAuthenticated">
       <transition name="fade" mode="out-in">
         <component :is="Component" />
       </transition>
     </router-view>
 
-    <!-- <app-layout v-if="isAuthenticated">
+    <app-layout v-if="isAuthenticated"/>
      
-    </app-layout> -->
   </div>
 </template>
 

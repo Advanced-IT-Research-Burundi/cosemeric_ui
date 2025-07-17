@@ -44,7 +44,7 @@
     </div>
     <div class="main-content">
         <div>
-            <slot></slot>
+           <router-view />
         </div>
     </div>
     
