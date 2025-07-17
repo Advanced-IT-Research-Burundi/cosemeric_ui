@@ -9,7 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   
   // State
   const user = ref(JSON.parse(localStorage.getItem('user')) || null);
-  const token = ref(localStorage.getItem('token') || null);
+  const token = ref(localStorage.getItem('auth_token') || null);
   const returnUrl = ref(null);
   const isAuthenticated = computed(() => !!token.value);
   const isAdmin = computed(() => user.value?.role === 'admin');
@@ -171,7 +171,6 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     isAuthenticated,
     isAdmin,
-    
     // Actions
     login,
     register,
