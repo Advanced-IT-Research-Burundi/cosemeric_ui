@@ -11,17 +11,17 @@
           <div class="menu-section">
             <div 
               class="menu-header" 
-              @click="toggleSection(index)"
               :class="{ 'active': activeSection === index }"
+              @click="toggleSection(index)"
             >
-              <span class="icon">{{ item.icon }}</span>
+              <i :class="item.icon || 'fas fa-folder'"></i>
               <span v-if="!isCollapsed" class="title">{{ item.title }}</span>
-              <span v-if="!isCollapsed" class="arrow">
+              <span v-if="!isCollapsed && item.children && item.children.length" class="arrow">
                 {{ activeSection === index ? '▼' : '▶' }}
               </span>
             </div>
             <transition name="slide">
-              <div v-show="!isCollapsed && (activeSection === index || activeSection === null)" class="submenu">
+              <div v-show="!isCollapsed && (activeSection === index) && item.children && item.children.length" class="submenu">
                 <router-link 
                   v-for="(subItem, subIndex) in item.children" 
                   :key="subIndex"
@@ -42,12 +42,12 @@
         </button>
       </div>
     </div>
-    <header>
-      <h1>{{ currentRouteName }}</h1>
-    </header>
     <div class="main-content">
-      <router-view />
+        <div>
+            <slot></slot>
+        </div>
     </div>
+    
   </div>
 </template>
 
@@ -60,77 +60,42 @@ export default {
       activeSection: null,
       menuItems: [
         {
-          icon: '🏠',
-          title: 'Dashboard',
+          icon: '',
+          title: 'Tableau de bord',
           path: '/dashboard'
         },
         {
-          icon: '👥',
-          title: 'Members',
-          children: [
-            { title: 'All Members', path: '/members' },
-            { title: 'Add Member', path: '/members/add' },
-            { title: 'Categories', path: '/members/categories' },
-            { title: 'Import/Export', path: '/members/import-export' }
-          ]
+          icon: '',
+          title: 'Membres',
+          path: '/members'
         },
         {
-          icon: '💳',
-          title: 'Contributions',
-          children: [
-            { title: 'Record Payment', path: '/contributions/record' },
-            { title: 'Monthly Tracking', path: '/contributions/monthly' },
-            { title: 'Semi-Annual (USD)', path: '/contributions/semi-annual' },
-            { title: 'Payment History', path: '/contributions/history' }
-          ]
+          icon: '',
+          title: 'Cotisations',
+          path: '/contributions'
         },
         {
-          icon: '💰',
-          title: 'Credits',
-          children: [
-            { title: 'New Applications', path: '/credits/applications' },
-            { title: 'Approval Queue', path: '/credits/approval' },
-            { title: 'Active Loans', path: '/credits/loans' },
-            { title: 'Repayment Tracking', path: '/credits/repayments' }
-          ]
+          icon: '',
+          title: 'Crédits',
+          path: '/credits'
         },
         {
-          icon: '🤝',
+          icon: '',
           title: 'Assistance',
-          children: [
-            { title: 'New Requests', path: '/assistance/requests' },
-            { title: 'Pending Approvals', path: '/assistance/approvals' },
-            { title: 'Payment History', path: '/assistance/payments' },
-            { title: 'Assistance Types', path: '/assistance/types' }
-          ]
+          path: '/assistance'
         },
         {
-          icon: '📊',
-          title: 'Reports',
-          children: [
-            { title: 'Monthly Summary', path: '/reports/monthly' },
-            { title: 'Financial Statements', path: '/reports/financial' },
-            { title: 'Member Reports', path: '/reports/members' },
-            { title: 'Export Data', path: '/reports/export' }
-          ]
+          icon: '',
+          title: 'Rapports',
+          path: '/reports'
         },
         {
-          icon: '⚙️',
+          icon: '',
           title: 'Administration',
-          children: [
-            { title: 'User Management', path: '/admin/users' },
-            { title: 'System Settings', path: '/admin/settings' },
-            { title: 'Audit Logs', path: '/admin/audit-logs' },
-            { title: 'Backup/Restore', path: '/admin/backup' }
-          ]
+          path: '/admin'
         }
       ]
     };
-  },
-  computed: {
-    currentRouteName() {
-      return this.$route.name || 'Dashboard';
-    }
   },
   methods: {
     toggleSidebar() {
@@ -148,18 +113,6 @@ export default {
 </script>
 
 <style scoped>
-:root {
-  --sidebar-width: 250px;
-  --sidebar-collapsed-width: 70px;
-  --header-height: 60px;
-  --primary-color: #4f46e5;
-  --primary-light: #eef2ff;
-  --text-color: #1f2937;
-  --text-light: #6b7280;
-  --border-color: #e5e7eb;
-  --hover-bg: #f3f4f6;
-  --transition-speed: 0.3s;
-}
 
 * {
   margin: 0;
@@ -180,10 +133,11 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-  width: var(--sidebar-width);
+  width: 250px;
   background: white;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   transition: width var(--transition-speed) ease;
   position: relative;
@@ -245,7 +199,7 @@ body {
 }
 
 .menu-header.active {
-  color: var(--primary-color);
+  color: white !important;
   background-color: var(--primary-light);
   border-left-color: var(--primary-color);
 }
@@ -294,9 +248,9 @@ body {
 }
 
 .submenu-item.active {
-  color: var(--primary-color);
+  color: white !important;
   font-weight: 500;
-  background-color: var(--primary-light);
+  background-color: var(--primary-color);
 }
 
 .sidebar-footer {
@@ -326,6 +280,7 @@ body {
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
+  
   transition: margin var(--transition-speed) ease;
   min-height: 100vh;
   background-color: #f9fafb;
