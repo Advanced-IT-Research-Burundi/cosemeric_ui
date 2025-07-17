@@ -3,7 +3,6 @@ import { useAuthStore } from '../stores/auth'
 import AppLayout from '../components/layout/AppLayout.vue'
 
 // Import your components
-import Home from '../views/Home.vue'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
@@ -64,139 +63,10 @@ const routes = [
             name: 'AllMembers',
             component: AllMembers
           },
-          // {
-          //   path: 'add',
-          //   name: 'AddMember',
-          //   component: AddMember
-          // },
-          // {
-          //   path: 'categories',
-          //   name: 'MemberCategories',
-          //   component: MemberCategories
-          // },
-          // {
-          //   path: 'import-export',
-          //   name: 'MemberImportExport',
-          //   component: MemberImportExport
-          // }
+       
         ]
       },
-      // Contributions
-      // {
-      //   path: 'contributions',
-      //   children: [
-      //     {
-      //       path: 'record',
-      //       name: 'RecordPayment',
-      //       component: RecordPayment
-      //     },
-      //     {
-      //       path: 'monthly',
-      //       name: 'MonthlyTracking',
-      //       component: MonthlyTracking
-      //     },
-      //     {
-      //       path: 'semi-annual',
-      //       name: 'SemiAnnualUSD',
-      //       component: SemiAnnualUSD
-      //     },
-      //     {
-      //       path: 'history',
-      //       name: 'PaymentHistory',
-      //       component: PaymentHistory
-      //     }
-      //   ]
-      // },
-      // // Credits
-      // {
-      //   path: 'credits',
-      //   children: [
-      //     {
-      //       path: 'applications',
-      //       name: 'NewApplications',
-      //       component: NewApplications
-      //     },
-      //     {
-      //       path: 'approval',
-      //       name: 'ApprovalQueue',
-      //       component: ApprovalQueue
-      //     },
-      //     {
-      //       path: 'loans',
-      //       name: 'ActiveLoans',
-      //       component: ActiveLoans
-      //     },
-      //     {
-      //       path: 'repayments',
-      //       name: 'RepaymentTracking',
-      //       component: RepaymentTracking
-      //     }
-      //   ]
-      // },
-      // // Assistance
-      // {
-      //   path: 'assistance',
-      //   children: [
-      //     {
-      //       path: 'requests',
-      //       name: 'NewRequests',
-      //       component: NewRequests
-      //     },
-      //     {
-      //       path: 'approvals',
-      //       name: 'PendingApprovals',
-      //       component: PendingApprovals
-      //     },
-      //     {
-      //       path: 'payments',
-      //       name: 'AssistancePaymentHistory',
-      //       component: AssistancePaymentHistory
-      //     },
-      //     {
-      //       path: 'types',
-      //       name: 'AssistanceTypes',
-      //       component: AssistanceTypes
-      //     }
-      //   ]
-      // },
-      // // Reports
-      // {
-      //   path: 'reports',
-      //   children: [
-      //     {
-      //       path: 'monthly',
-      //       name: 'MonthlySummary',
-      //       component: MonthlySummary
-      //     },
-      //     {
-      //       path: 'financial',
-      //       name: 'FinancialStatements',
-      //       component: FinancialStatements
-      //     },
-      //     {
-      //       path: 'members',
-      //       name: 'MemberReports',
-      //       component: MemberReports
-      //     },
-      //     {
-      //       path: 'export',
-      //       name: 'ExportData',
-      //       component: ExportData
-      //     }
-      //   ]
-      // },
-      // // Administration
-      // {
-      //   path: 'admin',
-      //   children: [
-      //     {
-      //       path: 'users',
-      //       name: 'UserManagement',
-      //       component: UserManagement
-      //     },
-      //     {
-      //       path: 'settings',
-      //       name: 'SystemSettings',
+  
     ]
   },
   

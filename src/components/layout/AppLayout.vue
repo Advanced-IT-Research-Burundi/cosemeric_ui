@@ -42,29 +42,11 @@
         </button>
       </div>
     </div>
-
-    <!-- Main Content -->
+    <header>
+      <h1>{{ currentRouteName }}</h1>
+    </header>
     <div class="main-content">
-      <!-- Header -->
-      <header class="app-header">
-        <div class="header-left">
-          <button @click="toggleSidebar" class="menu-toggle">
-            ☰
-          </button>
-          <h1>{{ currentRouteName }}</h1>
-        </div>
-        <div class="header-right">
-          <div class="user-profile">
-            <span class="user-avatar">👤</span>
-            <span class="user-name">Admin User</span>
-          </div>
-        </div>
-      </header>
-
-      <!-- Page Content -->
-      <main class="page-content">
-        <router-view />
-      </main>
+      <router-view />
     </div>
   </div>
 </template>

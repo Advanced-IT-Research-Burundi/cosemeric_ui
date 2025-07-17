@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    {{isAuthenticated ? 'true' : 'false'}}
     <router-view v-slot="{ Component }" v-if="!isAuthenticated">
       <transition name="fade" mode="out-in">
         <component :is="Component" />
