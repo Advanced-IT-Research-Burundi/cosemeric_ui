@@ -182,9 +182,8 @@ export default {
           email: form.email,
           password: form.password
         })
-        
         // Save token to localStorage if 'remember me' is checked
-        if (form.remember && response.access_token) {
+        if (response.access_token) {
           localStorage.setItem('auth_token', response.access_token)
         }
         //console.log("token", response.access_token)

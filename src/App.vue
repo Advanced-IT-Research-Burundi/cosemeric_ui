@@ -1,19 +1,27 @@
 <template>
   <div id="app">
-    <router-view v-slot="{ Component }">
+    {{isAuthenticated ? 'true' : 'false'}}
+    <router-view v-slot="{ Component }" v-if="!isAuthenticated">
       <transition name="fade" mode="out-in">
         <component :is="Component" />
       </transition>
     </router-view>
+
+    <app-layout v-if="isAuthenticated">
+     
+    </app-layout>
   </div>
 </template>
 
 <script>
+import AppLayout from './components/layout/AppLayout.vue';
 export default {
+  components: { AppLayout },
   name: 'App',
-  data() {
-    return {
-      isAuthenticated: false
+  computed: {
+    isAuthenticated() {
+      console.log(localStorage.getItem('auth_token'));
+      return !!localStorage.getItem('auth_token');
     }
   },
   created() {
@@ -21,10 +29,10 @@ export default {
   },
   methods: {
     checkAuth() {
-      this.isAuthenticated = !!localStorage.getItem('isAuthenticated');
+        this.isAuthenticated = !!localStorage.getItem('auth_token');
     },
     handleLogout() {
-      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('auth_token');
       this.isAuthenticated = false;
       this.$router.push('/login');
     }

@@ -10,42 +10,8 @@ import PageNotFound from '../views/errors/PageNotFound.vue'
 
 // Lazy load components
 const Dashboard = () => import('../views/Dashboard.vue')
-
 // Members
 const AllMembers = () => import('../views/members/AllMembers.vue')
-// const AddMember = () => import('../views/members/AddMember.vue')
-// const MemberCategories = () => import('../views/members/Categories.vue')
-// const MemberImportExport = () => import('../views/members/ImportExport.vue')
-
-// // Contributions
-// const RecordPayment = () => import('../views/contributions/RecordPayment.vue')
-// const MonthlyTracking = () => import('../views/contributions/MonthlyTracking.vue')
-// const SemiAnnualUSD = () => import('../views/contributions/SemiAnnualUSD.vue')
-// const PaymentHistory = () => import('../views/contributions/PaymentHistory.vue')
-
-// // Credits
-// const NewApplications = () => import('../views/credits/NewApplications.vue')
-// const ApprovalQueue = () => import('../views/credits/ApprovalQueue.vue')
-// const ActiveLoans = () => import('../views/credits/ActiveLoans.vue')
-// const RepaymentTracking = () => import('../views/credits/RepaymentTracking.vue')
-
-// // Assistance
-// const NewRequests = () => import('../views/assistance/NewRequests.vue')
-// const PendingApprovals = () => import('../views/assistance/PendingApprovals.vue')
-// const AssistancePaymentHistory = () => import('../views/assistance/PaymentHistory.vue')
-// const AssistanceTypes = () => import('../views/assistance/AssistanceTypes.vue')
-
-// // Reports
-// const MonthlySummary = () => import('../views/reports/MonthlySummary.vue')
-// const FinancialStatements = () => import('../views/reports/FinancialStatements.vue')
-// const MemberReports = () => import('../views/reports/MemberReports.vue')
-// const ExportData = () => import('../views/reports/ExportData.vue')
-
-// // Administration
-// const UserManagement = () => import('../views/administration/UserManagement.vue')
-// const SystemSettings = () => import('../views/administration/SystemSettings.vue')
-// const AuditLogs = () => import('../views/administration/AuditLogs.vue')
-// const BackupRestore = () => import('../views/administration/BackupRestore.vue')
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -85,7 +51,7 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       {
-        path: '',
+        path: '/dashboard',
         name: 'dashboard',
         component: Dashboard
       },
