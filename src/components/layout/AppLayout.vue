@@ -30,7 +30,7 @@
             <button @click="toggleSidebar" class="btn">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h1>{{ currentRouteName }}</h1>
+            <!-- <h1>{{ currentRouteName }}</h1> -->
           </div>
           <div class="header-right">
             <div class="user-profile" @click="toggleUserDropdown">
@@ -93,7 +93,7 @@ export default {
           path: '/credits'
         },
         {
-          icon: 'fas fa-headset',
+          icon: 'fas fa-hand-holding-dollar',
           title: 'Assistance',
           path: '/assistance'
         },
