@@ -46,7 +46,6 @@ const routes = [
   // Authenticated routes
   {
     path: '/',
-    component: AppLayout,
     meta: { requiresAuth: true },
     children: [
       {
