@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api', // Added port 8000 which is common for Laravel/Node backends
+  baseURL: 'http://84.46.251.167:8205/api/', // Added port 8000 which is common for Laravel/Node backends
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
