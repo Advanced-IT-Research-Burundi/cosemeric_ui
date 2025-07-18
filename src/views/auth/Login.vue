@@ -188,7 +188,8 @@ export default {
         }
         //console.log("token", response.access_token)
         // Redirect to dashboard
-        router.reload('/dashboard')
+        // router.push('/dashboard')
+        window.location.href = '/dashboard'
         
       } catch (error) {
         // Handle API errors
