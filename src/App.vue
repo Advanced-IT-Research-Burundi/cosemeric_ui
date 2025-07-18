@@ -1,20 +1,17 @@
 <template>
   <div id="app">
-    <router-view v-slot="{ Component }" v-if="!isAuthenticated">
-      <transition name="fade" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view>
 
     <app-layout v-if="isAuthenticated"/>
+    <Login v-else/>
      
   </div>
 </template>
 
 <script>
 import AppLayout from './components/layout/AppLayout.vue';
+import Login from './views/auth/Login.vue';
 export default {
-  components: { AppLayout },
+  components: { AppLayout, Login },
   name: 'App',
   computed: {
     isAuthenticated() {
@@ -32,7 +29,7 @@ export default {
     handleLogout() {
       localStorage.removeItem('auth_token');
       this.isAuthenticated = false;
-      this.$router.push('/login');
+      window.location.href = '/login';
     }
   },
   watch: {

@@ -8,7 +8,8 @@
       </div>
       <nav class="nav-menu">
         <template v-for="(item, index) in menuItems" :key="index">
-            <div class="menu-section">
+           
+              <router-link :to="item.path" class="menu-section">
                 <div 
                 class="menu-header" 
                 :class="{ 'active': activeSection === index }"
@@ -17,7 +18,8 @@
                 <i :class="item.icon || ''"></i>
                 <span v-if="!isCollapsed" class="title">{{ item.title }}</span>
                 </div>
-            </div>
+              </router-link>
+           
         </template>
       </nav>
       <div class="sidebar-footer">
