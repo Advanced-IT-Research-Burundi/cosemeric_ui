@@ -8,6 +8,7 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import vuexStore from './store'
 // Create app
 const app = createApp(App)
 
@@ -16,6 +17,7 @@ const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
+app.use(vuexStore)
 app.use(router)
 
 // Configure toast notifications

@@ -11,6 +11,7 @@ import PageNotFound from '../views/errors/PageNotFound.vue'
 const Dashboard = () => import('../views/Dashboard.vue')
 // Members
 const AllMembers = () => import('../views/members/AllMembers.vue')
+const ContributionView = () => import('../views/contributions/ContributionView.vue')
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -61,6 +62,17 @@ const routes = [
             path: '',
             name: 'Tous les Membres',
             component: AllMembers
+          },
+       
+        ]
+      },
+      {
+        path: 'contributions',
+        children: [
+          {
+            path: '',
+            name: 'Tous les Membres',
+            component: ContributionView
           },
        
         ]
