@@ -10,6 +10,17 @@ import PageNotFound from '../views/errors/PageNotFound.vue'
 const Dashboard = () => import('../views/Dashboard.vue')
 // Members
 const AllMembers = () => import('../views/members/AllMembers.vue')
+const ContributionView = () => import('../views/contributions/ContributionView.vue')
+
+// Auth guard
+const requireAuth = (to, from, next) => {
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  if (!isAuthenticated) {
+    next('/login');
+  } else {
+    next();
+  }
+};
 
 const routes = [
   // Public routes
