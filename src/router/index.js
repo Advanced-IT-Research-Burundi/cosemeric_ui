@@ -5,12 +5,9 @@ import { useAuthStore } from '../stores/auth'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
-import CreateMember from '../views/members/CreateMember.vue'
-import EditMember from '../views/members/EditMember.vue'
 // Lazy load components
 const Dashboard = () => import('../views/Dashboard.vue')
 // Members
-const AllMembers = () => import('../views/members/AllMembers.vue')
 const ContributionView = () => import('../views/contributions/ContributionView.vue')
 
 // Auth guard
@@ -41,105 +38,74 @@ const routes = [
   
   // Authenticated routes
   {
-    path: '/',
-    meta: { requiresAuth: true },
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('../views/Dashboard.vue')
+  },
+
+  {
+    path: '/credits',
+    name: 'credits',
     children: [
       {
-        path: '/dashboard',
-        name: 'dashboard',
-        component: () => import('../views/Dashboard.vue')
+        path: '',
+        name: 'creditsView',
+        component: () => import('../views/credits/Credits.vue')
       },
+      {
+        path: 'new',
+        name: 'creditsAdd',
+        component: () => import('../views/credits/AddCredit.vue')
+      },
+   
+    ]
+  },
+  // Members
+  {
+    path: '/members',
+    name: 'members',
+    children: [
+      {
+        path: '',
+        name: 'Tous les Membres',
+        component: () => import('../views/members/AllMembers.vue')
+      },
+      {
+        path: 'create',
+        name: 'Create Member',
+        component: () => import('../views/members/CreateMember.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'Edit Member',
+        component: () => import('../views/members/EditMember.vue')
+      },
+    ]
+   
+  },
 
+  // Contributions
+  {
+    path: '/contributions',
+    name: 'contributions',
+    children: [
       {
-        path: '/credits',
-        name: 'credits',
-        children: [
-          {
-            path: '',
-            name: 'creditsView',
-            component: () => import('../views/credits/Credits.vue')
-          },
-          {
-            path: 'new',
-            name: 'creditsAdd',
-            component: () => import('../views/credits/AddCredit.vue')
-          },
-       
-        ]
+        path: '',
+        name: 'contributionsView',
+        component: () => import('../views/contributions/ContributionView.vue')
       },
-      // Members
-      {
-        path: '/members',
-        name: 'members',
-        children: [
-          {
-            path: '',
-            name: 'Tous les Membres',
-            component: () => import('../views/members/AllMembers.vue')
-          },
-          {
-            path: 'new',
-            name: 'membersAdd',
-            component: () => import('../views/members/AddMember.vue')
-          },
-          // {
-          //   path: 'edit/:id',
-          //   name: 'membersEdit',
-          //   component: EditMember
-          // },
-          // {
-          //   path: 'view/:id',
-          //   name: 'membersView',
-          //   component: ViewMember
-          // },
-          
-       
-        ]
-       
-      },
-      {
-        path: '/contributions',
-        name: 'contributions',
-        children: [
-          {
-            path: '',
-            name: 'Tous les Membres',
-            component: () => import('../views/contributions/ContributionView.vue')
-          },
-       
-        ]
-      },
-      {
-        path: '/:pathMatch(.*)*',
-        name: 'PageNotFound',
-        component: PageNotFound,
-        meta: { title: 'Page non trouvée' }
-      },
-  
+   
     ]
   },
 
-  {
-    path: '/members/create',
-    name: 'Create Member',
-    component: CreateMember,
-    meta: { requiresAuth: true }
-  },
-
-  {
-    path: '/members/:id/edit',
-    name: 'Edit Member',
-    component: EditMember,
-    meta: { requiresAuth: true }
-  },
-  
   // 404 - Keep this as last route
   {
     path: '/:pathMatch(.*)*',
     name: 'PageNotFound',
     component: PageNotFound,
-    meta: { title: 'Page Not Found' }
-  }
+    meta: { title: 'Page non trouvée' }
+  },
+
 ]
 
 const router = createRouter({
