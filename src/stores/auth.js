@@ -2,6 +2,7 @@ import { acceptHMRUpdate, defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import api from '../services/api';
 
 export const useAuthStore = defineStore('auth', () => {
   const router = useRouter();
@@ -12,7 +13,6 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null);
   const returnUrl = ref(null);
   const isAuthenticated = computed(() => !!token.value);
-  const isAdmin = computed(() => user.value?.role === 'admin');
 
   // Actions
   async function login(email, password) {
@@ -22,12 +22,13 @@ export const useAuthStore = defineStore('auth', () => {
         password: password
       });
       
-      if (!response.data || !response.data.access_token) {
+      
+      if (!response.access_token) {
         throw new Error('Invalid response from server');
       }
 
       // Map backend response to our user object
-      const { user: userData, access_token, token_type, expires_at } = response.data;
+      const { user: userData, access_token, token_type, expires_at } = response;
       
       const userObj = {
         id: userData.id,
@@ -57,12 +58,10 @@ export const useAuthStore = defineStore('auth', () => {
       returnUrl.value = null;
       router.push(redirectTo);
       
-      toast.success(response.data.message || 'Connexion réussie');
+      toast.success(response.message || 'Connexion réussie');
       return true;
     } catch (error) {
-      console.error('Login failed:', error);
-      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
-      return false;
+      throw error;
     }
   }
 
@@ -168,7 +167,6 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     token,
     isAuthenticated,
-    isAdmin,
     // Actions
     login,
     register,
@@ -181,6 +179,6 @@ export const useAuthStore = defineStore('auth', () => {
 });
 
 if(import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
 }
 export default useAuthStore;

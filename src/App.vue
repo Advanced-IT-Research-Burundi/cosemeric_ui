@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <app-layout v-if="isAuthenticated"/>
+    <app-layout v-if="authStore.isAuthenticated"/>
     <Login v-else/>
      
   </div>
@@ -10,32 +10,13 @@
 <script>
 import AppLayout from './components/layout/AppLayout.vue';
 import Login from './views/auth/Login.vue';
+import { useAuthStore } from './stores/auth';
 export default {
   components: { AppLayout, Login },
   name: 'App',
-  computed: {
-    isAuthenticated() {
-      console.log(localStorage.getItem('auth_token'));
-      return !!localStorage.getItem('auth_token');
-    }
-  },
-  created() {
-    this.checkAuth();
-  },
-  methods: {
-    checkAuth() {
-        this.isAuthenticated = !!localStorage.getItem('auth_token');
-    },
-    handleLogout() {
-      localStorage.removeItem('auth_token');
-      this.isAuthenticated = false;
-      window.location.href = '/login';
-    }
-  },
-  watch: {
-    $route() {
-      this.checkAuth();
-    }
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
   }
 }
 </script>
@@ -171,22 +152,6 @@ button:hover,
 .btn-danger:hover {
   background-color: #dc2626;
   border-color: #dc2626;
-}
-
-/* Forms */
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: var(--gray-700);
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid var(--gray-300);
-  border-radius: 0.375rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 input:focus,
