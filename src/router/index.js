@@ -38,12 +38,7 @@ const routes = [
     meta: { guest: true }
   },
   // 404 route
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'PageNotFound',
-    component: PageNotFound,
-    meta: { title: 'Page non trouvée' }
-  },
+  
   // Authenticated routes
   {
     path: '/',
@@ -56,18 +51,13 @@ const routes = [
       },
       // Members
       {
-        path: 'members',
-        children: [
-          {
-            path: '',
-            name: 'Tous les Membres',
-            component: AllMembers
-          },
-       
-        ]
+        path: '/members',
+        name: 'members',
+        component: AllMembers
       },
       {
-        path: 'contributions',
+        path: '/contributions',
+        name: 'contributions',
         children: [
           {
             path: '',
@@ -76,6 +66,12 @@ const routes = [
           },
        
         ]
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'PageNotFound',
+        component: PageNotFound,
+        meta: { title: 'Page non trouvée' }
       },
   
     ]
