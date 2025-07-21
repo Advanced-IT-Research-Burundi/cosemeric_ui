@@ -103,11 +103,13 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../../services/api.js'
+import { useAuthStore } from '../../stores/auth'
 
 export default {
   name: 'LoginPage',
   setup() {
     const router = useRouter()
+    const authStore = useAuthStore()
     
     const isLoading = ref(false)
     const showPassword = ref(false)
@@ -115,7 +117,7 @@ export default {
     
     const form = reactive({
       email: 'nijeanlionel@gmail.com',
-      password: 'password',
+      password: 'passwor',
       remember: false
     })
     
@@ -178,37 +180,27 @@ export default {
 
       try {
         // Make API call to login
-        const response = await api.post('/login', {
-          email: form.email,
-          password: form.password
-        })
-        // Save token to localStorage if 'remember me' is checked
-        if (response.access_token) {
-          localStorage.setItem('auth_token', response.access_token)
-        }
-        //console.log("token", response.access_token)
-        // Redirect to dashboard
-        // router.push('/dashboard')
-        window.location.href = '/dashboard'
-        
+        const success = await authStore.login(form.email, form.password)
+        if (success) {
+          // Get the redirect URL from query parameters or default to dashboard
+          const redirectUrl = router.currentRoute.value.query.redirect || '/dashboard'
+          await router.push(redirectUrl)
+          return
+        }        
       } catch (error) {
         // Handle API errors
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           if (error.response.status === 401) {
-            errorMessage.value = 'Email ou mot de passe incorrect'
+            errorMessage.value = error.response.data.message
           } else if (error.response.data && error.response.data.message) {
             errorMessage.value = error.response.data.message
           } else {
             errorMessage.value = 'Une erreur est survenue lors de la connexion'
           }
         } else if (error.request) {
-          // The request was made but no response was received
           errorMessage.value = 'Impossible de se connecter au serveur. Veuillez réessayer plus tard.'
         } else {
-          // Something happened in setting up the request that triggered an Error
-          errorMessage.value = error.message || 'Une erreur est survenue lors de la connexion'
+          errorMessage.value = error.response.data.message || 'Une erreur est survenue lors de la connexion'
         }
       } finally {
         isLoading.value = false

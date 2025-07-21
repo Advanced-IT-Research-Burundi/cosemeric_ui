@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import AppLayout from '../components/layout/AppLayout.vue'
 
 // Import your components
 import Login from '../views/auth/Login.vue'
@@ -41,36 +40,13 @@ const routes = [
       {
         path: '/dashboard',
         name: 'dashboard',
-        component: () => import('../views/Dashboard.vue')
+        component: Dashboard
       },
       // Members
       {
         path: '/members',
         name: 'members',
-        children: [
-          {
-            path: '',
-            name: 'membersListe',
-            component: () => import('../views/members/AllMembers.vue')
-          },
-          {
-            path: 'new',
-            name: 'membersAdd',
-            component: () => import('../views/members/AddMember.vue')
-          },
-          // {
-          //   path: 'edit/:id',
-          //   name: 'membersEdit',
-          //   component: EditMember
-          // },
-          // {
-          //   path: 'view/:id',
-          //   name: 'membersView',
-          //   component: ViewMember
-          // },
-          
-       
-        ]
+        component: AllMembers
       },
       {
         path: '/contributions',
@@ -78,8 +54,8 @@ const routes = [
         children: [
           {
             path: '',
-            name: 'contributionsListe',
-            component: () => import('../views/contributions/ContributionView.vue')
+            name: 'Tous les Membres',
+            component: ContributionView
           },
        
         ]
@@ -122,14 +98,8 @@ router.beforeEach(async (to, from, next) => {
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      // Store the attempted URL and redirect to login
       authStore.setReturnUrl(to.fullPath)
       return next({ name: 'Login' })
-    }
-    
-    // Check admin role if required
-    if (to.meta.requiresAdmin && !authStore.isAdmin) {
-      return next({ name: 'dashboard' })
     }
     
     return next()

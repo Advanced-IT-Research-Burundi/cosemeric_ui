@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>BONJOUR LE MOINDE</h1>
+    <h1>BONJOUR LE MONDE</h1>
   </div>
 </template>
 
