@@ -7,12 +7,6 @@ import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
 
-// Lazy load components
-const Dashboard = () => import('../views/Dashboard.vue')
-// Members
-const AllMembers = () => import('../views/members/AllMembers.vue')
-const ContributionView = () => import('../views/contributions/ContributionView.vue')
-
 // Auth guard
 const requireAuth = (to, from, next) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -47,13 +41,36 @@ const routes = [
       {
         path: '/dashboard',
         name: 'dashboard',
-        component: Dashboard
+        component: () => import('../views/Dashboard.vue')
       },
       // Members
       {
         path: '/members',
         name: 'members',
-        component: AllMembers
+        children: [
+          {
+            path: '',
+            name: 'membersListe',
+            component: () => import('../views/members/AllMembers.vue')
+          },
+          {
+            path: 'new',
+            name: 'membersAdd',
+            component: () => import('../views/members/AddMember.vue')
+          },
+          // {
+          //   path: 'edit/:id',
+          //   name: 'membersEdit',
+          //   component: EditMember
+          // },
+          // {
+          //   path: 'view/:id',
+          //   name: 'membersView',
+          //   component: ViewMember
+          // },
+          
+       
+        ]
       },
       {
         path: '/contributions',
@@ -61,8 +78,8 @@ const routes = [
         children: [
           {
             path: '',
-            name: 'Tous les Membres',
-            component: ContributionView
+            name: 'contributionsListe',
+            component: () => import('../views/contributions/ContributionView.vue')
           },
        
         ]
