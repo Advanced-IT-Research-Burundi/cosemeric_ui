@@ -13,457 +13,391 @@
     </div>
 
     <!-- Members Table -->
-    <div class="card">
-      <div class="card-body p-0">
-        <!-- Search and Filter Bar -->
-        <div class="row g-3 p-3 border-bottom">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="fas fa-search"></i>
-              </span>
-              <input
-                type="text"
-                v-model="searchQuery"
-                class="form-control"
-                placeholder="Rechercher des membres..."
-                @keyup.enter="applyFilters"
-              >
-              <button
-                v-if="searchQuery"
-                class="btn btn-outline-secondary"
-                type="button"
-                @click="clearSearch"
-              >
-                <i class="fas fa-times"></i>
-              </button>
+    <DataTable
+      :columns="columns"
+      :data="membersData"
+      :loading="loading"
+      :sort-by.sync="sortBy"
+      :sort-direction.sync="sortDirection"
+      :search-query.sync="searchQuery"
+      @page-changed="handlePageChange"
+      @sort-changed="handleSortChange"
+      @search="handleSearch"
+      @row-click="handleRowClick"
+      class="card"
+    >
+      <!-- Custom filter slot -->
+      <template #filters>
+        <div class="col-md-3">
+          <select v-model="statusFilter" class="form-select" @change="applyFilters">
+            <option value="">Tous les statuts</option>
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </template>
+
+      <!-- Custom cell templates -->
+      <template #cell-nom="{ item, value }">
+        <div class="d-flex align-items-center">
+          <div class="avatar me-3">
+            <div class="avatar-text bg-light text-dark">
+              {{ getInitials(`${item.prenom} ${item.nom}`) }}
             </div>
           </div>
-          <div class="col-md-3">
-            <select v-model="statusFilter" class="form-select" @change="applyFilters">
-              <option value="">Tous les statuts</option>
-              <option value="actif">Actif</option>
-              <option value="inactif">Inactif</option>
-              <option value="suspendu">Suspendu</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select v-model="sortBy" class="form-select" @change="applyFilters">
-              <option value="nom_asc">Trier par nom (A-Z)</option>
-              <option value="nom_desc">Trier par nom (Z-A)</option>
-              <option value="date_asc">Plus ancien d'abord</option>
-              <option value="date_desc">Plus récent d'abord</option>
-            </select>
+          <div class="tr-width">
+            <h6 class="mb-0 text-truncate-1">{{ item.prenom }} {{ item.nom }}</h6>
+            <small class="text-muted">ID: {{ item.id }}</small>
           </div>
         </div>
+      </template>
 
-        <!-- Members Table -->
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th class="max-w-25">Membre</th>
-                <th>Matricule</th>
-                <th>Contact</th>
-                <th>Statut</th>
-                <th>Date d'adhésion</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading">
-                <td colspan="6" class="text-center py-4">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="members.length === 0">
-                <td colspan="6" class="text-center py-4">
-                  <div class="text-muted">
-                    <i class="fas fa-users-slash fa-2x mb-2"></i>
-                    <p class="mb-0">Aucun membre trouvé</p>
-                    <button class="btn btn-link p-0" @click="resetFilters">
-                      Réinitialiser les filtres
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr 
-                v-for="member in members" 
-                :key="member.id" 
-                class="cursor-pointer"
-                @click="viewMember(member.id)"
-              >
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="avatar me-3">
-                      <div class="avatar-text bg-light text-dark">
-                        {{ getInitials(`${member.prenom} ${member.nom}`) }}
-                      </div>
-                    </div>
-                    <div class="tr-width">
-                      <h6 class="mb-0 text-truncate-1">{{ member.prenom }} {{ member.nom }}</h6>
-                      <small class="text-muted">ID: {{ member.id }}</small>
-                    </div>
-                  </div>
-                </td>
-                <td class="tr-width">
-                  <small class="text-muted text-truncate-1">{{ member.matricule }}</small>
-                </td>
-                <td>
-                  <div>{{ member.email }}</div>
-                  <small class="text-muted">{{ member.telephone || 'Aucun téléphone' }}</small>
-                </td>
-                <td>
-                  <span class="badge" :class="getStatusClass(member.statut)">
-                    {{ formatStatus(member.statut) }}
-                  </span>
-                </td>
-                <td>{{ formatDate(member.date_adhesion) }}</td>
-                <td class="text-end">
-                  <div class="btn-group" @click.stop>
-                    <button
-                      class="btn btn-sm btn-outline-primary"
-                      @click.stop="viewMember(member.id)"
-                      title="Voir les détails"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="btn btn-sm btn-outline-secondary"
-                      @click.stop="editMember(member.id)"
-                      title="Modifier"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="btn btn-sm btn-outline-danger"
-                      @click.stop="confirmDelete(member)"
-                      title="Supprimer"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <template #cell-email="{ value, item }">
+        <div>{{ value }}</div>
+        <small class="text-muted">{{ item.telephone || 'Aucun téléphone' }}</small>
+      </template>
+
+      <template #cell-statut="{ value }">
+        <span class="badge" :class="getStatusClass(value)">
+          {{ formatStatus(value) }}
+        </span>
+      </template>
+
+      <
+
+      <template #cell-actions="{ item }">
+        <div class="btn-group">
+          <button
+            class="btn btn-sm btn-outline-primary"
+            @click.stop="viewMember(item.id)"
+            title="Voir les détails"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            @click.stop="editMember(item.id)"
+            title="Modifier"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-danger"
+            @click.stop="confirmDelete(item)"
+            title="Supprimer"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
+      </template>
+    </DataTable>
 
-        <!-- Pagination -->
-        <div 
-          v-if="pagination.total > 0" 
-          class="d-flex justify-content-between align-items-center p-3 border-top"
-        >
-          <div class="text-muted">
-            Affichage de <span class="fw-semibold">{{ pagination.from }}</span> à 
-            <span class="fw-semibold">{{ pagination.to }}</span> sur 
-            <span class="fw-semibold">{{ pagination.total }}</span> membres
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" :class="{ 'show d-block': showDeleteModal }" tabindex="-1" v-if="showDeleteModal">
+      <div class="modal-dialog modal-dialog-centered" style="z-index: 1060;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmer la suppression</h5>
+            <button type="button" class="btn-close" @click="showDeleteModal = false" aria-label="Close"></button>
           </div>
-          
-          <nav>
-            <ul class="pagination mb-0">
-              <li 
-                class="page-item" 
-                :class="{ 'disabled': pagination.current_page === 1 }"
-              >
-                <button 
-                  class="page-link" 
-                  @click="changePage(pagination.current_page - 1)" 
-                  :disabled="pagination.current_page === 1"
-                >
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-              </li>
-              
-              <li 
-                v-for="page in visiblePages" 
-                :key="page" 
-                class="page-item"
-                :class="{ 'active': page === pagination.current_page }"
-              >
-                <button 
-                  class="page-link" 
-                  @click="changePage(page)"
-                >
-                  {{ page }}
-                </button>
-              </li>
-              
-              <li 
-                class="page-item" 
-                :class="{ 'disabled': pagination.current_page === pagination.last_page }"
-              >
-                <button 
-                  class="page-link" 
-                  @click="changePage(pagination.current_page + 1)" 
-                  :disabled="pagination.current_page === pagination.last_page"
-                >
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-          
-          <div class="d-flex align-items-center">
-            <label class="me-2 mb-0 text-muted">Lignes par page :</label>
-            <select 
-              v-model="itemsPerPage" 
-              class="form-select form-select-sm" 
-              style="width: auto;"
-            >
-              <option value="15">15</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
+          <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir supprimer ce membre ? Cette action est irréversible.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">Annuler</button>
+            <button type="button" class="btn btn-danger" @click="deleteMember" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              {{ deleting ? 'Suppression...' : 'Supprimer' }}
+            </button>
           </div>
         </div>
       </div>
+      <div class="modal-backdrop fade show" @click="showDeleteModal = false"></div>
     </div>
-
-        <!-- Delete Confirmation Modal -->
-        <div class="modal fade" :class="{ 'show d-block': showDeleteModal }" tabindex="-1" v-if="showDeleteModal">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
-                <button type="button" class="btn-close" @click="showDeleteModal = false" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p>Êtes-vous sûr de vouloir supprimer ce membre ? Cette action est irréversible.</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">Annuler</button>
-                <button type="button" class="btn btn-danger" @click="deleteMember" :disabled="deleting">
-                  <span v-if="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                  {{ deleting ? 'Suppression...' : 'Supprimer' }}
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="modal-backdrop fade show" @click="showDeleteModal = false"></div>
-        </div>
-      </div>
+  </div>
       
 </template>
 
 <script>
 import api from '../../services/api';
+import DataTable from '../../components/common/DataTable.vue';
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
 
 export default {
   name: 'AllMembers',
+  components: {
+    DataTable
+  },
   data() {
     return {
-      loading: false,
       members: [],
+      loading: false,
+      error: null,
       searchQuery: '',
       statusFilter: '',
-      sortBy: 'nom_asc',
+      sortBy: 'nom',
+      sortDirection: 'asc',
       currentPage: 1,
       itemsPerPage: 15,
-      showDeleteModal: false,
-      memberToDelete: null,
-      deleting: false,
-      pagination: {
+      searchTimeout: null,
+      membersData: {
+        data: [],
+        total: 0,
+        per_page: 15,
         current_page: 1,
         last_page: 1,
-        per_page: 15,
-        total: 0,
         from: 0,
         to: 0
       },
-      error: null
+      columns: [
+        { 
+          key: 'nom', 
+          label: 'Membre',
+          sortable: true,
+          class: 'max-w-25'
+        },
+        { 
+          key: 'email', 
+          label: 'Contact',
+          sortable: true
+        },
+        { 
+          key: 'statut', 
+          label: 'Statut',
+          sortable: true
+        },
+        { 
+          key: 'date_adhesion', 
+          label: "Date d'adhésion",
+          sortable: true,
+          formatter: (value) => this.formatDate(value)
+        },
+        { 
+          key: 'actions', 
+          label: 'Actions', 
+          sortable: false,
+          class: 'text-end'
+        }
+      ],
+      memberToDelete: null,
+      showDeleteModal: false,
     };
-  },
-  computed: {
-    filteredMembers() {
-      return this.members;
-    },
-    paginatedMembers() {
-      return this.filteredMembers;
-    },
-    totalPages() {
-      return this.pagination.last_page || 1;
-    },
-    visiblePages() {
-      const range = [];
-      const maxVisible = 5;
-      let start = Math.max(1, this.pagination.current_page - Math.floor(maxVisible / 2));
-      let end = start + maxVisible - 1;
-
-      if (end > this.totalPages) {
-        end = this.totalPages;
-        start = Math.max(1, end - maxVisible + 1);
-      }
-
-      for (let i = start; i <= end; i++) {
-        range.push(i);
-      }
-
-      return range;
-    }
   },
   methods: {
     async fetchMembers() {
       this.loading = true;
       this.error = null;
-
+      
       try {
-        const params = {
-          page: this.currentPage,
-          per_page: this.itemsPerPage,
-          search: this.searchQuery,
-          status: this.statusFilter,
-          sort: this.sortBy
-        };
-
-        const response = await api.get('/membres', { params });
+        // Build query parameters for Laravel pagination
+        const queryParams = new URLSearchParams();
+        queryParams.append('page', this.currentPage);
         
-        if (response.success) {
-          this.members = response.data.data;
-          this.pagination = {
-            current_page: response.data.current_page,
-            last_page: response.data.last_page,
-            per_page: parseInt(response.data.per_page),
-            total: response.data.total,
-            from: response.data.from,
-            to: response.data.to
+        // Add optional parameters if they exist
+        if (this.itemsPerPage) queryParams.append('per_page', this.itemsPerPage);
+        if (this.searchQuery) queryParams.append('query', this.searchQuery);
+        if (this.statusFilter) queryParams.append('status', this.statusFilter);
+        if (this.sortBy) queryParams.append('sort_by', this.sortBy);
+        if (this.sortDirection) queryParams.append('sort_direction', this.sortDirection);
+        
+        // Construct the URL with query parameters
+        const url = `/membres?${queryParams.toString()}`;
+        console.log(url);
+        
+        
+        // Make the API request - note we're not using the params option here
+        // because we've already built the query string
+        const response = await api.get(url);
+        
+        // Handle Laravel pagination response format
+        if (response.data) {
+          this.members = response.data.data || [];
+          this.membersData = {
+            data: response.data.data || [],
+            total: response.data.total || 0,
+            per_page: parseInt(response.data.per_page) || this.itemsPerPage,
+            current_page: parseInt(response.data.current_page) || 1,
+            last_page: response.data.last_page || 1,
+            from: response.data.from || 0,
+            to: response.data.to || 0
           };
+          
+          // Update current page if it changed from the response
+          this.currentPage = parseInt(response.data.current_page) || 1;
         } else {
-          throw new Error(response.data.message || 'Erreur lors du chargement des membres');
+          throw new Error('Format de réponse inattendu de l\'API');
         }
       } catch (error) {
-        alert(error);
         console.error('Error fetching members:', error);
-        
-        // Enhanced error logging
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error('Response data:', error.response.data);
-          console.error('Status code:', error.response.status);
-          console.error('Headers:', error.response.headers);
-          
-          if (error.response.status === 401) {
-            this.error = 'Non autorisé. Veuillez vous reconnecter.';
-            // Optionally redirect to login
-            this.$router.push('/login');
-          } else if (error.response.status === 403) {
-            this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
-          } else if (error.response.status === 404) {
-            this.error = 'Endpoint non trouvé. Veuillez vérifier l\'URL de l\'API.';
-          } else if (error.response.status >= 500) {
-            this.error = 'Erreur serveur. Veuillez réessayer plus tard.';
-          } else {
-            this.error = error.response.data?.message || 'Erreur lors du chargement des membres';
-          }
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error('No response received:', error.request);
-          this.error = 'Aucune réponse du serveur. Vérifiez votre connexion internet.';
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error setting up request:', error.message);
-          this.error = 'Erreur lors de la configuration de la requête';
-        }
+        this.error = error.response?.data?.message || 'Erreur lors du chargement des membres';
       } finally {
         this.loading = false;
       }
     },
+    
+    handlePageChange(page) {
+      this.currentPage = page;
+      this.fetchMembers();
+    },
+    
+    handleSortChange({ sortBy, sortDirection }) {
+      this.sortBy = sortBy;
+      this.sortDirection = sortDirection;
+      this.fetchMembers();
+    },
+    
+    handleSearch(query) {
+      this.searchQuery = query || '';
+      this.currentPage = 1;
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+      this.searchTimeout = setTimeout(() => {
+        this.fetchMembers();
+      }, 300); // 300ms debounce
+    },
+    
+    handleRowClick(item) {
+      this.viewMember(item.id);
+    },
+    
     applyFilters() {
       this.currentPage = 1;
       this.fetchMembers();
     },
+    
     clearSearch() {
       this.searchQuery = '';
       this.applyFilters();
     },
+    
     resetFilters() {
       this.searchQuery = '';
       this.statusFilter = '';
-      this.sortBy = 'nom_asc';
+      this.sortBy = 'nom';
+      this.sortDirection = 'asc';
       this.currentPage = 1;
-      this.applyFilters();
+      this.fetchMembers();
     },
+    
     viewMember(id) {
       this.$router.push(`/members/${id}`);
     },
+    
     editMember(id) {
       this.$router.push(`/members/${id}/edit`);
     },
+    
     addMember() {
-      this.$router.push('/members/new');
+      this.$router.push('/members/create');
     },
+    
     confirmDelete(member) {
       this.memberToDelete = member;
       this.showDeleteModal = true;
     },
+    
     async deleteMember() {
       if (!this.memberToDelete) return;
-
-      this.deleting = true;
+      
       try {
         await api.delete(`/membres/${this.memberToDelete.id}`);
-        this.showDeleteModal = false;
-        this.memberToDelete = null;
-        this.fetchMembers();
+        
+        // Remove from local array
+        this.members = this.members.filter(m => m.id !== this.memberToDelete.id);
+        this.membersData.data = this.members;
+        this.membersData.total--;
+        
+        // Show success message
+        toast.success('Membre supprimé avec succès');
+        
       } catch (error) {
         console.error('Error deleting member:', error);
-        this.error = error.response?.data?.message || 'Erreur lors de la suppression du membre';
+        toast.error('Une erreur est survenue lors de la suppression du membre');
       } finally {
-        this.deleting = false;
+        this.showDeleteModal = false;
+        this.memberToDelete = null;
       }
     },
+    
     getInitials(name) {
       if (!name) return '??';
       return name
         .split(' ')
         .map(part => part[0])
         .join('')
-        .toUpperCase()
-        .substring(0, 2);
+        .substring(0, 2)
+        .toUpperCase();
     },
+    
     formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('fr-FR', options);
+      if (!dateString) return '-';
+      return new Date(dateString).toLocaleDateString('fr-FR');
     },
+    
     formatStatus(status) {
       const statusMap = {
-        'actif': 'Actif',
-        'inactif': 'Inactif',
-        'en_attente': 'En attente',
-        'suspendu': 'Suspendu'
+        actif: 'Actif',
+        inactif: 'Inactif',
+        suspendu: 'Suspendu',
+        banni: 'Banni',
+        en_attente: 'En attente',
       };
       return statusMap[status] || status;
     },
+    
     getStatusClass(status) {
-      return {
-        'bg-success': status === 'actif',
-        'bg-warning': status === 'en_attente',
-        'bg-danger': status === 'inactif' || status === 'suspendu',
-        'bg-secondary': !['actif', 'en_attente', 'inactif', 'suspendu'].includes(status)
+      const statusClasses = {
+        actif: 'bg-success',
+        inactif: 'bg-secondary',
+        suspendu: 'bg-warning',
+        banni: 'bg-danger',
+        en_attente: 'bg-info',
       };
+      return statusClasses[status] || 'bg-secondary';
     },
-    changePage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page;
+    itemsPerPage: {
+      handler() {
+        this.currentPage = 1;
         this.fetchMembers();
       }
-    },
-    changeItemsPerPage() {
-      this.currentPage = 1;
-      this.fetchMembers();
     }
-  },
-  watch: {
-    currentPage: 'fetchMembers',
-    itemsPerPage: 'changeItemsPerPage'
   },
   created() {
     this.fetchMembers();
+  },
+  
+  mounted() {
+    // Initialize DataTable with any saved state from localStorage if needed
+    const savedState = localStorage.getItem('membersTableState');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        this.sortBy = state.sortBy || 'nom';
+        this.sortDirection = state.sortDirection || 'asc';
+        this.itemsPerPage = state.itemsPerPage || 15;
+      } catch (e) {
+        console.error('Error loading table state:', e);
+      }
+    }
+  },
+  
+  beforeUnmount() {
+    // Clear any pending search timeouts
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    // Save table state to localStorage
+    const state = {
+      sortBy: this.sortBy,
+      sortDirection: this.sortDirection,
+      itemsPerPage: this.itemsPerPage
+    };
+    localStorage.setItem('membersTableState', JSON.stringify(state));
   }
 }
 </script>
@@ -528,10 +462,6 @@ export default {
   font-size: 0.8125rem;
 }
 
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8125rem;
-}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

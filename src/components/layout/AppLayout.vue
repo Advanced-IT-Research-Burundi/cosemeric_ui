@@ -242,6 +242,7 @@ body {
 
 .menu-section {
   margin-bottom: 0.5rem;
+  text-decoration: none !important;
 }
 
 .menu-header {
@@ -259,6 +260,7 @@ body {
 .menu-header:hover {
   background-color: var(--hover-bg);
   color: var(--primary-color);
+  text-decoration: none;
 }
 
 .menu-header.active {

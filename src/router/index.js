@@ -5,7 +5,8 @@ import { useAuthStore } from '../stores/auth'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
-
+import CreateMember from '../views/members/CreateMember.vue'
+import EditMember from '../views/members/EditMember.vue'
 // Lazy load components
 const Dashboard = () => import('../views/Dashboard.vue')
 // Members
@@ -50,6 +51,20 @@ const routes = [
     path: '/members',
     name: 'Tous les Membres',
     component: AllMembers,
+    meta: { requiresAuth: true }
+  },
+
+  {
+    path: '/members/create',
+    name: 'Create Member',
+    component: CreateMember,
+    meta: { requiresAuth: true }
+  },
+
+  {
+    path: '/members/:id/edit',
+    name: 'Edit Member',
+    component: EditMember,
     meta: { requiresAuth: true }
   },
   
