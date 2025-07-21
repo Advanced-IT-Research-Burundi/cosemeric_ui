@@ -77,28 +77,28 @@ const router = createRouter({
 })
 
 // Navigation guard
-// router.beforeEach(async (to, from, next) => {
-//   const authStore = useAuthStore()
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
   
-//   // Set page title
-//   document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : 'COSEMERIC'
+  // Set page title
+  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : 'COSEMERIC'
   
-//   // Check if route requires authentication
-//   if (to.meta.requiresAuth) {
-//     if (!authStore.isAuthenticated) {
-//       authStore.setReturnUrl(to.fullPath)
-//       return next({ name: 'Login' })
-//     }
+  // Check if route requires authentication
+  if (to.meta.requiresAuth) {
+    if (!authStore.isAuthenticated) {
+      authStore.setReturnUrl(to.fullPath)
+      return next({ name: 'Login' })
+    }
     
-//     return next()
-//   }
+    return next()
+  }
   
-//   // Redirect to dashboard if user is already authenticated and trying to access guest pages
-//   if (to.meta.guest && authStore.isAuthenticated) {
-//     return next({ name: 'dashboard' })
-//   }
+  // Redirect to dashboard if user is already authenticated and trying to access guest pages
+  if (to.meta.guest && authStore.isAuthenticated) {
+    return next({ name: 'dashboard' })
+  }
   
-//   next()
-// })
+  next()
+})
 
 export default router;
