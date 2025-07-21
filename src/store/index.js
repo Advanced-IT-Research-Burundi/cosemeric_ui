@@ -6,6 +6,7 @@ const vuexStore = createStore({
     return {
       cotisations: [],
       members: [],
+      categories: [],
     }
   },
  

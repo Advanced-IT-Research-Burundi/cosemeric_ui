@@ -41,17 +41,82 @@ const routes = [
   
   // Authenticated routes
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: Dashboard,
-    meta: { requiresAuth: true }
-  },
-  // Members
-  {
-    path: '/members',
-    name: 'Tous les Membres',
-    component: AllMembers,
-    meta: { requiresAuth: true }
+    path: '/',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: () => import('../views/Dashboard.vue')
+      },
+
+      {
+        path: '/credits',
+        name: 'credits',
+        children: [
+          {
+            path: '',
+            name: 'creditsView',
+            component: () => import('../views/credits/Credits.vue')
+          },
+          {
+            path: 'new',
+            name: 'creditsAdd',
+            component: () => import('../views/credits/AddCredit.vue')
+          },
+       
+        ]
+      },
+      // Members
+      {
+        path: '/members',
+        name: 'members',
+        children: [
+          {
+            path: '',
+            name: 'Tous les Membres',
+            component: () => import('../views/members/AllMembers.vue')
+          },
+          {
+            path: 'new',
+            name: 'membersAdd',
+            component: () => import('../views/members/AddMember.vue')
+          },
+          // {
+          //   path: 'edit/:id',
+          //   name: 'membersEdit',
+          //   component: EditMember
+          // },
+          // {
+          //   path: 'view/:id',
+          //   name: 'membersView',
+          //   component: ViewMember
+          // },
+          
+       
+        ]
+       
+      },
+      {
+        path: '/contributions',
+        name: 'contributions',
+        children: [
+          {
+            path: '',
+            name: 'Tous les Membres',
+            component: () => import('../views/contributions/ContributionView.vue')
+          },
+       
+        ]
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'PageNotFound',
+        component: PageNotFound,
+        meta: { title: 'Page non trouvée' }
+      },
+  
+    ]
   },
 
   {
