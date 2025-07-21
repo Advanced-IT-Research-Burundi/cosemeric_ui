@@ -42,11 +42,53 @@ const routes = [
         name: 'dashboard',
         component: () => import('../views/Dashboard.vue')
       },
+
+      {
+        path: '/credits',
+        name: 'credits',
+        children: [
+          {
+            path: '',
+            name: 'creditsView',
+            component: () => import('../views/credits/Credits.vue')
+          },
+          {
+            path: 'new',
+            name: 'creditsAdd',
+            component: () => import('../views/credits/AddCredit.vue')
+          },
+       
+        ]
+      },
       // Members
       {
         path: '/members',
         name: 'members',
-        component: () => import('../views/members/AllMembers.vue')
+        children: [
+          {
+            path: '',
+            name: 'Tous les Membres',
+            component: () => import('../views/members/AllMembers.vue')
+          },
+          {
+            path: 'new',
+            name: 'membersAdd',
+            component: () => import('../views/members/AddMember.vue')
+          },
+          // {
+          //   path: 'edit/:id',
+          //   name: 'membersEdit',
+          //   component: EditMember
+          // },
+          // {
+          //   path: 'view/:id',
+          //   name: 'membersView',
+          //   component: ViewMember
+          // },
+          
+       
+        ]
+       
       },
       {
         path: '/contributions',
