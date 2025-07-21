@@ -40,13 +40,13 @@ const routes = [
       {
         path: '/dashboard',
         name: 'dashboard',
-        component: Dashboard
+        component: () => import('../views/Dashboard.vue')
       },
       // Members
       {
         path: '/members',
         name: 'members',
-        component: AllMembers
+        component: () => import('../views/members/AllMembers.vue')
       },
       {
         path: '/contributions',
@@ -55,7 +55,7 @@ const routes = [
           {
             path: '',
             name: 'Tous les Membres',
-            component: ContributionView
+            component: () => import('../views/contributions/ContributionView.vue')
           },
        
         ]
