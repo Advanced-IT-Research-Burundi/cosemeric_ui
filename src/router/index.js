@@ -37,12 +37,7 @@ const routes = [
     meta: { guest: true }
   },
   // 404 route
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'PageNotFound',
-    component: PageNotFound,
-    meta: { title: 'Page non trouvée' }
-  },
+  
   // Authenticated routes
   {
     path: '/dashboard',
