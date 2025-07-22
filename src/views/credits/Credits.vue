@@ -121,7 +121,7 @@ const credits = ref({
   total: 0
 });
 
-const listesCredits = computed(() => store.state.credits.data|| []);
+const listesCredits = computed(() => store.state?.credits?.data|| []);
 const currentPage = ref(1);
 const searchQuery = ref('');
 const statusFilter = ref('');
