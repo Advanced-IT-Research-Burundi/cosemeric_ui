@@ -3,22 +3,19 @@
 
     <app-layout v-if="authStore.isAuthenticated"/>
     <Login v-else/>
-     
+    <LoadingComponent v-if="isLoading"/>
   </div>
 </template>
 
-<script>
+<script setup>
 import AppLayout from './components/layout/AppLayout.vue';
 import Login from './views/auth/Login.vue';
 import { useAuthStore } from './stores/auth';
-export default {
-  components: { AppLayout, Login },
-  name: 'App',
-  setup() {
-    const authStore = useAuthStore();
-    return { authStore };
-  }
-}
+import { ref } from 'vue';
+import LoadingComponent from './components/common/LoadingComponent.vue';
+const isLoading = ref(false);
+const authStore = useAuthStore();
+
 </script>
 
 <style>

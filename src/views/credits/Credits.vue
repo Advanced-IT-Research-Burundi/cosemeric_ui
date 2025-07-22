@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <LoadingComponent />
+    <LoadingComponent v-if="isLoading" />
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
