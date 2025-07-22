@@ -1,5 +1,6 @@
 <template>
   <div class="container-fluid">
+    <LoadingComponent />
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
@@ -110,6 +111,8 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import api from '../../services/api';
 import Pagination from '../../components/Pagination.vue';
+import LoadingComponent from '../../components/common/LoadingComponent.vue';
+
 
 // Références réactives
 const store = useStore();
@@ -125,7 +128,7 @@ const listesCredits = computed(() => store.state?.credits?.data|| []);
 const currentPage = ref(1);
 const searchQuery = ref('');
 const statusFilter = ref('');
-const isLoading = ref(false);
+const isLoading = ref(true);
 const errorMessage = ref('');
 
 // Formateurs
