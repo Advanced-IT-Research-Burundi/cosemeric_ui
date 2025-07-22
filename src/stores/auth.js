@@ -124,14 +124,13 @@ export const useAuthStore = defineStore('auth', () => {
     // Clear state
     user.value = null;
     token.value = null;
+    
     // Remove from local storage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('token_type');
     localStorage.removeItem('token_expires');
     localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth');
-    alert("Vous avez été déconnecté avec succès");
     window.location.href = '/login';
     
     toast.success('Vous avez été déconnecté avec succès');

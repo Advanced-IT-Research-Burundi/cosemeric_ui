@@ -97,12 +97,13 @@ button{
   padding: 8px 20px !important;
 }
 
-.form-control{
-  padding: 10px 12px !important;
-  line-height: 0;
+
+input[type="date"].form-control{
+  color: var(--text-color) !important;
 }
 
 .card {
   border: none;
   border-radius: 10px;
 }
+

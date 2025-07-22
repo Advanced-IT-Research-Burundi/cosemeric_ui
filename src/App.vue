@@ -96,62 +96,8 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Buttons */
-button,
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background-color: white;
-  color: var(--gray-700);
-  border-color: var(--gray-300);
-}
-
-button:hover,
-.btn:hover {
-  background-color: var(--gray-50);
-  border-color: var(--gray-400);
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
-}
-
-.btn-success {
-  background-color: var(--success);
-  color: white;
-  border-color: var(--success);
-}
-
-.btn-success:hover {
-  background-color: #0d9f6e;
-  border-color: #0d9f6e;
-}
-
-.btn-danger {
-  background-color: var(--danger);
-  color: white;
-  border-color: var(--danger);
-}
-
-.btn-danger:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
+router-link:hover {
+  text-decoration: none;
 }
 
 input:focus,
