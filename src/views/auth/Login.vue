@@ -117,7 +117,7 @@ export default {
     
     const form = reactive({
       email: 'nijeanlionel@gmail.com',
-      password: 'passwor',
+      password: 'password',
       remember: false
     })
     
