@@ -97,7 +97,7 @@ export default {
         {
           icon: 'fas fa-hand-holding-dollar',
           title: 'Assistance',
-          path: '/assistance'
+          path: '/assistances'
         },
         {
           icon: 'fas fa-chart-line',

@@ -42,6 +42,17 @@ const routes = [
     name: 'dashboard',
     component: () => import('../views/Dashboard.vue')
   },
+  {
+    path: "/assistances",
+    name: "assistances",
+    children: [
+      {
+        path: '',
+        name: 'assistancesView',
+        component: () => import('../views/assistances/AssistanceView.vue')
+      },
+    ]
+  },
 
   {
     path: '/credits',

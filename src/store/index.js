@@ -9,6 +9,7 @@ const vuexStore = createStore({
         members: [],
         categories: [],
         credits: [],
+        assistances: [],
       },
       isLoading: false,
       error: null,
