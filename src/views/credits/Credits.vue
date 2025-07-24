@@ -1,6 +1,5 @@
 <template>
   <div class="container-fluid">
-    <LoadingComponent v-if="isLoading" />
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
@@ -111,7 +110,6 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import api from '../../services/api';
 import Pagination from '../../components/Pagination.vue';
-import LoadingComponent from '../../components/common/LoadingComponent.vue';
 
 
 // Références réactives
@@ -166,8 +164,8 @@ const getStatusBadgeClass = (status) => {
 
 // Récupération des crédits
 const fetchCredits = async (page = 1) => {
-  isLoading.value = true;
-  errorMessage.value = '';
+  store.state.isLoading = true;
+  store.state.error = '';
   
   try {
     const response = await api.get('/credits', {
@@ -179,14 +177,13 @@ const fetchCredits = async (page = 1) => {
     });
     // save data to the store 
     store.state.credits = response.data;
-    
     credits.value = response.data;
     currentPage.value = response.data.current_page;
   } catch (error) {
     console.error('Erreur lors de la récupération des crédits:', error);
-    errorMessage.value = 'Une erreur est survenue lors du chargement des crédits.';
+    store.state.error = 'Une erreur est survenue lors du chargement des crédits.';
   } finally {
-    isLoading.value = false;
+    store.state.isLoading = false;
   }
 };
 

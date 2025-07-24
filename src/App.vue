@@ -11,10 +11,14 @@
 import AppLayout from './components/layout/AppLayout.vue';
 import Login from './views/auth/Login.vue';
 import { useAuthStore } from './stores/auth';
-import { ref } from 'vue';
+import { computed } from 'vue';
 import LoadingComponent from './components/common/LoadingComponent.vue';
-const isLoading = ref(false);
+import { useStore } from 'vuex';
+
 const authStore = useAuthStore();
+const store = useStore();
+
+const isLoading = computed(() => store.state.isLoading);
 
 </script>
 

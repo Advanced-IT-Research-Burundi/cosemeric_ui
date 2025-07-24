@@ -16,7 +16,6 @@
     <DataTable
       :columns="columns"
       :data="membersData"
-      :loading="loading"
       :sort-by.sync="sortBy"
       :sort-direction.sync="sortDirection"
       :search-query.sync="searchQuery"
@@ -143,15 +142,6 @@ export default {
       currentPage: 1,
       itemsPerPage: 15,
       searchTimeout: null,
-      membersData: {
-        data: [],
-        total: 0,
-        per_page: 15,
-        current_page: 1,
-        last_page: 1,
-        from: 0,
-        to: 0
-      },
       columns: [
         { 
           key: 'nom', 
@@ -190,41 +180,25 @@ export default {
     async fetchMembers() {
       this.loading = true;
       this.error = null;
-      
       try {
         // Build query parameters for Laravel pagination
         const queryParams = new URLSearchParams();
         queryParams.append('page', this.currentPage);
-        
         // Add optional parameters if they exist
         if (this.itemsPerPage) queryParams.append('per_page', this.itemsPerPage);
         if (this.searchQuery) queryParams.append('query', this.searchQuery);
         if (this.statusFilter) queryParams.append('status', this.statusFilter);
         if (this.sortBy) queryParams.append('sort_by', this.sortBy);
         if (this.sortDirection) queryParams.append('sort_direction', this.sortDirection);
-        
-        // Construct the URL with query parameters
-        const url = `/membres?${queryParams.toString()}`;
-        console.log(url);
-        
-        
+
         // Make the API request - note we're not using the params option here
         // because we've already built the query string
-        const response = await api.get(url);
-        
+        const response = await api.get(`/membres?${queryParams.toString()}`);
+
         // Handle Laravel pagination response format
         if (response.data) {
           this.members = response.data.data || [];
-          this.membersData = {
-            data: response.data.data || [],
-            total: response.data.total || 0,
-            per_page: parseInt(response.data.per_page) || this.itemsPerPage,
-            current_page: parseInt(response.data.current_page) || 1,
-            last_page: response.data.last_page || 1,
-            from: response.data.from || 0,
-            to: response.data.to || 0
-          };
-          
+          this.$store.state.members = response.data || [];
           // Update current page if it changed from the response
           this.currentPage = parseInt(response.data.current_page) || 1;
         } else {
@@ -390,14 +364,18 @@ export default {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-    
     // Save table state to localStorage
     const state = {
       sortBy: this.sortBy,
       sortDirection: this.sortDirection,
       itemsPerPage: this.itemsPerPage
     };
-    localStorage.setItem('membersTableState', JSON.stringify(state));
+   
+  },
+  computed: {
+    membersData() {
+      return this.$store.state.members || [];
+    }
   }
 }
 </script>

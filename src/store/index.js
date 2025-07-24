@@ -4,10 +4,15 @@ import { createStore } from 'vuex'
 const vuexStore = createStore({
   state () {
     return {
-      cotisations: [],
-      members: [],
-      categories: [],
-      credits: [],
+      data: {
+        cotisations: [],
+        members: [],
+        categories: [],
+        credits: [],
+      },
+      isLoading: false,
+      error: null,
+
     }
   },
  
