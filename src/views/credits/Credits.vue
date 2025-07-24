@@ -164,9 +164,7 @@ const getStatusBadgeClass = (status) => {
 
 // Récupération des crédits
 const fetchCredits = async (page = 1) => {
-  store.state.isLoading = true;
   store.state.error = '';
-  
   try {
     const response = await api.get('/credits', {
       params: {
@@ -182,9 +180,7 @@ const fetchCredits = async (page = 1) => {
   } catch (error) {
     console.error('Erreur lors de la récupération des crédits:', error);
     store.state.error = 'Une erreur est survenue lors du chargement des crédits.';
-  } finally {
-    store.state.isLoading = false;
-  }
+  } 
 };
 
 // Gestion de la recherche avec délai

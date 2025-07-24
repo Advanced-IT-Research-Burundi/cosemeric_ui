@@ -67,13 +67,11 @@ onMounted(() => {
 
 const getData = async (page = 1) => {
   try {
-    store.state.isLoading = true;
     const response = await api.get(`/cotisations?page=${page}`);
     store.state.cotisations = response.data;
-    store.state.isLoading = false;
   } catch (error) {
     console.error('Error fetching data:', error);
-    store.state.isLoading = false;
+    
   }
 };
 

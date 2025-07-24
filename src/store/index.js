@@ -15,6 +15,16 @@ const vuexStore = createStore({
 
     }
   },
+  mutations: {
+    SET_LOADING(state, value) {
+      state.isLoading = value;
+    }
+  },
+  actions: {
+    setLoading({ commit }, value) {
+      commit('SET_LOADING', value);
+    }
+  }
  
 })
 
