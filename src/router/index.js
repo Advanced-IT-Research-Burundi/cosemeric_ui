@@ -5,10 +5,6 @@ import { useAuthStore } from '../stores/auth'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
-// Lazy load components
-const Dashboard = () => import('../views/Dashboard.vue')
-// Members
-const ContributionView = () => import('../views/contributions/ContributionView.vue')
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -51,6 +47,17 @@ const routes = [
         name: 'assistancesView',
         component: () => import('../views/assistances/AssistanceView.vue')
       },
+      {
+        path: 'add',
+        name: 'assistancesAdd',
+        component: () => import('../views/assistances/AddAssistance.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'assistancesEdit',
+        component: () => import('../views/assistances/EditAssistance.vue'),
+        props: true
+      }
     ]
   },
 
@@ -64,11 +71,16 @@ const routes = [
         component: () => import('../views/credits/Credits.vue')
       },
       {
-        path: 'new',
+        path: 'add',
         name: 'creditsAdd',
         component: () => import('../views/credits/AddCredit.vue')
       },
-   
+      {
+        path: ':id/edit',
+        name: 'creditsEdit',
+        component: () => import('../views/credits/EditCredit.vue'),
+        props: true
+      }
     ]
   },
   // Members
@@ -78,17 +90,17 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'Tous les Membres',
+        name: 'membersView',
         component: () => import('../views/members/AllMembers.vue')
       },
       {
-        path: 'create',
-        name: 'Create Member',
+        path: 'add',
+        name: 'membersAdd',
         component: () => import('../views/members/CreateMember.vue')
       },
       {
         path: ':id/edit',
-        name: 'Edit Member',
+        name: 'membersEdit',
         component: () => import('../views/members/EditMember.vue')
       },
     ]
@@ -105,7 +117,16 @@ const routes = [
         name: 'contributionsView',
         component: () => import('../views/contributions/ContributionView.vue')
       },
-   
+      {
+        path: 'add',
+        name: 'contributionsAdd',
+        component: () => import('../views/contributions/AddContribution.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'contributionsEdit',
+        component: () => import('../views/contributions/EditContribution.vue')
+      },
     ]
   },
 

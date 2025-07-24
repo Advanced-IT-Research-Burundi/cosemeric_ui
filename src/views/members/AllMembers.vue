@@ -266,7 +266,7 @@ export default {
     },
     
     addMember() {
-      this.$router.push('/members/create');
+      this.$router.push('/members/add');
     },
     
     confirmDelete(member) {

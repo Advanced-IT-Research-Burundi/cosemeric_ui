@@ -1,10 +1,10 @@
 <template>
-  <div class="container-fluid">
+  <div class="container py-4 px-4">
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
           <h1 class="h3 mb-0">Gestion des Crédits</h1>
-          <router-link to="/credits/new" class="btn btn-primary">
+          <router-link to="/credits/add" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>Nouveau Crédit
           </router-link>
         </div>
@@ -78,12 +78,12 @@
                 <td class="text-center">{{ formatDate(credit.date_demande) }}</td>
                 <td class="text-center">
                   <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary" title="Voir les détails">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="btn btn-outline-secondary" title="Éditer">
-                      <i class="bi bi-pencil"></i>
-                    </button>
+                    <router-link :to="{ name: 'creditsView', params: { id: credit.id } }" class="btn btn-outline-primary" title="Voir les détails">
+                      <i class="fas fa-eye"></i>
+                    </router-link>
+                    <router-link :to="{ name: 'creditsEdit', params: { id: credit.id } }" class="btn btn-outline-secondary" title="Éditer">
+                      <i class="fas fa-pen"></i>
+                    </router-link>
                   </div>
                 </td>
               </tr>

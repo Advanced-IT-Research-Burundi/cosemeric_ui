@@ -63,7 +63,6 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 
 export default {

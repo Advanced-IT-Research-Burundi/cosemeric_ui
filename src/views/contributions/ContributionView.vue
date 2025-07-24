@@ -1,10 +1,19 @@
 <template>
-  <div class="cotisations-container">
-    <h1 class="page-title">Liste des Cotisations</h1>
+  <div class="container py-4 px-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="h3 mb-0">Gestion des Cotisations</h1>
+          <router-link to="/contributions/add" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nouvelle Cotisation
+          </router-link>
+        </div>
+      </div>
+    </div>
     
     <!-- Tableau des cotisations -->
     <div class="table-container">
-      <table class="cotisations-table">
+      <table class="table">
         <thead>
           <tr>
             <th>ID</th>
@@ -35,8 +44,8 @@
             <td>{{ getModePaiement(cotisation.mode_paiement) }}</td>
             <td>{{ cotisation.reference_paiement }}</td>
             <td class="actions">
-              <button class="btn btn-view" @click="viewCotisation(cotisation)">Voir</button>
-              <button class="btn btn-edit" @click="editCotisation(cotisation)">Modifier</button>
+              <router-link :to="`/contributions/${cotisation.id}/view`" class="btn btn-view">Voir</router-link>
+              <router-link :to="`/contributions/${cotisation.id}/edit`" class="btn btn-edit">Modifier</router-link>
             </td>
           </tr>
         </tbody>
@@ -93,17 +102,17 @@ const formatDate = (dateString) => {
 const getStatutClass = (statut) => {
   return {
     'statut-paye': statut === 'paye',
-    'statut-impaye': statut === 'impaye',
-    'statut-pending': statut === 'pending'
+    'statut-pending': statut === 'en_attente',
+    'statut-impaye': statut === 'en_retard'
   };
 };
 
 const getModePaiement = (mode) => {
   const modes = {
     '1': 'Espèces',
-    '2': 'Carte bancaire',
-    '3': 'Virement',
-    '4': 'Chèque'
+    '2': 'Virement',
+    '3': 'Chèque',
+    '4': 'Mobile Money'
   };
   return modes[mode] || 'Inconnu';
 };
@@ -125,11 +134,6 @@ const changePage = (page) => {
 </script>
 
 <style scoped>
-.cotisations-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
 
 .page-title {
   color: #333;
@@ -145,12 +149,7 @@ const changePage = (page) => {
   border-radius: 8px;
 }
 
-.cotisations-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  min-width: 800px;
-}
+
 
 .cotisations-table th {
   background-color: #f8f9fa;

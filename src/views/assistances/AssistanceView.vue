@@ -5,7 +5,7 @@
       <div class="d-flex align-items-center gap-3">
         <div class="input-group" style="width: 300px;">
           <span class="input-group-text bg-white">
-            <i class="bi bi-search"></i>
+            <i class="fas fa-search"></i>
           </span>
           <input
             v-model="searchQuery"
@@ -19,7 +19,7 @@
           @click="fetchAssistances"
           class="btn btn-primary d-flex align-items-center gap-2"
         >
-          <i class="bi bi-arrow-clockwise"></i>
+          <i class="fas fa-arrow-clockwise"></i>
           <span>Actualiser</span>
         </button>
       </div>
@@ -55,7 +55,8 @@
                   :class="{
                     'bg-warning text-dark': assistance.statut === 'en_attente',
                     'bg-success': assistance.statut === 'approuve',
-                    'bg-danger': assistance.statut === 'rejete'
+                    'bg-danger': assistance.statut === 'rejete',
+                    'bg-primary': assistance.statut === 'verse'
                   }"
                 >
                   {{ formatStatus(assistance.statut) }}
@@ -68,15 +69,23 @@
                     class="btn btn-outline-primary"
                     title="Voir les détails"
                   >
-                    <i class="bi bi-eye"></i>
+                    <i class="fas fa-eye"></i>
                   </button>
+                  <router-link 
+                    v-if="assistance.statut === 'en_attente'"
+                    :to="`/assistances/${assistance.id}/edit`" 
+                    class="btn btn-outline-secondary"
+                    title="Modifier"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </router-link>
                   <button 
                     v-if="assistance.statut === 'en_attente'"
                     @click="approveAssistance(assistance)" 
                     class="btn btn-outline-success"
                     title="Approuver"
                   >
-                    <i class="bi bi-check-lg"></i>
+                    <i class="fas fa-check"></i>
                   </button>
                   <button 
                     v-if="assistance.statut === 'en_attente'"
@@ -84,7 +93,7 @@
                     class="btn btn-outline-danger"
                     title="Rejeter"
                   >
-                    <i class="bi bi-x-lg"></i>
+                    <i class="fas fa-x"></i>
                   </button>
                 </div>
               </td>
