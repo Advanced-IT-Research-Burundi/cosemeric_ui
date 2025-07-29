@@ -47,7 +47,10 @@
     <!-- Tableau des crédits -->
     <div class="card">
       <div class="card-body p-0">
-        <div class="table-responsive">
+        <button @click="printPage">Imprimer </button>
+        <button @click="generatePdfA">Generate PDF  </button>
+        <button @click="generateExcel"> Generate Excel File  </button>
+        <div class="table-responsive" id="bonjour">
           <table class="table table-hover mb-0">
             <thead class="table-light">
               <tr>
@@ -110,6 +113,20 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import api from '../../services/api';
 import Pagination from '../../components/Pagination.vue';
+
+import usePrint from '../../utils/usePrint';
+const {print , generatePdf , exportToExcel } = usePrint();
+
+function printPage(){
+  print("bonjour")
+}
+function generatePdfA(){
+  generatePdf("bonjour")
+}
+
+function generateExcel(){
+  exportToExcel(['A', 'B', 'C']);
+}
 
 
 // Références réactives

@@ -38,6 +38,12 @@ const routes = [
     name: 'dashboard',
     component: () => import('../views/Dashboard.vue')
   },
+  // Test AdvancedTable
+  {
+    path: '/test',
+    name: 'TestAdvancedTable',
+    component: () => import('../views/TestAdvancedTable.vue')
+  },
   {
     path: "/assistances",
     name: "assistances",

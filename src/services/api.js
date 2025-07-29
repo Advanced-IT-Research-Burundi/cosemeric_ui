@@ -1,5 +1,8 @@
 import axios from 'axios';
 import store from '../store'; // importer le store directement
+import { useAuthStore } from '../stores/auth';
+
+// const authStore = useAuthStore();
 
 const url = import.meta.env.VITE_APP_LOCAL
   ? import.meta.env.VITE_API_BASE_URL_LOCAL
@@ -44,6 +47,12 @@ apiClient.interceptors.response.use(
     store.commit('SET_LOADING', false); // ✅
     if (error.response) {
       console.error('Response error:', error.response.data);
+      
+      // Handle 401 Unauthorized
+      // if (error.response.status === 401) {
+      //   authStore.logout();
+      // }
+
     } else if (error.request) {
       console.error('Request error:', error.request);
     } else {
