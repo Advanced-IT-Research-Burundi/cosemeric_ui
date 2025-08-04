@@ -2,8 +2,6 @@ import axios from 'axios';
 import store from '../store'; // importer le store directement
 import { useAuthStore } from '../stores/auth';
 
-// const authStore = useAuthStore();
-
 const url = import.meta.env.VITE_APP_LOCAL
   ? import.meta.env.VITE_API_BASE_URL_LOCAL
   : import.meta.env.VITE_API_BASE_URL;
@@ -23,7 +21,7 @@ const apiClient = axios.create({
 // Intercepteur de requête
 apiClient.interceptors.request.use(
   (config) => {
-    store.commit('SET_LOADING', true); // ✅ mutation
+    store.commit('SET_LOADING', true);
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -31,7 +29,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    store.commit('SET_LOADING', false); // même en cas d’erreur
+    store.commit('SET_LOADING', false);
     return Promise.reject(error);
   }
 );
@@ -39,19 +37,19 @@ apiClient.interceptors.request.use(
 // Intercepteur de réponse
 apiClient.interceptors.response.use(
   (response) => {
-    store.commit('SET_LOADING', false); // ✅
-    console.log('Response:', response.status, response.config.url);
+    store.commit('SET_LOADING', false);
     return response.data;
   },
   (error) => {
-    store.commit('SET_LOADING', false); // ✅
+    store.commit('SET_LOADING', false);
     if (error.response) {
       console.error('Response error:', error.response.data);
       
       // Handle 401 Unauthorized
-      // if (error.response.status === 401) {
-      //   authStore.logout();
-      // }
+      if (error.response.status === 401) {
+        const authStore = useAuthStore();
+        authStore.logout();
+      }
 
     } else if (error.request) {
       console.error('Request error:', error.request);

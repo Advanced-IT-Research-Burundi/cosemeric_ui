@@ -1,110 +1,84 @@
 <template>
-  <div class="container py-4 px-4">
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-          <h1 class="h3 mb-0">Gestion des Cotisations</h1>
-          <router-link to="/contributions/add" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Nouvelle Cotisation
-          </router-link>
-        </div>
+    <div class="container py-4 px-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Tous les membres</h2>
+        <router-link to="/members/add" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Ajouter un membre
+        </router-link>
+      </div>
+  
+      <div class="card">
+          <AdvancedTable
+              :data="tableData"
+              :columns="columns"
+              :loading="loading"
+              search-placeholder="Rechercher des cotisations..."
+              no-data-message="Aucune cotisation trouvée"
+              :show-filters="true"
+              :has-actions="true"
+              row-key="id"
+              @edit="handleEdit"
+              @delete="handleDelete"
+              @search="handleSearch"
+              @sort="handleSort"
+              @filter="handleFilter"
+              @page-change="handlePageChange"
+              @per-page-change="handlePerPageChange"
+              >
+              <!-- Custom column slot -->
+              <template #column-statut="{ value }">
+                  <span class="badge rounded-1" :class="getClassByStatut(value)">
+                  {{ ucFirst(value) }}
+                  </span>
+              </template>
+          </AdvancedTable>
       </div>
     </div>
-    
-    <!-- Tableau des cotisations -->
-    <div class="table-container">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Membre ID</th>
-            <th>Période ID</th>
-            <th>Montant</th>
-            <th>Devise</th>
-            <th>Date de Paiement</th>
-            <th>Statut</th>
-            <th>Mode de Paiement</th>
-            <th>Référence</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="cotisation in cotisationListes.data" :key="cotisation.id">
-            <td>{{ cotisation.id }}</td>
-            <td>{{ cotisation.membre_id }}</td>
-            <td>{{ cotisation.periode_id }}</td>
-            <td class="montant">{{ formatMontant(cotisation.montant) }}</td>
-            <td>{{ cotisation.devise }}</td>
-            <td>{{ formatDate(cotisation.date_paiement) }}</td>
-            <td>
-              <span :class="getStatutClass(cotisation.statut)">
-                {{ cotisation.statut }}
-              </span>
-            </td>
-            <td>{{ getModePaiement(cotisation.mode_paiement) }}</td>
-            <td>{{ cotisation.reference_paiement }}</td>
-            <td class="actions">
-              <router-link :to="`/contributions/${cotisation.id}/view`" class="btn btn-view">Voir</router-link>
-              <router-link :to="`/contributions/${cotisation.id}/edit`" class="btn btn-edit">Modifier</router-link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Composant de pagination -->
-    <Pagination 
-      v-if="cotisationListes.data && cotisationListes.data.length > 0"
-      :pagination-data="cotisationListes"
-      @page-changed="changePage"
-    />
-  </div>
-</template>
-
-<script setup>
-import { computed, onMounted } from "vue";
-import api from "../../services/api";
-import { useStore } from "vuex";
-import Pagination from "../../components/Pagination.vue";
-
-const store = useStore();
-
-onMounted(() => {
-  console.log('Component mounted');
-  getData();
-});
-
-const getData = async (page = 1) => {
-  try {
-    const response = await api.get(`/cotisations?page=${page}`);
-    store.state.cotisations = response.data;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    
-  }
-};
-
-const cotisationListes = computed(() => store.state.cotisations || { data: [] });
-
-// Méthodes utilitaires
-const formatMontant = (montant) => {
-  return parseFloat(montant).toLocaleString('fr-FR', { 
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2 
+  </template>
+  
+  <script setup>
+  import { ref, onMounted, computed } from "vue";
+  import { useStore } from "vuex";
+  import api from "../../services/api";
+  import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
+  import router from "../../router";
+  
+  const store = useStore();
+  const cotisations = ref([]);
+  const loading = ref(false);
+  
+  // Query parameters for API
+  const queryParams = ref({
+    page: 1,
+    per_page: 15,
+    search: "",
+    sort_field: "",
+    sort_order: "asc",
+    filters: {},
   });
-};
+  
+  const columns = [
+    { key: "id", label: "ID", sortable: true },
+    { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
+    { key: "montant", label: "Montant", sortable: true, filterable: true, formatter: (value) => formatMontant(value) },
+    { key: "mode_paiement", label: "Mode de paiement", sortable: true, filterable: true, formatter: (value) => getModePaiement(value) },
+    {
+      key: "statut",
+      label: "Statut",
+      sortable: true,
+      filterable: true,
+    },
+    {
+      key: "created_at",
+      label: "Créé le",
+      sortable: true,
+      formatter: (value) => new Date(value).toLocaleDateString('fr-FR'),
+    },
+  ];
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR');
-};
-
-const getStatutClass = (statut) => {
-  return {
-    'statut-paye': statut === 'paye',
-    'statut-pending': statut === 'en_attente',
-    'statut-impaye': statut === 'en_retard'
-  };
+  // Méthodes utilitaires
+const formatMontant = (montant) => {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'FBU' }).format(montant);
 };
 
 const getModePaiement = (mode) => {
@@ -117,131 +91,120 @@ const getModePaiement = (mode) => {
   return modes[mode] || 'Inconnu';
 };
 
-// Actions
-const viewCotisation = (cotisation) => {
-  console.log('Voir cotisation:', cotisation);
-  // Logique pour voir les détails
+const ucFirst = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
-
-const editCotisation = (cotisation) => {
-  console.log('Modifier cotisation:', cotisation);
-  // Logique pour modifier
-};
-
-const changePage = (page) => {
-  getData(page);
-};
-</script>
-
-<style scoped>
-
-.page-title {
-  color: #333;
-  margin-bottom: 30px;
-  font-size: 2rem;
-  text-align: center;
-}
-
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-
-
-.cotisations-table th {
-  background-color: #f8f9fa;
-  color: #495057;
-  font-weight: 600;
-  padding: 15px 12px;
-  text-align: left;
-  border-bottom: 2px solid #dee2e6;
-  white-space: nowrap;
-}
-
-.cotisations-table td {
-  padding: 12px;
-  border-bottom: 1px solid #dee2e6;
-  vertical-align: middle;
-}
-
-.cotisations-table tbody tr:hover {
-  background-color: #f8f9fa;
-}
-
-.montant {
-  font-weight: 600;
-  color: #28a745;
-}
-
-.statut-paye {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.statut-impaye {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.statut-pending {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.actions {
-  white-space: nowrap;
-}
-
-.btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  margin-right: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.btn-view {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.btn-view:hover {
-  background-color: #138496;
-}
-
-.btn-edit {
-  background-color: #ffc107;
-  color: #212529;
-}
-
-.btn-edit:hover {
-  background-color: #e0a800;
-}
-
-@media (max-width: 768px) {
-  .cotisations-container {
-    padding: 10px;
+  
+  // Fetch data from your API
+  const fetchCotisations = async () => {
+    loading.value = true;
+  
+    try {
+      const params = {};
+  
+      // Add query parameters
+      params.page = queryParams.value.page;
+      params.per_page = queryParams.value.per_page;
+  
+      if (queryParams.value.search) {
+        params.search = queryParams.value.search;
+      }
+  
+      if (queryParams.value.sort_field) {
+        params.sort_field = queryParams.value.sort_field;
+        params.sort_order = queryParams.value.sort_order;
+      }
+  
+      // Add filters
+      Object.entries(queryParams.value.filters).forEach(([key, value]) => {
+        if (value) {
+          params[`filter[${key}]`] = value;
+        }
+      });
+  
+      const response = await api.get("/cotisations",params);
+  
+      // Handle your API response structure
+      if (response.success) {
+        cotisations.value = response.data || [];
+        store.state.cotisations = response.data || [];
+      } else {
+        console.error("API Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching cotisations:", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+  
+  const getClassByStatut = (statut) => {
+    if (statut === "paye") {
+      return "bg-success";
+    } else if (statut === "en_attente") {
+      return "bg-danger";
+    } else if (statut === "en_retard") {
+      return "bg-warning";
+    } else {
+      return "bg-secondary";
+    }
   }
   
-  .page-title {
-    font-size: 1.5rem;
-  }
-}
-</style>
+  // Event handlers
+  const handleSearch = (searchTerm) => {
+    queryParams.value.search = searchTerm;
+    queryParams.value.page = 1;
+    fetchCotisations();
+  };
+  
+  const handleSort = (sortData) => {
+    queryParams.value.sort_field = sortData.field;
+    queryParams.value.sort_order = sortData.order;
+    queryParams.value.page = 1;
+    fetchCotisations();
+  };
+  
+  const handleFilter = (filters) => {
+    queryParams.value.filters = filters;
+    queryParams.value.page = 1;
+    fetchCotisations();
+  };
+  
+  const handlePageChange = (page) => {
+    queryParams.value.page = page;
+    fetchCotisations();
+  };
+  
+  const handlePerPageChange = (perPage) => {
+    queryParams.value.per_page = perPage;
+    queryParams.value.page = 1;
+    fetchCotisations();
+  };
+  
+  const handleEdit = (cotisation) => {
+    console.log(cotisation);
+    router.push({ name: 'contributionsEdit', params: { id: cotisation.id } });
+  };
+  
+  const handleDelete = (cotisation) => {
+    if(confirm("Etês-vous sûr de vouloir supprimer ce cotisation?")){
+      api.delete(`/cotisations/${cotisation.id}`)
+      .then((response) => {
+        console.log("Cotisation supprimée avec succès!");
+        fetchCotisations();
+      })
+      .catch((error) => {
+        console.error("Une erreur est survenue lors de la suppression du membre:", error);
+      });
+    }
+  };
+  
+  onMounted(() => {
+    fetchCotisations();
+  });
+  
+  const tableData = computed(() => {
+    return store.state.cotisations || [];
+  });
+  </script>
+  

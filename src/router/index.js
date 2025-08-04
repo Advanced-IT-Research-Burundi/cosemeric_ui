@@ -44,6 +44,8 @@ const routes = [
     name: 'TestAdvancedTable',
     component: () => import('../views/TestAdvancedTable.vue')
   },
+  
+  // Assistances
   {
     path: "/assistances",
     name: "assistances",
@@ -67,6 +69,7 @@ const routes = [
     ]
   },
 
+  // Credits
   {
     path: '/credits',
     name: 'credits',

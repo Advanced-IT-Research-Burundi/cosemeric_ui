@@ -107,3 +107,6 @@ input[type="date"].form-control{
   border-radius: 10px;
 }
 
+a:hover{
+  text-decoration: none !important;
+}

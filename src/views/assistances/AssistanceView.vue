@@ -1,235 +1,207 @@
 <template>
-  <div class="container-fluid p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3 mb-0">Gestion des Assistances</h1>
-      <div class="d-flex align-items-center gap-3">
-        <div class="input-group" style="width: 300px;">
-          <span class="input-group-text bg-white">
-            <i class="fas fa-search"></i>
-          </span>
-          <input
-            v-model="searchQuery"
-            type="text"
-            class="form-control"
-            placeholder="Rechercher..."
-            @keyup.enter="fetchAssistances"
-          >
-        </div>
-        <button
-          @click="fetchAssistances"
-          class="btn btn-primary d-flex align-items-center gap-2"
-        >
-          <i class="fas fa-arrow-clockwise"></i>
-          <span>Actualiser</span>
-        </button>
+    <div class="container py-4 px-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestion des Crédits</h2>
+        <router-link to="/credits/add" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Ajouter un crédit
+        </router-link>
+      </div>
+  
+      <div class="card">
+          <AdvancedTable
+              :data="tableData"
+              :columns="columns"
+              :loading="loading"
+              search-placeholder="Rechercher des assistances..."
+              no-data-message="Aucune assistance trouvée"
+              :show-filters="true"
+              :has-actions="true"
+              row-key="id"
+              @edit="handleEdit"
+              @delete="handleDelete"
+              @search="handleSearch"
+              @sort="handleSort"
+              @filter="handleFilter"
+              @page-change="handlePageChange"
+              @per-page-change="handlePerPageChange"
+              >
+              <!-- Custom column slot -->
+              <template #column-statut="{ value }">
+                  <span class="badge rounded-1" :class="getClassByStatut(value)">
+                  {{ getStatusLabel(value) }}
+                  </span>
+              </template>
+          </AdvancedTable>
       </div>
     </div>
-
-    <div class="card shadow-sm">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>ID</th>
-              <th>Membre</th>
-              <th>Type d'assistance</th>
-              <th>Montant</th>
-              <th>Date demande</th>
-              <th>Statut</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="assistance in assistances.data" :key="assistance.id">
-              <td>{{ assistance.id }}</td>
-              <td>
-                <div class="fw-medium">{{ assistance.membre.nom }} {{ assistance.membre.prenom }}</div>
-                <small class="text-muted">{{ assistance.membre.matricule }}</small>
-              </td>
-              <td>{{ assistance.type_assistance.nom }}</td>
-              <td>{{ formatCurrency(assistance.montant) }}</td>
-              <td>{{ formatDate(assistance.date_demande) }}</td>
-              <td>
-                <span 
-                  class="badge"
-                  :class="{
-                    'bg-warning text-dark': assistance.statut === 'en_attente',
-                    'bg-success': assistance.statut === 'approuve',
-                    'bg-danger': assistance.statut === 'rejete',
-                    'bg-primary': assistance.statut === 'verse'
-                  }"
-                >
-                  {{ formatStatus(assistance.statut) }}
-                </span>
-              </td>
-              <td class="text-end">
-                <div class="btn-group btn-group-sm">
-                  <button 
-                    @click="viewDetails(assistance)" 
-                    class="btn btn-outline-primary"
-                    title="Voir les détails"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <router-link 
-                    v-if="assistance.statut === 'en_attente'"
-                    :to="`/assistances/${assistance.id}/edit`" 
-                    class="btn btn-outline-secondary"
-                    title="Modifier"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </router-link>
-                  <button 
-                    v-if="assistance.statut === 'en_attente'"
-                    @click="approveAssistance(assistance)" 
-                    class="btn btn-outline-success"
-                    title="Approuver"
-                  >
-                    <i class="fas fa-check"></i>
-                  </button>
-                  <button 
-                    v-if="assistance.statut === 'en_attente'"
-                    @click="rejectAssistance(assistance)" 
-                    class="btn btn-outline-danger"
-                    title="Rejeter"
-                  >
-                    <i class="fas fa-x"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="!assistances?.data?.length">
-              <td colspan="7" class="text-center py-4 text-muted">
-                Aucune assistance trouvée
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="assistances?.links" class="card-footer d-flex justify-content-between align-items-center">
-        <div class="text-muted small">
-          Affichage de {{ assistances.from || 0 }} à {{ assistances.to || 0 }} sur {{ assistances.total || 0 }} résultats
-        </div>
-        <nav aria-label="Pagination">
-          <ul class="pagination pagination-sm mb-0">
-            <li 
-              v-for="(link, index) in assistances.links" 
-              :key="index"
-              class="page-item"
-              :class="{ 'active': link.active, 'disabled': !link.url }"
-            >
-              <a 
-                class="page-link" 
-                href="#"
-                v-html="link.label"
-                @click.prevent="link.url && goToPage(link.url)"
-              ></a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-import api from '../../services/api';
-
-const router = useRouter();
-const store = useStore();
-const searchQuery = ref('');
-const currentPage = ref(1);
-const perPage = ref(15);
-
-onMounted(() => {
-  fetchAssistances();
-});
-
-const fetchAssistances = async (url = null) => {
-  try {
-    const params = {
-      page: currentPage.value,
-      per_page: perPage.value,
-      search: searchQuery.value
-    };
-
-    const response = url 
-      ? await api.get(url, { params: { search: searchQuery.value } })
-      : await api.get('/assistances', { params });
-    
-    store.state.data.assistances = response.data;
-  } catch (error) {
-    console.error('Erreur lors de la récupération des assistances:', error);
-  }
-};
-const assistances = computed(() => store.state.data.assistances);
-const goToPage = (url) => {
-  if (!url) return;
+  </template>
   
-  const match = url.match(/page=(\d+)/);
-  if (match) {
-    currentPage.value = parseInt(match[1]);
-  }
+  <script setup>
+  import { ref, onMounted, computed } from "vue";
+  import { useStore } from "vuex";
+  import api from "../../services/api";
+  import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
+  import router from "../../router";
   
-  fetchAssistances(url);
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('fr-FR', options);
-};
-
-const formatCurrency = (amount) => {
-  if (!amount) return '0,00 €';
-  return new Intl.NumberFormat('fr-FR', { 
-    style: 'currency', 
-    currency: 'EUR'
-  }).format(amount);
-};
-
-const formatStatus = (status) => {
-  const statusMap = {
-    'en_attente': 'En attente',
-    'approuve': 'Approuvé',
-    'rejete': 'Rejeté'
+  const store = useStore();
+  const assistances = ref([]);
+  const loading = ref(false);
+  
+  // Query parameters for API
+  const queryParams = ref({
+    page: 1,
+    per_page: 15,
+    search: "",
+    sort_field: "",
+    sort_order: "asc",
+    filters: {},
+  });
+  
+  const columns = [
+    { key: "id", label: "ID", sortable: true },
+    { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
+    { key: "type_assistance.nom", label: "Type d'assistance", width: "100px", sortable: true },
+    { key: "montant", label: "Montant", sortable: true, filterable: true },
+    { key: "date_versement", label: "Date de versement", sortable: true, filterable: true, formatter: (value) => new Date(value).toLocaleDateString() },
+    {
+      key: "statut",
+      label: "Statut",
+      sortable: true,
+      filterable: true,
+    },
+    {
+      key: "created_at",
+      label: "Créé le",
+      sortable: true,
+      formatter: (value) => new Date(value).toLocaleDateString(),
+    },
+  ];
+  
+  // Fetch data from your API
+  const fetchAssistances = async () => {
+    loading.value = true;
+  
+    try {
+      const params = {};
+  
+      // Add query parameters
+      params.page = queryParams.value.page;
+      params.per_page = queryParams.value.per_page;
+  
+      if (queryParams.value.search) {
+        params.search = queryParams.value.search;
+      }
+  
+      if (queryParams.value.sort_field) {
+        params.sort_field = queryParams.value.sort_field;
+        params.sort_order = queryParams.value.sort_order;
+      }
+  
+      // Add filters
+      Object.entries(queryParams.value.filters).forEach(([key, value]) => {
+        if (value) {
+          params[`filter[${key}]`] = value;
+        }
+      });
+  
+      const response = await api.get("/assistances",params);
+  
+      // Handle your API response structure
+      if (response.success) {
+        assistances.value = response.data || [];
+        store.state.assistances = response.data || [];
+      } else {
+        console.error("API Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching assistances:", error);
+    } finally {
+      loading.value = false;
+    }
   };
-  return statusMap[status] || status;
-};
-
-const viewDetails = (assistance) => {
-  console.log('View details:', assistance);
-};
-
-const approveAssistance = async (assistance) => {
-  if (confirm('Voulez-vous vraiment approuver cette assistance ?')) {
-    try {
-      await api.put(`/assistances/${assistance.id}/approve`);
-      fetchAssistances();
-    } catch (error) {
-      console.error('Erreur lors de l\'approbation de l\'assistance:', error);
+  
+  const getClassByStatut = (statut) => {
+    if (statut === "rejete") {
+      return "bg-danger";
+    } else if (statut === "en_attente") {
+      return "bg-warning";
+    } else if (statut === "en_cours") {
+      return "bg-info";
+    } else if (statut === "approuve") {
+      return "bg-success";
+    } else {
+      return "bg-secondary";
     }
   }
-};
 
-const rejectAssistance = async (assistance) => {
-  const reason = prompt('Veuillez saisir la raison du rejet:');
-  if (reason !== null) {
-    try {
-      await api.put(`/assistances/${assistance.id}/reject`, { motif_rejet: reason });
-      fetchAssistances();
-    } catch (error) {
-      console.error('Erreur lors du rejet de l\'assistance:', error);
+  const getStatusLabel = (statut) => {
+    if (statut === "rejete") {
+      return "Rejeté";
+    } else if (statut === "en_attente") {
+      return "En attente";
+    } else if (statut === "en_cours") {
+      return "En cours";
+    } else if (statut === "approuve") {
+      return "Approuvé";
+    } else {
+      return "Terminé";
     }
   }
-};
-</script>
-
-<style scoped>
-/* Add any custom styles here */
-</style>
+  
+  // Event handlers
+  const handleSearch = (searchTerm) => {
+    queryParams.value.search = searchTerm;
+    queryParams.value.page = 1;
+    fetchAssistances();
+  };
+  
+  const handleSort = (sortData) => {
+    queryParams.value.sort_field = sortData.field;
+    queryParams.value.sort_order = sortData.order;
+    queryParams.value.page = 1;
+    fetchAssistances();
+  };
+  
+  const handleFilter = (filters) => {
+    queryParams.value.filters = filters;
+    queryParams.value.page = 1;
+    fetchAssistances();
+  };
+  
+  const handlePageChange = (page) => {
+    queryParams.value.page = page;
+    fetchAssistances();
+  };
+  
+  const handlePerPageChange = (perPage) => {
+    queryParams.value.per_page = perPage;
+    queryParams.value.page = 1;
+    fetchAssistances();
+  };
+  
+  const handleEdit = (assistance) => {
+    router.push({ name: 'assistancesEdit', params: { id: assistance.id } });
+  };
+  
+  const handleDelete = (assistance) => {
+    if(confirm("Etês-vous sûr de vouloir supprimer cette assistance?")){
+      api.delete(`/assistances/${assistance.id}`)
+      .then((response) => {
+        console.log("Assistance supprimée avec succès!");
+        fetchAssistances();
+      })
+      .catch((error) => {
+        console.error("Une erreur est survenue lors de la suppression de l'assistance:", error);
+      });
+    }
+  };
+  
+  onMounted(() => {
+    fetchAssistances();
+  });
+  
+  const tableData = computed(() => {
+    return store.state.assistances || [];
+  });
+  </script>
+  

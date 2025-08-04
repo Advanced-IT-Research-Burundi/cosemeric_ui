@@ -1,10 +1,15 @@
 <template>
-  <div class="container">
-    <h2>Membres Management</h2>
+  <div class="container py-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Tous les membres</h2>
+      <button class="btn btn-primary" @click="addMember">
+        <i class="fas fa-plus me-2"></i>Ajouter un membre
+      </button>
+    </div>
 
     <div class="card">
         <AdvancedTable
-            :data="paginatedMembres"
+            :data="tableData"
             :columns="columns"
             :loading="loading"
             search-placeholder="Rechercher des membres..."
@@ -32,20 +37,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import api from "../services/api";
 import AdvancedTable from "../components/advancedTable/AdvancedTable.vue";
 import router from "../router";
 
-const paginatedMembres = ref({
-  data: [],
-  current_page: 1,
-  last_page: 1,
-  per_page: 15,
-  total: 0,
-  from: 0,
-  to: 0,
-});
+const store = useStore();
+const membres = ref([]);
 const loading = ref(false);
 
 // Query parameters for API
@@ -110,7 +109,8 @@ const fetchMembres = async () => {
 
     // Handle your API response structure
     if (response.success) {
-      paginatedMembres.value = response.data;
+      membres.value = response.data || [];
+      store.state.membres = response.data || [];
     } else {
       console.error("API Error:", response.message);
     }
@@ -183,5 +183,9 @@ const handleDelete = (membre) => {
 
 onMounted(() => {
   fetchMembres();
+});
+
+const tableData = computed(() => {
+  return store.state.membres || [];
 });
 </script>

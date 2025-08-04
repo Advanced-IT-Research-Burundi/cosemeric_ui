@@ -1,268 +1,209 @@
 <template>
-  <div class="container py-4 px-4">
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-          <h1 class="h3 mb-0">Gestion des Crédits</h1>
-          <router-link to="/credits/add" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Nouveau Crédit
-          </router-link>
-        </div>
+    <div class="container py-4 px-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestion des Crédits</h2>
+        <router-link to="/credits/add" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Ajouter un crédit
+        </router-link>
       </div>
-    </div>
-
-    <!-- Barre de recherche et filtres -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input 
-                type="text" 
-                class="form-control" 
-                placeholder="Rechercher..." 
-                v-model="searchQuery"
-                @keyup.enter="searchCredits"
+  
+      <div class="card">
+          <AdvancedTable
+              :data="tableData"
+              :columns="columns"
+              :loading="loading"
+              search-placeholder="Rechercher des crédits..."
+              no-data-message="Aucun crédit trouvé"
+              :show-filters="true"
+              :has-actions="true"
+              row-key="id"
+              @edit="handleEdit"
+              @delete="handleDelete"
+              @search="handleSearch"
+              @sort="handleSort"
+              @filter="handleFilter"
+              @page-change="handlePageChange"
+              @per-page-change="handlePerPageChange"
               >
-            </div>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" v-model="statusFilter" @change="fetchCredits">
-              <option value="">Tous les statuts</option>
-              <option value="en_attente">En attente</option>
-              <option value="approuve">Approuvé</option>
-              <option value="rejete">Rejeté</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline-secondary w-100" @click="resetFilters">
-              <i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tableau des crédits -->
-    <div class="card">
-      <div class="card-body p-0">
-        <button @click="printPage">Imprimer </button>
-        <button @click="generatePdfA">Generate PDF  </button>
-        <button @click="generateExcel"> Generate Excel File  </button>
-        <div class="table-responsive" id="bonjour">
-          <table class="table table-hover mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Membre</th>
-                <th class="text-end">Montant demandé</th>
-                <th class="text-end">Montant accordé</th>
-                <th class="text-center">Taux d'intérêt</th>
-                <th class="text-center">Durée (mois)</th>
-                <th class="text-center">Statut</th>
-                <th class="text-center">Date demande</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="credit in listesCredits" :key="credit.id" class="align-middle">
-                <td>#{{ credit.id }}</td>
-                <td>Membre #{{ credit.membre_id }}</td>
-                <td class="text-end">{{ formatCurrency(credit.montant_demande) }}</td>
-                <td class="text-end">{{ formatCurrency(credit.montant_accorde) }}</td>
-                <td class="text-center">{{ credit.taux_interet }}%</td>
-                <td class="text-center">{{ credit.duree_mois }}</td>
-                <td class="text-center">
-                  <span :class="`badge bg-${getStatusBadgeClass(credit.statut)}`">
-                    {{ formatStatus(credit.statut) }}
+              <!-- Custom column slot -->
+              <template #column-statut="{ value }">
+                  <span class="badge rounded-1" :class="getClassByStatut(value)">
+                  {{ getStatusLabel(value) }}
                   </span>
-                </td>
-                <td class="text-center">{{ formatDate(credit.date_demande) }}</td>
-                <td class="text-center">
-                  <div class="btn-group btn-group-sm">
-                    <router-link :to="{ name: 'creditsView', params: { id: credit.id } }" class="btn btn-outline-primary" title="Voir les détails">
-                      <i class="fas fa-eye"></i>
-                    </router-link>
-                    <router-link :to="{ name: 'creditsEdit', params: { id: credit.id } }" class="btn btn-outline-secondary" title="Éditer">
-                      <i class="fas fa-pen"></i>
-                    </router-link>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <!-- Pagination -->
-      <div class="card-footer bg-white">
-        <Pagination 
-          v-if="credits.last_page > 1"
-          :current-page="currentPage"
-          :total-pages="credits.last_page"
-          @page-changed="onPageChange"
-        />
+              </template>
+          </AdvancedTable>
       </div>
     </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { useStore } from 'vuex';
-import api from '../../services/api';
-import Pagination from '../../components/Pagination.vue';
-
-import usePrint from '../../utils/usePrint';
-const {print , generatePdf , exportToExcel } = usePrint();
-
-function printPage(){
-  print("bonjour")
-}
-function generatePdfA(){
-  generatePdf("bonjour")
-}
-
-function generateExcel(){
-  exportToExcel(['A', 'B', 'C']);
-}
-
-
-// Références réactives
-const store = useStore();
-const credits = ref({
-  data: [],
-  current_page: 1,
-  last_page: 1,
-  per_page: 15,
-  total: 0
-});
-
-const listesCredits = computed(() => store.state?.credits?.data|| []);
-const currentPage = ref(1);
-const searchQuery = ref('');
-const statusFilter = ref('');
-const isLoading = ref(true);
-const errorMessage = ref('');
-
-// Formateurs
-const formatCurrency = (value) => {
-  return new Intl.NumberFormat('fr-FR', { 
-    style: 'currency', 
-    currency: 'BIF',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(value);
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleDateString('fr-FR');
-};
-
-const formatStatus = (status) => {
-  const statusMap = {
-    'en_attente': 'En attente',
-    'approuve': 'Approuvé',
-    'rejete': 'Rejeté'
-  };
-  return statusMap[status] || status;
-};
-
-const getStatusBadgeClass = (status) => {
-  const classes = {
-    'en_attente': 'warning',
-    'approuve': 'success',
-    'rejete': 'danger'
-  };
-  return classes[status] || 'secondary';
-};
-
-// Récupération des crédits
-const fetchCredits = async (page = 1) => {
-  store.state.error = '';
-  try {
-    const response = await api.get('/credits', {
-      params: {
-        page,
-        search: searchQuery.value,
-        status: statusFilter.value
+  </template>
+  
+  <script setup>
+  import { ref, onMounted, computed } from "vue";
+  import { useStore } from "vuex";
+  import api from "../../services/api";
+  import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
+  import router from "../../router";
+  
+  const store = useStore();
+  const credits = ref([]);
+  const loading = ref(false);
+  
+  // Query parameters for API
+  const queryParams = ref({
+    page: 1,
+    per_page: 15,
+    search: "",
+    sort_field: "",
+    sort_order: "asc",
+    filters: {},
+  });
+  
+  const columns = [
+    { key: "id", label: "ID", sortable: true },
+    { key: "membre.nom", label: "Nom", width: "100px", sortable: true },
+    { key: "montant_accorde", label: "Montant accordé", sortable: true, filterable: true },
+    { key: "taux_interet", label: "Taux d'intérêt", sortable: true, filterable: true, formatter: (value) => value + " %" },
+    { key: "duree_mois", label: "Durée", width: "80px", sortable: true, filterable: true, formatter: (value) => value + " mois" },
+    {
+      key: "statut",
+      label: "Statut",
+      sortable: true,
+      filterable: true,
+    },
+    {
+      key: "created_at",
+      label: "Créé le",
+      sortable: true,
+      formatter: (value) => new Date(value).toLocaleDateString(),
+    },
+  ];
+  
+  // Fetch data from your API
+  const fetchCredits = async () => {
+    loading.value = true;
+  
+    try {
+      const params = {};
+  
+      // Add query parameters
+      params.page = queryParams.value.page;
+      params.per_page = queryParams.value.per_page;
+  
+      if (queryParams.value.search) {
+        params.search = queryParams.value.search;
       }
-    });
-    // save data to the store 
-    store.state.credits = response.data;
-    credits.value = response.data;
-    currentPage.value = response.data.current_page;
-  } catch (error) {
-    console.error('Erreur lors de la récupération des crédits:', error);
-    store.state.error = 'Une erreur est survenue lors du chargement des crédits.';
-  } 
-};
-
-// Gestion de la recherche avec délai
-let searchTimeout = null;
-const searchCredits = () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    currentPage.value = 1;
-    fetchCredits(1);
-  }, 500);
-};
-
-// Gestion du changement de page
-const onPageChange = (page) => {
-  currentPage.value = page;
-  fetchCredits(page);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// Réinitialisation des filtres
-const resetFilters = () => {
-  searchQuery.value = '';
-  statusFilter.value = '';
-  fetchCredits(1);
-};
-
-// Surveillance des changements de filtres
-watch([searchQuery, statusFilter], () => {
-  if (searchQuery.value || statusFilter.value) {
-    fetchCredits(1);
+  
+      if (queryParams.value.sort_field) {
+        params.sort_field = queryParams.value.sort_field;
+        params.sort_order = queryParams.value.sort_order;
+      }
+  
+      // Add filters
+      Object.entries(queryParams.value.filters).forEach(([key, value]) => {
+        if (value) {
+          params[`filter[${key}]`] = value;
+        }
+      });
+  
+      const response = await api.get("/credits",params);
+  
+      console.log(response);
+  
+      // Handle your API response structure
+      if (response.success) {
+        credits.value = response.data || [];
+        store.state.credits = response.data || [];
+      } else {
+        console.error("API Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching credits:", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+  
+  const getClassByStatut = (statut) => {
+    if (statut === "rejete") {
+      return "bg-danger";
+    } else if (statut === "en_attente") {
+      return "bg-warning";
+    } else if (statut === "en_cours") {
+      return "bg-info";
+    } else if (statut === "approuve") {
+      return "bg-success";
+    } else {
+      return "bg-secondary";
+    }
   }
-});
 
-// Au chargement du composant
-onMounted(() => {
-  fetchCredits(1);
-});
-</script>
-
-<style scoped>
-.table th {
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  border-top: none;
-  padding: 0.75rem 1rem;
-}
-
-.table td {
-  padding: 1rem;
-  vertical-align: middle;
-}
-
-.badge {
-  font-size: 0.75rem;
-  padding: 0.35em 0.65em;
-  font-weight: 500;
-}
-
-.btn-group-sm > .btn {
-  padding: 0.25rem 0.5rem;
-}
-
-.table-responsive {
-  min-height: 300px;
-}
-</style>
+  const getStatusLabel = (statut) => {
+    if (statut === "rejete") {
+      return "Rejeté";
+    } else if (statut === "en_attente") {
+      return "En attente";
+    } else if (statut === "en_cours") {
+      return "En cours";
+    } else if (statut === "approuve") {
+      return "Approuvé";
+    } else {
+      return "Terminé";
+    }
+  }
+  
+  // Event handlers
+  const handleSearch = (searchTerm) => {
+    queryParams.value.search = searchTerm;
+    queryParams.value.page = 1;
+    fetchCredits();
+  };
+  
+  const handleSort = (sortData) => {
+    queryParams.value.sort_field = sortData.field;
+    queryParams.value.sort_order = sortData.order;
+    queryParams.value.page = 1;
+    fetchCredits();
+  };
+  
+  const handleFilter = (filters) => {
+    queryParams.value.filters = filters;
+    queryParams.value.page = 1;
+    fetchCredits();
+  };
+  
+  const handlePageChange = (page) => {
+    queryParams.value.page = page;
+    fetchCredits();
+  };
+  
+  const handlePerPageChange = (perPage) => {
+    queryParams.value.per_page = perPage;
+    queryParams.value.page = 1;
+    fetchCredits();
+  };
+  
+  const handleEdit = (credit) => {
+    router.push({ name: 'creditsEdit', params: { id: credit.id } });
+  };
+  
+  const handleDelete = (credit) => {
+    if(confirm("Etês-vous sûr de vouloir supprimer ce membre?")){
+      api.delete(`/credits/${credit.id}`)
+      .then((response) => {
+        console.log("Credit supprimé avec succès!");
+        fetchCredits();
+      })
+      .catch((error) => {
+        console.error("Une erreur est survenue lors de la suppression du membre:", error);
+      });
+    }
+  };
+  
+  onMounted(() => {
+    fetchCredits();
+  });
+  
+  const tableData = computed(() => {
+    return store.state.credits || [];
+  });
+  </script>
+  
