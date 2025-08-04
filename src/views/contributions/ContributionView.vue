@@ -1,9 +1,9 @@
 <template>
     <div class="container py-4 px-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Tous les membres</h2>
-        <router-link to="/members/add" class="btn btn-primary">
-          <i class="fas fa-plus me-2"></i>Ajouter un membre
+        <h2 class="mb-0">Toutes les cotisations</h2>
+        <router-link to="/contributions/add" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Ajouter une cotisation
         </router-link>
       </div>
   
