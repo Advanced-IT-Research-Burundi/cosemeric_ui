@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-4">
     <h3>Tableau de bord</h3>
     
   </div>
