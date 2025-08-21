@@ -20,7 +20,7 @@
                 <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
                 <select 
                   id="membre_id" 
-                  class="form-select" 
+                  class="form-select select2" 
                   v-model="formData.membre_id" 
                   required
                   :disabled="loadingMembers"

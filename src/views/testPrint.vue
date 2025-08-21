@@ -1,6 +1,11 @@
 <template>
   <div>
-    <h3>Tableau de bord</h3>
+    <button @click="printPage">Imprimer </button>
+    <button @click="generatePdfA">Generate PDF  </button>
+    <button @click="generateExcel"> Generate Excel File  </button>
+    <div id="bonjour">
+        <h1>BONJOUR LE MONDE</h1>
+    </div>
     
   </div>
 </template>
