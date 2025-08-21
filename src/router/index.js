@@ -103,6 +103,11 @@ const routes = [
         component: () => import('../views/members/AllMembers.vue')
       },
       {
+        path: ':id',
+        name: 'memberView',
+        component: () => import('../views/members/ViewMember.vue')
+      },
+      {
         path: 'add',
         name: 'membersAdd',
         component: () => import('../views/members/CreateMember.vue')

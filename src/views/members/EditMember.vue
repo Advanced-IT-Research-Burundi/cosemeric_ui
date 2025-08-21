@@ -60,7 +60,7 @@
           <select class="form-select" id="categorie_id" v-model="formData.categorie_id" required>
             <option value="" disabled>Sélectionnez une catégorie</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.nom }}
+              {{ category.description }}
             </option>
           </select>
         </div>

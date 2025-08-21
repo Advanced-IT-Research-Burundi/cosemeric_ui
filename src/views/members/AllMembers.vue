@@ -17,6 +17,7 @@
               :show-filters="true"
               :has-actions="true"
               row-key="id"
+              @view="handleView"
               @edit="handleEdit"
               @delete="handleDelete"
               @search="handleSearch"
@@ -28,8 +29,12 @@
               <!-- Custom column slot -->
               <template #column-statut="{ value }">
                   <span class="badge rounded-1" :class="getClassByStatut(value)">
-                  {{ value }}
+                  {{ value.charAt(0).toUpperCase() + value.slice(1) }}
                   </span>
+              </template>
+
+              <template #column-matricule="{ value }">
+                  <span class="badge fw-semibold text-bg-secondary rounded-1">{{ value }}</span>
               </template>
           </AdvancedTable>
       </div>
@@ -58,22 +63,20 @@
   });
   
   const columns = [
-    { key: "id", label: "ID", sortable: true },
-    { key: "nom", label: "Nom", width: "100px", sortable: true },
-    { key: "email", label: "Email", width: "100px", sortable: true },
-    { key: "telephone", label: "Téléphone", sortable: true, filterable: true },
-    {
-      key: "statut",
-      label: "Statut",
-      sortable: true,
-      filterable: true,
-    },
+    { key: "matricule", label: "Matricule", width: "100px", sortable: true },
+    { key: "full_name", label: "Nom complet", width: "100px", sortable: true },
+    { key: "categorie.description", label: "Catégorie", width: "150px", sortable: true },
     {
       key: "created_at",
       label: "Créé le",
       sortable: true,
       formatter: (value) => new Date(value).toLocaleDateString(),
-    },
+    },{
+      key: "statut",
+      label: "Statut",
+      sortable: true,
+      filterable: true,
+    }
   ];
   
   // Fetch data from your API
@@ -166,6 +169,10 @@
   
   const handleEdit = (membre) => {
     router.push({ name: 'membersEdit', params: { id: membre.id } });
+  };
+
+  const handleView = (membre) => {
+    router.push({ name: 'memberView', params: { id: membre.id } });
   };
   
   const handleDelete = (membre) => {

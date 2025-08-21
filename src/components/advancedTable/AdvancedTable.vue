@@ -118,7 +118,13 @@
             </td>
             <td v-if="hasActions">
               <slot name="actions" :item="item" :index="index">
-                <div class="btn-group btn-group-sm">
+                <div class="btn-group">
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    @click="$emit('view', item)"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
                   <button
                     class="btn btn-outline-primary btn-sm"
                     @click="$emit('edit', item)"
@@ -381,5 +387,9 @@ watch(() => props.data.per_page, (newPerPage) => {
   .table-responsive {
     font-size: 0.875rem;
   }
+}
+
+th{
+font-weight: 600 !important;
 }
 </style>

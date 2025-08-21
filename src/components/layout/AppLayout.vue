@@ -3,8 +3,8 @@
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'collapsed': isCollapsed }">
       <div class="logo-container">
-        <h2 v-if="!isCollapsed">COSEMERIC</h2>
-        <h2 v-else>C</h2>
+        <h2 v-if="!isCollapsed"><i class="fas fa-hand-holding-droplet me-2"></i> CASOMERIC</h2>
+        <h2 v-else><i class="fas fa-hand-holding-droplet"></i></h2>
       </div>
       <nav class="nav-menu">
         <template v-for="(item, index) in menuItems" :key="index">

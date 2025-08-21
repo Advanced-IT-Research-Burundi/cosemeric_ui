@@ -20,14 +20,15 @@
           <h5 class="mb-3">Informations personnelles</h5>
         </div>
 
-        <div class="col-md-6">
-          <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="prenom" v-model="formData.prenom" required>
-        </div>
-
+        
         <div class="col-md-6">
           <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
           <input type="text" class="form-control" id="nom" v-model="formData.nom" required>
+        </div>
+
+        <div class="col-md-6">
+          <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="prenom" v-model="formData.prenom" required>
         </div>
 
         <div class="col-md-6">
@@ -54,7 +55,7 @@
           <select class="form-select" id="categorie_id" v-model="formData.categorie_id" required>
             <option value="" disabled>Sélectionnez une catégorie</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.nom }}
+              {{ category.description }}
             </option>
           </select>
         </div>
