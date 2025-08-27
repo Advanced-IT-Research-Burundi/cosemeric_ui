@@ -29,11 +29,13 @@
       <div v-else class="text-center py-4 text-muted">
         {{ emptyMessage }}
       </div>
-      <div v-if="showViewAll" class="text-end mt-2">
-        <button class="btn btn-sm btn-link text-decoration-none">
-          Voir tout <i class="fas fa-arrow-right ms-1"></i>
-        </button>
-      </div>
+    </div>
+    <div class="card-footer border-top-0 bg-white d-none">
+        <div v-if="showViewAll" class="text-end mt-2">
+            <button class="btn btn-sm btn-light text-decoration-none">
+            Voir tout <i class="fas fa-arrow-right ms-1"></i>
+            </button>
+        </div>
     </div>
   </div>
 </template>

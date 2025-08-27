@@ -18,7 +18,7 @@
             <!-- Membre -->
             <div class="col-md-6">
               <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
-              <select 
+              <select v-select2
                 id="membre_id" 
                 class="form-select" 
                 v-model="formData.membre_id" 
@@ -300,4 +300,7 @@ onMounted(() => {
   fetchMembers();
   calculatePayments();
 });
+
+
+
 </script>

@@ -9,9 +9,14 @@ import App from './App.vue'
 import router from './router'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import vuexStore from './store'
-import $ from 'jquery'
+import jQuery from 'jquery'
 import 'select2'
 import 'select2/dist/css/select2.css'
+import select2 from './directives/select2'
+
+window.$ = window.jQuery = jQuery
+
+
 // Create app
 const app = createApp(App)
 
@@ -40,10 +45,7 @@ const toastOptions = {
 }
 
 app.use(Toast, toastOptions)
+app.directive('select2', select2)
 
 // Mount the app
 app.mount('#app')
-
-$(document).ready(function() {
-    $(".select2").select2();
-})

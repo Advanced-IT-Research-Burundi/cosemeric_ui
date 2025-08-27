@@ -13,6 +13,7 @@ const vuexStore = createStore({
       },
       isLoading: false,
       error: null,
+    activePage: null,
 
     }
   },

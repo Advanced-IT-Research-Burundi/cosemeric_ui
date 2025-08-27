@@ -36,13 +36,16 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: () => import('../views/Dashboard.vue')
+    component: () => import('../views/Dashboard.vue'),
+    alias: '/',
+    meta: { requiresAuth: true } 
   },
   // Test AdvancedTable
   {
     path: '/test',
     name: 'TestAdvancedTable',
-    component: () => import('../views/TestAdvancedTable.vue')
+    component: () => import('../views/TestAdvancedTable.vue'),
+    meta: { requiresAuth: true } 
   },
   
   // Assistances
@@ -66,7 +69,8 @@ const routes = [
         component: () => import('../views/assistances/EditAssistance.vue'),
         props: true
       }
-    ]
+    ],
+    meta: { requiresAuth: true } 
   },
 
   // Credits
@@ -90,7 +94,8 @@ const routes = [
         component: () => import('../views/credits/EditCredit.vue'),
         props: true
       }
-    ]
+    ],
+    meta: { requiresAuth: true } 
   },
   // Members
   {
@@ -117,8 +122,8 @@ const routes = [
         name: 'membersEdit',
         component: () => import('../views/members/EditMember.vue')
       },
-    ]
-   
+    ],
+    meta: { requiresAuth: true } 
   },
 
   // Contributions
@@ -141,7 +146,8 @@ const routes = [
         name: 'contributionsEdit',
         component: () => import('../views/contributions/EditContribution.vue')
       },
-    ]
+    ],
+    meta: { requiresAuth: true }
   },
 
   // 404 - Keep this as last route
@@ -149,9 +155,8 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'PageNotFound',
     component: PageNotFound,
-    meta: { title: 'Page non trouvée' }
+    meta: { title: 'Page non trouvée', requiresAuth: true }
   },
-
 ]
 
 const router = createRouter({

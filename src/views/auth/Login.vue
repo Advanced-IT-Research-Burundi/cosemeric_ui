@@ -50,7 +50,7 @@
                     />
                     <button
                       type="button"
-                      class="btn btn-sm btn-outline-secondary"
+                      class="btn btn-sm btn-light border"
                       @click="togglePassword"
                     >
                       <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
