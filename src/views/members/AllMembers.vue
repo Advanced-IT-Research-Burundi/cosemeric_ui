@@ -17,6 +17,7 @@
               :show-filters="true"
               :has-actions="true"
               row-key="id"
+              model="membres"
               @view="handleView"
               @edit="handleEdit"
               @delete="handleDelete"
