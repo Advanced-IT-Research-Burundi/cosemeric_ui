@@ -12,7 +12,7 @@
 
           <!-- Step 1: Select Member -->
           <div v-if="currentStep === 1" class="row g-3">
-            <div class="col-md-8">
+            <div class="col-md-12">
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                 <input
@@ -66,17 +66,6 @@
                   <strong>{{ formData.membre?.nom }} {{ formData.membre?.prenom }}</strong>
                 </div>
               </div>
-            </div>
-
-            <div class="col-md-4 d-flex align-items-start" v-if="!formData.membre_id">
-              <button
-                type="button"
-                class="btn btn-primary w-100"
-                :disabled="!formData.membre_id || loadingMembers"
-                @click="goNext"
-              >
-                Suivant
-              </button>
             </div>
           </div>
 
