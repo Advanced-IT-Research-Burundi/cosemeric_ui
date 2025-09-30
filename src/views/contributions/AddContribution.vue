@@ -70,162 +70,163 @@
           </div>
 
           <!-- Step 2: Cotisation details -->
-          <div v-if="currentStep === 2" class="row g-3">
-            
-            <!-- Show selected member name -->
-            <div v-if="formData.membre_id" class="alert alert-info d-flex align-items-center mt-2" role="alert">
-              <i class="fas fa-user me-2"></i>
-              <div>
-                Membre sélectionné :
-                <strong>{{ formData.membre?.nom }} {{ formData.membre?.prenom }}</strong>
+          <div v-if="currentStep === 2">
+            <form @submit.prevent="handleSubmit" class="row g-3">
+              <!-- Show selected member name -->
+              <div v-if="formData.membre_id" class="alert alert-info d-flex align-items-center mt-2" role="alert">
+                <i class="fas fa-user me-2"></i>
+                <div>
+                  Membre sélectionné :
+                  <strong>{{ formData.membre?.nom }} {{ formData.membre?.prenom }}</strong>
+                </div>
               </div>
-            </div>
 
-            <!-- Période -->
-            <div class="col-md-6">
-              <label for="periode_id" class="form-label">Période <span class="text-danger">*</span></label>
-              <select
-                id="periode_id"
-                class="form-select"
-                v-model="formData.periode_id"
-                required
-                :disabled="loadingPeriodes"
-              >
-                <option value="" disabled>Sélectionnez une période</option>
-                <option v-for="periode in periodes" :key="periode.id" :value="periode.id">
-                  {{ periode.libelle }} ({{ formatDate(periode.date_debut) }} - {{ formatDate(periode.date_fin) }})
-                </option>
-              </select>
-              <div v-if="loadingPeriodes" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des périodes...
-              </div>
-            </div>
-
-            <!-- Montant et Devise -->
-            <div class="col-md-6">
-              <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
-              <div class="input-group">
-                <input
-                  type="number"
-                  class="form-control"
-                  id="montant"
-                  v-model.number="formData.montant"
-                  min="0"
-                  step="0.01"
-                  required
-                >
+              <!-- Période -->
+              <div class="col-md-6">
+                <label for="periode_id" class="form-label">Période <span class="text-danger">*</span></label>
                 <select
+                  id="periode_id"
                   class="form-select"
-                  style="max-width: 100px;"
-                  v-model="formData.devise"
+                  v-model="formData.periode_id"
+                  required
+                  :disabled="loadingPeriodes"
+                >
+                  <option value="" disabled>Sélectionnez une période</option>
+                  <option v-for="periode in periodes" :key="periode.id" :value="periode.id">
+                    {{ periode.libelle }} ({{ formatDate(periode.date_debut) }} - {{ formatDate(periode.date_fin) }})
+                  </option>
+                </select>
+                <div v-if="loadingPeriodes" class="form-text">
+                  <i class="fas fa-spinner fa-spin me-1"></i>Chargement des périodes...
+                </div>
+              </div>
+
+              <!-- Montant et Devise -->
+              <div class="col-md-6">
+                <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="montant"
+                    v-model.number="formData.montant"
+                    min="0"
+                    step="0.01"
+                    required
+                  >
+                  <select
+                    class="form-select"
+                    style="max-width: 100px;"
+                    v-model="formData.devise"
+                    required
+                  >
+                    <option value="FBU">FBU</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Date de Paiement -->
+              <div class="col-md-6">
+                <label for="date_paiement" class="form-label">Date de Paiement <span class="text-danger">*</span></label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="date_paiement"
+                  v-model="formData.date_paiement"
                   required
                 >
-                  <option value="FBU">FBU</option>
-                  <option value="USD">USD</option>
+              </div>
+
+              <!-- Mode de Paiement -->
+              <div class="col-md-6">
+                <label for="mode_paiement" class="form-label">Mode de Paiement <span class="text-danger">*</span></label>
+                <select
+                  id="mode_paiement"
+                  class="form-select"
+                  v-model="formData.mode_paiement"
+                  required
+                >
+                  <option value="1">Espèces</option>
+                  <option value="2">Virement</option>
+                  <option value="3">Chèque</option>
+                  <option value="4">Mobile Money</option>
                 </select>
               </div>
-            </div>
 
-            <!-- Date de Paiement -->
-            <div class="col-md-6">
-              <label for="date_paiement" class="form-label">Date de Paiement <span class="text-danger">*</span></label>
-              <input
-                type="date"
-                class="form-control"
-                id="date_paiement"
-                v-model="formData.date_paiement"
-                required
-              >
-            </div>
+              <!-- Référence de Paiement -->
+              <div class="col-md-6">
+                <label for="reference_paiement" class="form-label">Référence de Paiement</label>
+                <input
+                  type="string"
+                  class="form-control"
+                  id="reference_paiement"
+                  v-model="formData.reference_paiement"
+                  placeholder="Numéro de référence ou de transaction"
+                >
+              </div>
 
-            <!-- Mode de Paiement -->
-            <div class="col-md-6">
-              <label for="mode_paiement" class="form-label">Mode de Paiement <span class="text-danger">*</span></label>
-              <select
-                id="mode_paiement"
-                class="form-select"
-                v-model="formData.mode_paiement"
-                required
-              >
-                <option value="1">Espèces</option>
-                <option value="2">Virement</option>
-                <option value="3">Chèque</option>
-                <option value="4">Mobile Money</option>
-              </select>
-            </div>
-
-            <!-- Référence de Paiement -->
-            <div class="col-md-6">
-              <label for="reference_paiement" class="form-label">Référence de Paiement</label>
-              <input
-                type="string"
-                class="form-control"
-                id="reference_paiement"
-                v-model="formData.reference_paiement"
-                placeholder="Numéro de référence ou de transaction"
-              >
-            </div>
-
-            <!-- Statut -->
-            <div class="col-12">
-              <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
-              <div class="d-flex gap-4">
-                <div class="form-radio">
-                  <input type="radio" name="statut" class="form-check-input" id="paye" v-model="formData.statut" value="paye">
-                  <label for="paye" class="form-check-label ps-1">Payé</label>
-                </div>
-                <div class="form-radio">
-                  <input type="radio" name="statut" class="form-check-input" id="en_attente" v-model="formData.statut" value="en_attente">
-                  <label for="en_attente" class="form-check-label ps-1">En attente</label>
-                </div>
-                <div class="form-radio">
-                  <input type="radio" name="statut" class="form-check-input" id="en_retard" v-model="formData.statut" value="en_retard">
-                  <label for="en_retard" class="form-check-label ps-1">En retard</label>
+              <!-- Statut -->
+              <div class="col-md-6">
+                <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
+                <div class="d-flex gap-4">
+                  <div class="form-radio">
+                    <input type="radio" name="statut" class="form-check-input" id="paye" v-model="formData.statut" value="paye">
+                    <label for="paye" class="form-check-label ps-1">Payé</label>
+                  </div>
+                  <div class="form-radio">
+                    <input type="radio" name="statut" class="form-check-input" id="en_attente" v-model="formData.statut" value="en_attente">
+                    <label for="en_attente" class="form-check-label ps-1">En attente</label>
+                  </div>
+                  <div class="form-radio">
+                    <input type="radio" name="statut" class="form-check-input" id="en_retard" v-model="formData.statut" value="en_retard">
+                    <label for="en_retard" class="form-check-label ps-1">En retard</label>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Notes -->
-            <div class="col-12">
-              <label for="notes" class="form-label">Notes</label>
-              <textarea
-                class="form-control"
-                id="notes"
-                v-model="formData.notes"
-                rows="3"
-                placeholder="Notes supplémentaires..."
-              ></textarea>
-            </div>
+              <!-- Notes -->
+              <div class="col-12">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea
+                  class="form-control"
+                  id="notes"
+                  v-model="formData.notes"
+                  rows="3"
+                  placeholder="Notes supplémentaires..."
+                ></textarea>
+              </div>
 
-            <!-- Footer buttons for Step 2 -->
-            <div class="d-flex justify-content-between gap-2 mt-4">
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                @click="currentStep = 1"
-              >
-                Précédent
-              </button>
-
-              <div class="d-flex gap-2">
+              <!-- Footer buttons for Step 2 -->
+              <div class="d-flex justify-content-between gap-2 mt-4">
                 <button
                   type="button"
                   class="btn btn-outline-secondary"
-                  @click="$router.push('/contributions')"
-                  :disabled="loading"
+                  @click="currentStep = 1"
                 >
-                  Annuler
+                  Précédent
                 </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  :disabled="loading || loadingMembers || loadingPeriodes"
-                >
-                  <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                  {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
-                </button>
+
+                <div class="d-flex gap-2">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    @click="$router.push('/contributions')"
+                    :disabled="loading"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    :disabled="loading || loadingMembers || loadingPeriodes"
+                  >
+                    <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
 
           <form @submit.prevent="handleSubmit" class="d-none">

@@ -591,7 +591,7 @@ onMounted(() => {
 }
 
 .stat-card .card-body {
-  padding: 1.75rem;
+  padding: 0;
 }
 
 /* ============================================
@@ -647,7 +647,7 @@ onMounted(() => {
    VALEURS ET LABELS DES STATISTIQUES
    ============================================ */
 .stat-value {
-  font-size: 2.2rem;
+  font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   line-height: 1.2;
