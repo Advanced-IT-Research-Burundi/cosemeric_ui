@@ -278,7 +278,7 @@ body {
 }
 
 .menu-header {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.1rem;
   cursor: pointer;
   display: flex;
   align-items: center !important;

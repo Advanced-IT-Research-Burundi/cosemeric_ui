@@ -150,6 +150,20 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
+  // Users
+  {
+    path: '/users',
+    name: 'users',
+    children: [
+      {
+        path: '',
+        name: 'usersView',
+        component: () => import('../views/users/Users.vue')
+      },
+    ],
+    meta: { requiresAuth: true }
+  },
+
   // 404 - Keep this as last route
   {
     path: '/:pathMatch(.*)*',
@@ -178,6 +192,7 @@ router.beforeEach(async (to, from, next) => {
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
+      console.log("not authenticated");
       authStore.setReturnUrl(to.fullPath)
       return next({ name: 'Login' })
     }
