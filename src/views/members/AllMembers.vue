@@ -65,13 +65,8 @@
   const columns = [
     { key: "matricule", label: "Matricule", width: "100px", sortable: true },
     { key: "full_name", label: "Nom complet", width: "100px", sortable: true },
-    { key: "categorie.description", label: "Catégorie", width: "150px", sortable: true },
+    { key: "categorie", label: "Catégorie", width: "150px", sortable: true },
     {
-      key: "created_at",
-      label: "Créé le",
-      sortable: true,
-      formatter: (value) => new Date(value).toLocaleDateString(),
-    },{
       key: "statut",
       label: "Statut",
       sortable: true,
