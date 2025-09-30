@@ -13,6 +13,8 @@ import jQuery from 'jquery'
 import 'select2'
 import 'select2/dist/css/select2.css'
 import select2 from './directives/select2'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 window.$ = window.jQuery = jQuery
 
