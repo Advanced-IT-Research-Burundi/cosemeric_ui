@@ -145,6 +145,9 @@
         </div>
       </div>
     </div>
+
+  
+
   </div>
 </template>
 
@@ -358,11 +361,7 @@ const tableData = computed(() => {
 </script>
 
 
-<template>
-    <div>
-        <advanced-table/>
-    </div>
-</template>
+
 
 <script setup >
 
