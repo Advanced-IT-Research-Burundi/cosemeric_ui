@@ -207,7 +207,9 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
+.nav-menu {
+ 
+}
 * {
   margin: 0;
   padding: 0;
@@ -255,6 +257,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(50, 246, 50, 0.854);
+  color: white;
 }
 
 .logo-container h2 {
@@ -391,7 +395,7 @@ body {
 
 /* Admin Header Styles */
 .admin-header {
-  background: white;
+  background: rgb(242, 41, 41);
   padding: 0 2rem;
   height: 60px;
   display: flex;

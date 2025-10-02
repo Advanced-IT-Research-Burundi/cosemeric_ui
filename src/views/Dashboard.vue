@@ -263,7 +263,7 @@ const dateActuelle = computed(() => {
 const formatMontant = (montant) => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'XAF',
+    currency: 'BIF',
     minimumFractionDigits: 0
   }).format(montant);
 };
@@ -327,7 +327,7 @@ const initCharts = () => {
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' XAF';
+                return value.toLocaleString('fr-FR') + ' BIF';
               }
             },
             grid: {
@@ -405,7 +405,7 @@ const initCharts = () => {
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' XAF';
+                return value.toLocaleString('fr-FR') + ' BIF';
               }
             },
             grid: {
@@ -504,7 +504,7 @@ const initCharts = () => {
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' XAF';
+                return value.toLocaleString('fr-FR') + ' BIF';
               }
             },
             grid: {
