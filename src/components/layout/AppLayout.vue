@@ -33,6 +33,19 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
             <!-- <h1>{{ currentRouteName }}</h1> -->
+
+            
+          </div>
+
+          <div class="custom-navbar">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-cash-coin me-2"></i>
+                Gestion des Cotisations Sociales
+              </span>
+              <span class="text-white">
+                <i class="bi bi-calendar-event me-2"></i>
+                {{ dateActuelle }}
+              </span>
           </div>
           <div class="header-right">
             <div class="user-profile" @click="toggleUserDropdown">
@@ -81,6 +94,16 @@ const route = useRoute();
 const store = useStore();
 const authStore = useAuthStore();
 
+
+const dateActuelle = computed(() => {
+  const options = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  return new Date().toLocaleDateString('fr-FR', options);
+});
 // Reactive data
 const isCollapsed = ref(false);
 const showUserDropdown = ref(false);
@@ -136,19 +159,13 @@ const currentRouteName = computed(() => {
 });
 
 const userInitials = computed(() => {
-  const user = authStore.user || {};
-  if (user.firstName && user.lastName) {
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  }
-  return 'U';
+  const user = authStore.user 
+  return user.name.charAt(0).toUpperCase();
 });
 
 const userName = computed(() => {
-  const user = authStore.user || {};
-  if (user.firstName && user.lastName) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  return 'Utilisateur';
+  const user = authStore.user
+  return user.name;
 });
 
 // Methods
@@ -207,8 +224,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.nav-menu {
- 
+
+.custom-navbar{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 * {
   margin: 0;
@@ -257,12 +277,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(50, 246, 50, 0.854);
-  color: white;
+  background: var(--primary-color);
+  color: black;
 }
 
 .logo-container h2 {
-  color: var(--primary-color);
+  
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -395,7 +415,7 @@ body {
 
 /* Admin Header Styles */
 .admin-header {
-  background: rgb(242, 41, 41);
+  background: #a2d2ff;
   padding: 0 2rem;
   height: 60px;
   display: flex;

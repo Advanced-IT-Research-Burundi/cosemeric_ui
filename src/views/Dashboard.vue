@@ -1,18 +1,7 @@
 <template>
   <div class="dashboard-container">
     <!-- Navbar -->
-    <nav class="navbar navbar-dark custom-navbar mb-4">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">
-          <i class="bi bi-cash-coin me-2"></i>
-          Gestion des Cotisations Sociales
-        </span>
-        <span class="text-white">
-          <i class="bi bi-calendar-event me-2"></i>
-          {{ dateActuelle }}
-        </span>
-      </div>
-    </nav>
+   
 
     <div class="container-fluid px-4">
       <!-- Cartes de statistiques principales -->
@@ -247,15 +236,7 @@ const stats = ref({
 // ============================================
 // COMPUTED - DATE ACTUELLE FORMATÉE
 // ============================================
-const dateActuelle = computed(() => {
-  const options = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  };
-  return new Date().toLocaleDateString('fr-FR', options);
-});
+
 
 // ============================================
 // FONCTION DE FORMATAGE DES MONTANTS
@@ -562,7 +543,7 @@ onMounted(() => {
    NAVBAR PERSONNALISÉE
    ============================================ */
 .custom-navbar {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: rgb(174, 204, 234);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
 }
