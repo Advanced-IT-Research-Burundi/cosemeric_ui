@@ -116,8 +116,8 @@ export default {
     const errorMessage = ref('')
     
     const form = reactive({
-      email: 'nijeanlionel@gmail.com',
-      password: 'password',
+      email: '',
+      password: '',
       remember: false
     })
     

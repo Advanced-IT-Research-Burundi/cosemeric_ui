@@ -171,7 +171,7 @@ const queryParams = ref({
 });
 
 const columns = [
-  { key: "full_name", label: "Nom complet", sortable: true },
+  { key: "name", label: "Nom complet", sortable: true },
   { key: "email", label: "Email", sortable: true },
   { key: "role", label: "Rôle", sortable: true, filterable: true },
   {
