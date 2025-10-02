@@ -304,7 +304,7 @@ const initCharts = () => {
       data: {
         labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'],
         datasets: [{
-          label: 'Cotisations (XAF)',
+          label: 'Cotisations (BIF)',
           data: [180000, 195000, 210000, 225000, 240000, 255000, 270000, 285000, 295000],
           borderColor: '#3498db',
           backgroundColor: 'rgba(52, 152, 219, 0.1)',
