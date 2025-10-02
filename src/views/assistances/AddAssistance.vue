@@ -31,7 +31,8 @@
                   :key="membre.id" 
                   :value="membre.id"
                 >
-                  {{ membre.prenom }} {{ membre.nom }}
+                {{ membre.id }} |
+                  {{ membre.full_name }} | {{ membre.telephone }} | {{ membre.categorie }}
                 </option>
               </select>
               <div v-if="loadingMembers" class="form-text">

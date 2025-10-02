@@ -45,9 +45,9 @@
                 >
                   <span>
                    Nom : {{ member.full_name }} |  
-                   Mat :  {{member.matricule}} | 
-                   Tel :  {{member.telephone}} | 
-                   Cat :  {{member.categorie}}
+                   Matricule :  {{member.matricule}} | 
+                   Téléphone :  {{member.telephone}} | 
+                   Catégorie :  {{member.categorie}}
                   </span>
                   <i v-if="formData.membre_id === member.id" class="fas fa-check"></i>
                 </li>

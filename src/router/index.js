@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
+import AdminComponent from '../views/admin/AdminComponent.vue'
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -17,6 +18,18 @@ const requireAuth = (to, from, next) => {
 };
 
 const routes = [
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminComponent,
+    meta: { requiresAuth: true } 
+  },
+  {
+    path: '/reports',
+    name: 'reports',
+    component: () => import('../views/rapports/RapportComponent.vue'),
+    meta: { requiresAuth: true } 
+  },
   // Public routes
   {
     path: '/login',
