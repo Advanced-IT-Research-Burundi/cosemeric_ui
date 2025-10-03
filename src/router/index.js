@@ -164,6 +164,14 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
+  // Periodes
+  {
+    path: '/periodes',
+    name: 'periodes',
+    component: () => import('../views/periodes/Periodes.vue'),
+    meta: { requiresAuth: true }
+  },
+
   // Contributions
   {
     path: '/contributions',
