@@ -33,29 +33,16 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
             <!-- <h1>{{ currentRouteName }}</h1> -->
-
-            
-          </div>
-
-          <div class="custom-navbar">
-            <span class="navbar-brand mb-0 h1">
-                <i class="bi bi-cash-coin me-2"></i>
-                Gestion des Cotisations Sociales
-              </span>
-              <span class="text-white">
-                <i class="bi bi-calendar-event me-2"></i>
-                {{ dateActuelle }}
-              </span>
           </div>
           <div class="header-right">
-            <div class="user-profile" @click="toggleUserDropdown">
+            <div class="user-profile" ref="profileRef" @click.stop="toggleUserDropdown">
               <div class="user-avatar">
                 {{ userInitials }}
               </div>
               <span class="user-name">{{ userName }}</span>
               <i class="fas fa-chevron-down"></i>
               
-              <div v-if="showUserDropdown" class="user-dropdown">
+              <div class="user-dropdown" v-if="showUserDropdown" @click.stop>
                 <div class="dropdown-item" @click="navigateToProfile">
                   Mon Profil
                 </div>
@@ -94,19 +81,10 @@ const route = useRoute();
 const store = useStore();
 const authStore = useAuthStore();
 
-
-const dateActuelle = computed(() => {
-  const options = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  };
-  return new Date().toLocaleDateString('fr-FR', options);
-});
 // Reactive data
 const isCollapsed = ref(false);
 const showUserDropdown = ref(false);
+const profileRef = ref(null);
 const menuItems = ref([
   {
     icon: '<svg xmlns="http://www.w3.org/2000/svg" class="me-1" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Huge Icons by Hugeicons - undefined --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="m22 10.5l-9.117-7.678a1.37 1.37 0 0 0-1.765 0L2 10.5"/><path d="M20.5 5v10.5c0 2.828 0 4.243-.879 5.121c-.878.879-2.293.879-5.121.879h-5c-2.828 0-4.243 0-5.121-.879C3.5 19.743 3.5 18.328 3.5 15.5v-6"/><path d="M15 21.5v-5c0-1.414 0-2.121-.44-2.56c-.439-.44-1.146-.44-2.56-.44s-2.121 0-2.56.44C9 14.378 9 15.085 9 16.5v5"/></g></svg>',
@@ -159,13 +137,19 @@ const currentRouteName = computed(() => {
 });
 
 const userInitials = computed(() => {
-  const user = authStore.user 
-  return user.name.charAt(0).toUpperCase();
+  const user = authStore.user || {};
+  if (user.firstName && user.lastName) {
+    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  }
+  return 'U';
 });
 
 const userName = computed(() => {
-  const user = authStore.user
-  return user.name;
+  const user = authStore.user || {};
+  if (user.firstName && user.lastName) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  return 'Utilisateur';
 });
 
 // Methods
@@ -186,7 +170,9 @@ const toggleSection = (index) => {
 };
 
 const toggleUserDropdown = () => {
+  console.log(showUserDropdown.value);
   showUserDropdown.value = !showUserDropdown.value;
+  console.log(showUserDropdown.value);
 };
 
 const navigateToProfile = () => {
@@ -204,12 +190,10 @@ const handleLogout = async () => {
 };
 
 const onClickOutside = (event) => {
-  // Note: In script setup, you can't directly access $el
-  // You'd need to use a template ref for this functionality
-  // const el = ref(null); // Add template ref
-  // if (!el.value?.contains(event.target)) {
-  //   showUserDropdown.value = false;
-  // }
+  // Close only if click is outside the profile/dropdown container
+  if (profileRef.value && profileRef.value.contains(event.target)) {
+    return;
+  }
   showUserDropdown.value = false;
 };
 
@@ -225,11 +209,6 @@ onUnmounted(() => {
 
 <style scoped>
 
-.custom-navbar{
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
 * {
   margin: 0;
   padding: 0;
@@ -277,12 +256,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-color);
-  color: black;
 }
 
 .logo-container h2 {
-  
+  color: var(--primary-color);
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -415,7 +392,7 @@ body {
 
 /* Admin Header Styles */
 .admin-header {
-  background: #a2d2ff;
+  background: white;
   padding: 0 2rem;
   height: 60px;
   display: flex;
