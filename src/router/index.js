@@ -139,6 +139,31 @@ const routes = [
     meta: { requiresAuth: true } 
   },
 
+  // Remboursements
+  {
+    path: '/remboursements',
+    name: 'remboursements',
+    children: [
+      {
+        path: '',
+        name: 'remboursementsView',
+        component: () => import('../views/remboursements/Remboursements.vue')
+      },
+      {
+        path: 'add',
+        name: 'remboursementsAdd',
+        component: () => import('../views/remboursements/AddRemboursement.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'remboursementsEdit',
+        component: () => import('../views/remboursements/EditRemboursement.vue'),
+        props: true
+      }
+    ],
+    meta: { requiresAuth: true }
+  },
+
   // Contributions
   {
     path: '/contributions',
