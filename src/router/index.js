@@ -40,7 +40,7 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register,
+    component: () => import('../views/auth/Register.vue'),
     meta: { guest: true }
   },
   // 404 route

@@ -2,14 +2,13 @@
   <div id="app">
 
     <app-layout v-if="authStore.isAuthenticated"/>
-    <Login v-else/>
+    <router-view v-else />
     <LoadingComponent v-if="isLoading"/>
   </div>
 </template>
 
 <script setup>
 import AppLayout from './components/layout/AppLayout.vue';
-import Login from './views/auth/Login.vue';
 import { useAuthStore } from './stores/auth';
 import { computed } from 'vue';
 import LoadingComponent from './components/common/LoadingComponent.vue';
