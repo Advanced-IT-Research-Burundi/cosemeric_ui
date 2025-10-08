@@ -207,6 +207,12 @@ const routes = [
         component: () => import('../views/users/Users.vue')
       },
       {
+        path: ':id',
+        name: 'usersShow',
+        component: () => import('../views/users/ShowUser.vue'),
+        props: true
+      },
+      {
         path: 'add',
         name: 'usersAdd',
         component: () => import('../views/users/AddUser.vue')

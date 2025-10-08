@@ -27,13 +27,10 @@
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
       >
-        <!-- Custom column slot for status -->
-        <template #column-status="{ value }">
-          <span class="badge rounded-1" :class="getClassByStatus(value)">
-            {{
-              (value || "").toString().charAt(0).toUpperCase() +
-              (value || "").toString().slice(1)
-            }}
+        <!-- Custom column slot for statut -->
+        <template #column-is_active="{ value }">
+          <span class="badge rounded-1" :class="getClassByActive(value)">
+            {{ value ? "Actif" : "Inactif" }}
           </span>
         </template>
       </AdvancedTable>
@@ -52,7 +49,6 @@ import { useToast } from "vue-toastification";
 const store = useStore();
 const users = ref([]);
 const loading = ref(false);
-const saving = ref(false);
 const toast = useToast();
 
 // Query params aligned with AllMembers.vue
@@ -75,28 +71,8 @@ const columns = [
     sortable: true,
     formatter: (value) => (value ? new Date(value).toLocaleDateString() : ""),
   },
-  { key: "status", label: "Statut", sortable: true, filterable: true },
+  { key: "is_active", label: "Statut", sortable: true, filterable: true },
 ];
-
-const form = ref({
-  id: null,
-  full_name: "",
-  email: "",
-  role: "",
-  status: "",
-  password: "",
-});
-
-const resetForm = () => {
-  form.value = {
-    id: null,
-    full_name: "",
-    email: "",
-    role: "",
-    status: "",
-    password: "",
-  };
-};
 
 // Fetch users
 const fetchUsers = async () => {
@@ -131,28 +107,6 @@ const fetchUsers = async () => {
     console.error("Error fetching users:", error);
   } finally {
     loading.value = false;
-  }
-};
-
-// Save (create/update)
-const saveUser = async () => {
-  try {
-    saving.value = true;
-    const payload = { ...form.value };
-    if (isEditMode.value) {
-      const id = payload.id;
-      delete payload.id;
-      if (!payload.password) delete payload.password;
-      await api.put(`/users/${id}`, payload);
-    } else {
-      if (!payload.password) delete payload.password;
-      await api.post("/users", payload);
-    }
-    await fetchUsers();
-  } catch (error) {
-    console.error("Error saving user:", error);
-  } finally {
-    saving.value = false;
   }
 };
 
@@ -192,8 +146,7 @@ const handleEdit = (user) => {
 };
 
 const handleView = (user) => {
-  // You can navigate to a view route if needed:
-  // router.push({ name: 'userView', params: { id: user.id } })
+  router.push({ name: 'usersShow', params: { id: user.id } })
 };
 
 const handleDelete = (user) => {
@@ -208,10 +161,8 @@ const handleDelete = (user) => {
   }
 };
 
-const getClassByStatus = (status) => {
-  if (status === "active" || status === "actif") return "bg-success";
-  if (status === "inactive" || status === "inactif") return "bg-danger";
-  if (status === "suspended" || status === "suspendu") return "bg-warning";
+const getClassByActive = (active) => {
+  if (active) return "bg-success";
   return "bg-secondary";
 };
 
@@ -223,15 +174,3 @@ const tableData = computed(() => {
   return store.state.users || users.value || [];
 });
 </script>
-
-
-
-
-<script setup >
-
-</script>
-
-
-<style  scoped>
-
-</style>
