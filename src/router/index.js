@@ -206,6 +206,17 @@ const routes = [
         name: 'usersView',
         component: () => import('../views/users/Users.vue')
       },
+      {
+        path: 'add',
+        name: 'usersAdd',
+        component: () => import('../views/users/AddUser.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'usersEdit',
+        component: () => import('../views/users/EditUser.vue'),
+        props: true
+      },
     ],
     meta: { requiresAuth: true }
   },

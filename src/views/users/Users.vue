@@ -2,9 +2,9 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Tous les utilisateurs</h2>
-      <button type="button" class="btn btn-primary" @click="openAddModal">
+      <router-link to="/users/add" type="button" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Ajouter un utilisateur
-      </button>
+      </router-link>
     </div>
 
     <div class="card">
@@ -38,113 +38,6 @@
         </template>
       </AdvancedTable>
     </div>
-
-    <!-- Add/Edit User Modal -->
-    <div
-      class="modal fade"
-      id="userModal"
-      tabindex="-1"
-      aria-labelledby="userModalLabel"
-      aria-hidden="true"
-      ref="userModalEl"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="userModalLabel">
-              {{
-                isEditMode ? "Modifier l'utilisateur" : "Ajouter un utilisateur"
-              }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-
-          <form @submit.prevent="saveUser">
-            <div class="modal-body">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label">Nom complet</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model.trim="form.full_name"
-                    required
-                  />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Email</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    v-model.trim="form.email"
-                    required
-                  />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Rôle</label>
-                  <select class="form-select" v-model="form.role" required>
-                    <option value="">Sélectionner un rôle</option>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="user">Utilisateur</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Statut</label>
-                  <select class="form-select" v-model="form.status" required>
-                    <option value="">Sélectionner un statut</option>
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                    <option value="suspended">Suspendu</option>
-                  </select>
-                </div>
-
-                <div v-if="!isEditMode" class="col-12">
-                  <label class="form-label">Mot de passe</label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    v-model="form.password"
-                    minlength="6"
-                    :required="!isEditMode"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                data-bs-dismiss="modal"
-              >
-                Annuler
-              </button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
-                <span
-                  v-if="saving"
-                  class="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                {{
-                  saving
-                    ? "Enregistrement..."
-                    : isEditMode
-                    ? "Enregistrer"
-                    : "Créer"
-                }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -154,11 +47,13 @@ import { useStore } from "vuex";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
+import { useToast } from "vue-toastification";
 
 const store = useStore();
 const users = ref([]);
 const loading = ref(false);
 const saving = ref(false);
+const toast = useToast();
 
 // Query params aligned with AllMembers.vue
 const queryParams = ref({
@@ -183,10 +78,6 @@ const columns = [
   { key: "status", label: "Statut", sortable: true, filterable: true },
 ];
 
-// Modal state
-const userModalEl = ref(null);
-let userModal = null;
-const isEditMode = ref(false);
 const form = ref({
   id: null,
   full_name: "",
@@ -205,25 +96,6 @@ const resetForm = () => {
     status: "",
     password: "",
   };
-};
-
-const openAddModal = () => {
-  isEditMode.value = false;
-  resetForm();
-  userModal?.show();
-};
-
-const openEditModal = (user) => {
-  isEditMode.value = true;
-  form.value = {
-    id: user.id,
-    full_name: user.full_name || user.name || "",
-    email: user.email || "",
-    role: user.role || "",
-    status: user.status || "",
-    password: "",
-  };
-  userModal?.show();
 };
 
 // Fetch users
@@ -277,7 +149,6 @@ const saveUser = async () => {
       await api.post("/users", payload);
     }
     await fetchUsers();
-    userModal?.hide();
   } catch (error) {
     console.error("Error saving user:", error);
   } finally {
@@ -317,20 +188,22 @@ const handlePerPageChange = (perPage) => {
 };
 
 const handleEdit = (user) => {
-  openEditModal(user);
+  router.push({ name: 'usersEdit', params: { id: user.id } })
 };
 
 const handleView = (user) => {
   // You can navigate to a view route if needed:
   // router.push({ name: 'userView', params: { id: user.id } })
-  openEditModal(user);
 };
 
 const handleDelete = (user) => {
   if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
     api
       .delete(`/users/${user.id}`)
-      .then(() => fetchUsers())
+      .then(() => {
+        fetchUsers()
+        toast.success("Utilisateur supprimé avec succès");
+      })
       .catch((error) => console.error("Delete user error:", error));
   }
 };
@@ -343,12 +216,6 @@ const getClassByStatus = (status) => {
 };
 
 onMounted(() => {
-  // Bootstrap 5 modal from bundle in main.js
-  if (typeof window !== "undefined" && window.bootstrap) {
-    userModal = new window.bootstrap.Modal(userModalEl.value, {
-      backdrop: "static",
-    });
-  }
   fetchUsers();
 });
 
