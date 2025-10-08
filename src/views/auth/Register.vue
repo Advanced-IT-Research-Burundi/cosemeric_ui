@@ -39,7 +39,7 @@
                       :key="categorie.id" 
                       :value="categorie.id"
                     >
-                      {{ categorie.nom }}
+                      {{ categorie.proper_name }}
                     </option>
                   </select>
                 </div>
@@ -137,7 +137,9 @@ import { computed, onMounted, ref } from "vue"
 import { useStore } from "vuex"
 import { useRouter } from 'vue-router'
 import api from "../../services/api"
+import { useToast } from "vue-toastification"
 
+const toast = useToast()
 const form = ref({
   matricule: "",
   nom: "",
@@ -147,50 +149,58 @@ const form = ref({
   categorie_id: "",
   password: "",
   password_confirmation: "",
+  statut: "inactif",
+  date_adhesion: new Date().toISOString().split('T')[0],
 })
 
 const store = useStore()
 const router = useRouter()
 const errorMessage = ref('')
-
-const statuts = ref([
- "actif","inactif","suspendu"
-])
-
-onMounted(() => {
-  loadCategories()
-})
-
+const isLoading = ref(false)
 const showPassword = ref(false)
 
 function togglePassword() {
   showPassword.value = !showPassword.value
 }
 
-async function loadCategories() {
-  try {
-    const response = await api.get('/categorie-membres')
-    store.state.categories = response.data
-  } catch (error) {
-    console.error('Erreur lors du chargement des catégories:', error)
-    errorMessage.value = 'Erreur lors du chargement des catégories. Veuillez rafraîchir la page.'
-  }
-}
+// async function loadCategories() {
+//   try {
+//     const response = await api.get('/categorie-membres')
+//     store.state.categories = response.data
+//   } catch (error) {
+//     console.error('Erreur lors du chargement des catégories:', error)
+//     errorMessage.value = 'Erreur lors du chargement des catégories. Veuillez rafraîchir la page.'
+//   }
+// }
 
 async function submitForm() {
   errorMessage.value = '' 
     try{
-        await api.post('/membres', form.value)
-    //  router.push('/members')
+      isLoading.value = true
+      
+      const res = await api.post('/register', form.value)
+      
+      toast.success(res.message)
+      router.push('/login')
     }
     catch (error) {
-      console.error('Erreur lors de l\'ajout du membre:', error)
-      errorMessage.value = error.response.data.message
+      console.error('Erreur lors de la creation du membre:', error)
+      errorMessage.value = error.response
+      toast.error(error.response.data.message)
+    }
+    finally {
+      isLoading.value = false
     }
            
 }
 
-const categories = computed(() => store.state.categories || [])
+const categories = [
+  {'nom':'cadre_contractuel','id':1, 'proper_name': 'Cadre Contractuel'},
+  {'nom':'collaborateur_a2','id':2, 'proper_name': 'Collaborateur A2'},
+  {'nom':'chauffeur_planton','id':3, 'proper_name': 'Chauffeur Planton'},
+  {'nom':'service_externe_10','id':4, 'proper_name': 'Service Externe 10'},
+  {'nom':'service_externe_5','id':5, 'proper_name': 'Service Externe 5'}
+]
 </script>
 
 <style scoped>
