@@ -78,7 +78,6 @@
   // Fetch data from your API
   const fetchMembres = async () => {
     loading.value = true;
-  
     try {
       const params = {};
   
@@ -101,11 +100,7 @@
           params[`filter[${key}]`] = value;
         }
       });
-  
       const response = await api.get("/membres",params);
-  
-      console.log(response);
-  
       // Handle your API response structure
       if (response.success) {
         membres.value = response.data || [];
