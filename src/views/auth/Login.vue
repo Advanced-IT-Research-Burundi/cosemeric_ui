@@ -221,13 +221,14 @@ async function login() {
 .input-group {
   display: flex;
   align-items: center;
-  background: #f9fafb;
+  background: #ffffff; 
   padding: 0.875rem 1rem;
   border-radius: 12px;
   margin-bottom: 1.2rem;
   border: 2px solid #e5e7eb;
   position: relative;
 }
+
 
 .input-group:focus-within {
   border-color: #1e40af; 
@@ -243,8 +244,9 @@ async function login() {
 }
 
 .form-input::placeholder {
-  color: #ffffff;
+  color: #000000;
 }
+
 
 .toggle-password {
   cursor: pointer;

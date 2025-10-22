@@ -13,20 +13,15 @@
         <div class="row g-3 mb-4">
           <div class="col-md-4">
             <label class="form-label fw-semibold">Rechercher un membre</label>
-            <input 
-              type="text" 
-              class="form-control" 
+            <input
+              type="text"
+              class="form-control"
               placeholder="Nom du membre..."
-              v-model="filters.search"
-            >
+              v-model="filters.search" />
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Période</label>
-            <input 
-              type="month" 
-              class="form-control"
-              v-model="filters.period"
-            >
+            <input type="month" class="form-control" v-model="filters.period" />
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Type de transaction</label>
@@ -70,7 +65,9 @@
             </thead>
             <tbody>
               <tr v-for="(item, index) in paginatedData" :key="item.id">
-                <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+                <th scope="row">
+                  {{ (currentPage - 1) * itemsPerPage + index + 1 }}
+                </th>
                 <td>{{ item.membre }}</td>
                 <td>
                   <span :class="getTypeBadgeClass(item.type)">
@@ -88,22 +85,29 @@
         <nav aria-label="Pagination des rapports">
           <ul class="pagination justify-content-center mb-0">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
-              <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage - 1)">
                 Précédent
               </a>
             </li>
-            <li 
-              v-for="page in totalPages" 
+            <li
+              v-for="page in totalPages"
               :key="page"
-              class="page-item" 
-              :class="{ active: currentPage === page }"
-            >
+              class="page-item"
+              :class="{ active: currentPage === page }">
               <a class="page-link" href="#" @click.prevent="changePage(page)">
                 {{ page }}
               </a>
             </li>
-            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-              <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }">
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage + 1)">
                 Suivant
               </a>
             </li>
@@ -113,14 +117,13 @@
     </div>
 
     <!-- Modal d'importation -->
-    <div 
-      class="modal fade" 
-      id="importModal" 
-      tabindex="-1" 
-      aria-labelledby="importModalLabel" 
+    <div
+      class="modal fade"
+      id="importModal"
+      tabindex="-1"
+      aria-labelledby="importModalLabel"
       aria-hidden="true"
-      ref="importModal"
-    >
+      ref="importModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-secondary text-white">
@@ -128,53 +131,54 @@
               <i class="bi bi-upload me-2"></i>
               Importer un fichier Excel
             </h5>
-            <button 
-              type="button" 
-              class="btn-close btn-close-white" 
-              data-bs-dismiss="modal" 
-              aria-label="Close"
-            ></button>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="fileInput" class="form-label">Sélectionner un fichier</label>
-              <input 
-                class="form-control" 
-                type="file" 
+              <label for="fileInput" class="form-label"
+                >Sélectionner un fichier</label
+              >
+              <input
+                class="form-control"
+                type="file"
                 id="fileInput"
                 accept=".xlsx,.xls"
-                @change="handleFileSelect"
-              >
+                @change="handleFileSelect" />
               <div class="form-text">Formats acceptés : .xlsx, .xls</div>
             </div>
-            
+
             <!-- Barre de progression -->
             <div v-if="uploadProgress > 0" class="mb-3">
               <label class="form-label">Progression de l'importation</label>
-              <div class="progress" style="height: 25px;">
-                <div 
-                  class="progress-bar progress-bar-striped progress-bar-animated" 
-                  role="progressbar" 
+              <div class="progress" style="height: 25px">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
                   :style="{ width: uploadProgress + '%' }"
-                  :aria-valuenow="uploadProgress" 
-                  aria-valuemin="0" 
-                  aria-valuemax="100"
-                >
+                  :aria-valuenow="uploadProgress"
+                  aria-valuemin="0"
+                  aria-valuemax="100">
                   {{ uploadProgress }}%
                 </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal">
               Annuler
             </button>
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
+            <button
+              type="button"
+              class="btn btn-secondary"
               @click="uploadFile"
-              :disabled="!selectedFile || uploadProgress > 0"
-            >
+              :disabled="!selectedFile || uploadProgress > 0">
               <i class="bi bi-cloud-upload me-2"></i>
               Importer
             </button>
@@ -186,37 +190,69 @@
 </template>
 
 <script>
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 export default {
-  name: 'ReportManager',
+  name: "ReportManager",
   data() {
     return {
-      // Filtres
       filters: {
-        search: '',
-        period: '',
-        type: ''
+        search: "",
+        period: "",
+        type: "",
       },
-      // Données fictives
       transactions: [
-        { id: 1, membre: 'Jean Dupont', type: 'cotisation', montant: 5000, date: '2024-01-15' },
-        { id: 2, membre: 'Marie Martin', type: 'credit', montant: 15000, date: '2024-01-18' },
-        { id: 3, membre: 'Paul Durand', type: 'dette', montant: 8000, date: '2024-01-20' },
-        { id: 4, membre: 'Sophie Bernard', type: 'assistance', montant: 3000, date: '2024-01-22' },
-        { id: 5, membre: 'Luc Petit', type: 'cotisation', montant: 5000, date: '2024-02-05' },
-        { id: 6, membre: 'Emma Rousseau', type: 'credit', montant: 20000, date: '2024-02-10' },
-        { id: 7, membre: 'Thomas Laurent', type: 'dette', montant: 12000, date: '2024-02-15' },
-        { id: 8, membre: 'Claire Simon', type: 'assistance', montant: 4500, date: '2024-02-20' },
-        { id: 9, membre: 'Nicolas Michel', type: 'cotisation', montant: 5000, date: '2024-03-01' },
-        { id: 10, membre: 'Julie Lefebvre', type: 'credit', montant: 18000, date: '2024-03-08' },
-        { id: 11, membre: 'Antoine Moreau', type: 'dette', montant: 9500, date: '2024-03-12' },
-        { id: 12, membre: 'Camille Garcia', type: 'assistance', montant: 3500, date: '2024-03-18' }
+        {
+          id: 1,
+          membre: "Jean Dupont",
+          type: "cotisation",
+          montant: 5000,
+          date: "2024-01-15",
+        },
+        {
+          id: 2,
+          membre: "Marie Martin",
+          type: "credit",
+          montant: 15000,
+          date: "2024-01-18",
+        },
+        {
+          id: 3,
+          membre: "Paul Durand",
+          type: "dette",
+          montant: 8000,
+          date: "2024-01-20",
+        },
+        {
+          id: 4,
+          membre: "Sophie Bernard",
+          type: "assistance",
+          montant: 3000,
+          date: "2024-01-22",
+        },
+        {
+          id: 5,
+          membre: "Luc Petit",
+          type: "cotisation",
+          montant: 5000,
+          date: "2024-02-05",
+        },
+        {
+          id: 6,
+          membre: "Emma Rousseau",
+          type: "credit",
+          montant: 20000,
+          date: "2024-02-10",
+        },
       ],
-      // Pagination
       currentPage: 1,
       itemsPerPage: 5,
-      // Import
       selectedFile: null,
-      uploadProgress: 0
+      uploadProgress: 0,
     };
   },
   computed: {
@@ -227,68 +263,134 @@ export default {
     },
     totalPages() {
       return Math.ceil(this.transactions.length / this.itemsPerPage);
-    }
+    },
   },
   methods: {
+    // --- PAGINATION ---
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
       }
     },
+
     getTypeBadgeClass(type) {
       const badges = {
-        cotisation: 'badge bg-primary',
-        credit: 'badge bg-success',
-        dette: 'badge bg-warning text-dark',
-        assistance: 'badge bg-info text-dark'
+        cotisation: "badge bg-primary",
+        credit: "badge bg-success",
+        dette: "badge bg-warning text-dark",
+        assistance: "badge bg-info text-dark",
       };
-      return badges[type] || 'badge bg-secondary';
+      return badges[type] || "badge bg-secondary";
     },
+
     formatCurrency(amount) {
-      return new Intl.NumberFormat('fr-FR', { 
-        style: 'currency', 
-        currency: 'BIF' 
+      return new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: "BIF",
       }).format(amount);
     },
+
+    // --- EXPORT EXCEL ---
     exportExcel() {
-      alert('Export Excel en cours... (fonctionnalité à implémenter)');
+      const ws = XLSX.utils.json_to_sheet(this.transactions);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Rapports");
+
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      saveAs(
+        new Blob([wbout], { type: "application/octet-stream" }),
+        "rapports_cosermic.xlsx"
+      );
     },
+
+    // --- EXPORT PDF ---
     exportPDF() {
-      alert('Export PDF en cours... (fonctionnalité à implémenter)');
+      const doc = new jsPDF();
+
+      autoTable(doc, {
+        startY: 25,
+        head: [["#", "Membre", "Type", "Montant (BIF)", "Date"]],
+        body: this.transactions.map((item, index) => [
+          index + 1,
+          item.membre,
+          item.type,
+          item.montant.toLocaleString("fr-FR"),
+          item.date,
+        ]),
+      });
+
+      doc.text("Rapports COSERMIC", 14, 15);
+      doc.save("rapports_cosermic.pdf");
     },
+
+    // --- IMPORT EXCEL ---
     openImportModal() {
       const modalElement = this.$refs.importModal;
-      const modal = new window.bootstrap.Modal(modalElement);
+      const modal = new bootstrap.Modal(modalElement);
       modal.show();
       this.selectedFile = null;
       this.uploadProgress = 0;
     },
-    handleFileSelect(event) {
-      this.selectedFile = event.target.files[0];
-    },
     uploadFile() {
       if (!this.selectedFile) return;
-      
-      // Simulation d'upload
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: "array" });
+          const wsName = wb.SheetNames[0];
+          const ws = wb.Sheets[wsName];
+          const imported = XLSX.utils.sheet_to_json(ws);
+
+          imported.forEach((row, idx) => {
+          
+            this.transactions.push({
+              id: this.transactions.length + 1 + idx,
+              membre: row.membre || row.Membre || "",
+              type: row.type || row.Type || "cotisation",
+              montant: Number(row.montant || row.Montant || 0),
+              date: row.date || row.Date || "",
+            });
+          });
+        } catch (err) {
+          console.error("Erreur lors de l'importation :", err);
+          alert("Impossible de lire le fichier Excel.");
+        }
+      };
+
+      // Lance la lecture du fichier sélectionné
+      reader.readAsArrayBuffer(this.selectedFile);
+
+      // Simulation de chargement
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 10;
+        progress += 20;
         this.uploadProgress = progress;
-        
+
         if (progress >= 100) {
           clearInterval(interval);
           setTimeout(() => {
-            alert('Fichier importé avec succès !');
+            alert("Fichier importé avec succès !");
             const modalElement = this.$refs.importModal;
-            const modal = window.bootstrap.Modal.getInstance(modalElement);
+            const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
             this.uploadProgress = 0;
             this.selectedFile = null;
           }, 500);
         }
       }, 300);
-    }
-  }
+    },
+
+    handleFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) {
+        this.selectedFile = file;
+      } else {
+        this.selectedFile = null;
+      }
+    },
+  },
 };
 </script>
 
@@ -352,7 +454,8 @@ export default {
   font-weight: 500;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   border-radius: 8px;
 }
 </style>
