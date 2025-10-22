@@ -1,60 +1,11 @@
 <template>
   <div class="admin-dashboard">
     <!-- Top Navigation -->
-    <nav class="top-navbar">
-      <div class="navbar-brand">
-        <i class="bi bi-cash-coin"></i>
-        <h3>COSERMIC</h3>
-        <span class="badge bg-success ms-2">Admin</span>
-      </div>
-      
-      <div class="navbar-menu">
-        <a 
-          v-for="item in menuItems" 
-          :key="item.id"
-          href="#" 
-          class="nav-link"
-          :class="{ active: activeMenu === item.id }"
-          @click.prevent="activeMenu = item.id"
-        >
-          <i :class="item.icon"></i>
-          <span>{{ item.label }}</span>
-        </a>
-      </div>
-
-      <div class="navbar-actions">
-        <button class="btn btn-light position-relative me-2">
-          <i class="bi bi-bell"></i>
-          <span class="notification-badge">3</span>
-        </button>
-        <div class="user-dropdown">
-          <button class="btn btn-outline-light dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle me-2"></i>
-            Admin Principal
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profil</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Paramètres</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#" @click.prevent="logout"><i class="bi bi-box-arrow-right me-2"></i>Déconnexion</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
+   
     <!-- Main Content -->
     <main class="main-content">
       <!-- Header -->
-      <div class="content-header">
-        <div>
-          <h1 class="page-title">Tableau de bord</h1>
-          <p class="page-subtitle">Vue d'ensemble de COSERMIC - {{ getCurrentDate() }}</p>
-        </div>
-        <button class="btn btn-primary btn-lg">
-          <i class="bi bi-plus-lg me-2"></i>
-          Nouvelle transaction
-        </button>
-      </div>
+     
 
       <!-- Statistics Cards -->
       <div class="stats-grid">

@@ -1,225 +1,311 @@
 <template>
-  <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-          <div class="card shadow-sm">
-            <div class="card-body p-4">
-              <!-- Logo et titre -->
-              <div class="text-center mb-4">
-                <h2 class="text-primary fw-bold mb-1">CASOMIREC</h2>
-                <p class="fs-6 text-muted">Système de Gestion des Cotisations</p>
-              </div>
+  <div class="login-page d-flex align-items-center justify-content-center">
+    <div class="login-card">
+      <!-- Panneau gauche -->
+      <div class="login-info d-none d-lg-flex flex-column p-5">
+        <div class="text-center mb-5">
+          <div class="logo-circle mb-3">
+            <i class="fas fa-coins fa-3x"></i>
+          </div>
 
-              <!-- Formulaire de connexion -->
-              <form @submit.prevent="handleLogin">
+          <h1 class="h2 fw-bold mb-2">{{ APP_CONFIG.name }}</h1>
+          <p class="opacity-75 mb-0">{{ APP_CONFIG.description }}</p>
+          <small class="opacity-50">Version {{ APP_CONFIG.version }}</small>
+        </div>
 
-                <!-- Message d'erreur général -->
-                <div v-if="errorMessage" class="alert alert-danger" role="alert">
-                  <i class="fas fa-exclamation-triangle me-2"></i>
-                  {{ errorMessage }}
-                </div>
-
-                <!-- Email -->
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    :class="{ 'is-invalid': errors.email }"
-                    id="email"
-                    v-model="form.email"
-                    required
-                  />
-                  <div v-if="errors.email" class="invalid-feedback">
-                    {{ errors.email }}
-                  </div>
-                </div>
-
-                <!-- Mot de passe -->
-                <div class="mb-3">
-                  <label for="password" class="form-label">Mot de passe</label>
-                  <div class="input-group">
-                    <input
-                      :type="showPassword ? 'text' : 'password'"
-                      class="form-control"
-                      :class="{ 'is-invalid': errors.password }"
-                      id="password"
-                      v-model="form.password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-light border"
-                      @click="togglePassword"
-                    >
-                      <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                    </button>
-                  </div>
-                  <div v-if="errors.password" class="invalid-feedback d-block">
-                    {{ errors.password }}
-                  </div>
-                </div>
-
-                <!-- Se souvenir de moi -->
-                <div class="mb-3 form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="remember"
-                    v-model="form.remember"
-                  />
-                  <small class="form-check-label" for="remember">
-                    Se souvenir de moi
-                  </small>
-                </div>
-
-                <!-- Bouton de connexion -->
-                <button
-                  type="submit"
-                  class="btn btn-primary fs-6 w-100 mb-3"
-                  :disabled="isLoading"
-                >
-                  <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ isLoading ? 'Connexion...' : 'Se connecter' }}
-                </button>
-              </form>
-
-              <!-- Liens utiles -->
-              <div class="text-center">
-                <small class="text-muted">
-                  Pas de compte ? <router-link to="/register">S'inscrire</router-link>
-                </small>
-              </div>
+        <div class="flex-grow-1">
+          <h5 class="mb-4 fw-bold">Fonctionnalités principales</h5>
+          <div
+            v-for="(feature, index) in FEATURES"
+            :key="index"
+            class="d-flex align-items-start mb-4 feature-item"
+          >
+            <div class="feature-icon me-3">
+              <i :class="feature.icon"></i>
+            </div>
+            <div>
+              <h6 class="mb-1 fw-bold">{{ feature.label }}</h6>
+              <p class="mb-0 opacity-75 small">{{ feature.description }}</p>
             </div>
           </div>
         </div>
+
+        <div class="mt-auto d-flex align-items-center">
+          <i class="fas fa-shield-alt opacity-75 me-2"></i>
+          <small class="opacity-75">Connexion sécurisée SSL</small>
+        </div>
+      </div>
+
+      <!-- Panneau droit (formulaire) -->
+      <div class="login-form-wrapper d-flex flex-column justify-content-center p-5">
+        <div class="text-center mb-5">
+          <h2 class="h3 fw-bold mb-2 text-dark">Connexion</h2>
+          <p class="text-muted mb-0">Accédez à votre espace de gestion des cotisations</p>
+        </div>
+
+        <form @submit.prevent="login" class="login-form">
+          <div v-if="error" class="error-message">{{ error }}</div>
+
+          <div class="input-group">
+            <input
+              type="email"
+              placeholder="Email"
+              v-model="email"
+              class="form-input"
+              :disabled="isLoading"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Mot de passe"
+              v-model="password"
+              class="form-input"
+              :disabled="isLoading"
+              required
+            />
+            <i
+              :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+              class="toggle-password"
+              @click="showPassword = !showPassword"
+            ></i>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember" />
+              <label class="form-check-label text-muted ms-2" for="remember">
+                Se souvenir de moi
+              </label>
+            </div>
+            <router-link to="/forgot-password" class="text-decoration-none fw-semibold" style="color: #3b82f6">
+              Mot de passe oublié ?
+            </router-link>
+          </div>
+
+          <button type="submit" class="submit-btn" :disabled="isLoading">
+            <span v-if="!isLoading">Se connecter</span>
+            <div v-else class="loading-content">
+              <div class="spinner"></div>
+              <span>Connexion...</span>
+            </div>
+          </button>
+
+          <div class="form-links mt-4 text-center">
+            <small class="text-muted">
+            Pas encore de compte ?
+           <router-link to="/register" style="color: #3b82f6" class="fw-semibold">
+              Créer un compte
+           </router-link>
+            </small>
+          </div>
+
+        </form>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '../../services/api.js'
+<script setup>
+import { ref } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import { useRouter } from 'vue-router'
 
-export default {
-  name: 'LoginPage',
-  setup() {
-    const router = useRouter()
-    const authStore = useAuthStore()
-    
-    const isLoading = ref(false)
-    const showPassword = ref(false)
-    const errorMessage = ref('')
-    
-    const form = reactive({
-      email: '',
-      password: '',
-      remember: false
-    })
-    
-    const errors = reactive({
-      email: '',
-      password: ''
-    })
+const authStore = useAuthStore()
+const router = useRouter()
 
-    const togglePassword = () => {
-      showPassword.value = !showPassword.value
-    }
-    
-    const clearError = (field) => {
-      if (field) {
-        errors[field] = ''
-      } else {
-        // Clear all errors
-        Object.keys(errors).forEach(key => {
-          errors[key] = ''
-        })
-        errorMessage.value = ''
-      }
-    }
+const APP_CONFIG = {
+  name: "CASOMIREC",
+  description: "Système de gestion des cotisations et adhérents",
+  version: "1.0.0",
+}
 
-    const validateForm = () => {
-      let isValid = true
-      
-      // Reset errors
-      errors.email = ''
-      errors.password = ''
-      
-      // Validation email
-      if (!form.email) {
-        errors.email = 'L\'email est requis'
-        isValid = false
-      } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-        errors.email = 'Format d\'email invalide'
-        isValid = false
-      }
-      
-      // Validation mot de passe
-      if (!form.password) {
-        errors.password = 'Le mot de passe est requis'
-        isValid = false
-      } else if (form.password.length < 6) {
-        errors.password = 'Le mot de passe doit contenir au moins 6 caractères'
-        isValid = false
-      }
-      
-      return isValid
-    }
+const FEATURES = [
+  { icon: "fas fa-wallet", label: "Gestion des cotisations", description: "Enregistrement et suivi des paiements" },
+  { icon: "fas fa-users", label: "Gestion des membres", description: "Base de données des adhérents" },
+  { icon: "fas fa-chart-bar", label: "Rapports", description: "Suivi des performances financières" },
+  { icon: "fas fa-lock", label: "Sécurité", description: "Accès sécurisé et rôles utilisateurs" },
+]
 
-    const handleLogin = async () => {
-      if (!validateForm()) {
-        return
-      }
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
+const error = ref('')
+const showPassword = ref(false)
 
-      isLoading.value = true
-      errorMessage.value = ''
+async function login() {
+  if (isLoading.value) return
+  isLoading.value = true
+  error.value = ''
 
-      try {
-        // Make API call to login
-        const success = await authStore.login(form.email, form.password)
-        if (success) {
-          // Get the redirect URL from query parameters or default to dashboard
-          const redirectUrl = router.currentRoute.value.query.redirect || '/dashboard'
-          await router.push(redirectUrl)
-          return
-        }        
-      } catch (error) {
-        // Handle API errors
-        if (error.response) {
-          if (error.response.status === 401) {
-            errorMessage.value = error.response.data.message
-          } else if (error.response.data && error.response.data.message) {
-            errorMessage.value = error.response.data.message
-          } else {
-            errorMessage.value = 'Une erreur est survenue lors de la connexion'
-          }
-        } else if (error.request) {
-          errorMessage.value = 'Impossible de se connecter au serveur. Veuillez réessayer plus tard.'
-        } else {
-          errorMessage.value = error.response.data.message || 'Une erreur est survenue lors de la connexion'
-        }
-      } finally {
-        isLoading.value = false
-      }
-    }
+  try {
+    const success = await authStore.login(email.value, password.value)
+    if (!success) throw new Error('Email ou mot de passe incorrect')
 
-    return {
-      form,
-      errors,
-      isLoading,
-      showPassword,
-      errorMessage,
-      togglePassword,
-      clearError,
-      handleLogin
-    }
+    await router.push('/dashboard')
+  } catch (err) {
+    error.value = err.message || 'Erreur de connexion'
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
 
 <style scoped>
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.login-card {
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  background-color: #fff;
+}
+
+/* Panneau gauche */
+.login-info {
+  flex: 1;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.feature-item .feature-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.login-form-wrapper {
+  flex: 1;
+  padding: 3rem;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  border: 2px solid #e5e7eb;
+  position: relative;
+}
+
+.input-group:focus-within {
+  border-color: #1e40af; 
+}
+
+.form-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: white;
+  color: black;
+}
+
+.form-input::placeholder {
+  color: #ffffff;
+}
+
+.toggle-password {
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 1.2rem;
+}
+
+.submit-btn {
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(59,130,246,0.4);
+}
+
+.loading-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error-message {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .login-card { flex-direction: column; }
+  .login-info { display: none; }
+}
 </style>

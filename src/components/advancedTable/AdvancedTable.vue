@@ -35,7 +35,7 @@
     </div>
 
     <!-- Loading Skeleton -->
-    <div v-if="loading" class="table-responsive">
+    <div v-if="loading && tableData.length  == 0 " class="table-responsive">
       <table class="table table-striped">
         <thead class="table-light">
           <tr>

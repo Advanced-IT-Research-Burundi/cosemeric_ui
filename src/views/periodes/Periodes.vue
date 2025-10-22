@@ -23,8 +23,7 @@
         @sort="handleSort"
         @filter="handleFilter"
         @page-change="handlePageChange"
-        @per-page-change="handlePerPageChange"
-      >
+        @per-page-change="handlePerPageChange">
         <!-- Status badge -->
         <!-- <template #column-status="{ value }">
           <span class="badge rounded-1" :class="value === 'ouvert' ? 'bg-success' : 'bg-danger'">
@@ -43,19 +42,30 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showModal" class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div
+      v-if="showModal"
+      class="modal fade show d-block"
+      tabindex="-1"
+      role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEdit ? 'Modifier la période' : 'Nouvelle période' }}</h5>
-            <button type="button" class="btn-close" @click="closeModal"></button>
+            <h5 class="modal-title">
+              {{ isEdit ? "Modifier la période" : "Nouvelle période" }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal"></button>
           </div>
           <div class="modal-body">
             <div v-if="error" class="alert alert-danger mb-3">{{ error }}</div>
             <form @submit.prevent="save">
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label">Type <span class="text-danger">*</span></label>
+                  <label class="form-label"
+                    >Type <span class="text-danger">*</span></label
+                  >
                   <select class="form-select" v-model="form.type" required>
                     <option value="mensuel">Mensuel</option>
                     <option value="semestriel">Semestriel</option>
@@ -63,27 +73,52 @@
                 </div>
 
                 <div class="col-md-6" v-if="form.type === 'mensuel'">
-                  <label class="form-label">Mois <span class="text-danger">*</span></label>
-                  <select class="form-select" v-model.number="form.month" required>
-                    <option v-for="(m, idx) in months" :key="idx" :value="idx+1">{{ m }}</option>
+                  <label class="form-label"
+                    >Mois <span class="text-danger">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    v-model.number="form.month"
+                    required>
+                    <option
+                      v-for="(m, idx) in months"
+                      :key="idx"
+                      :value="idx + 1">
+                      {{ m }}
+                    </option>
                   </select>
                 </div>
 
                 <div class="col-md-6" v-if="form.type === 'semestriel'">
-                  <label class="form-label">Semestre <span class="text-danger">*</span></label>
-                  <select class="form-select" v-model.number="form.semester" required>
+                  <label class="form-label"
+                    >Semestre <span class="text-danger">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    v-model.number="form.semester"
+                    required>
                     <option :value="1">1er semestre</option>
                     <option :value="2">2ème semestre</option>
                   </select>
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Année <span class="text-danger">*</span></label>
-                  <input type="number" class="form-control" v-model.number="form.annee" min="2000" max="2100" required />
+                  <label class="form-label"
+                    >Année <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    v-model.number="form.annee"
+                    min="2000"
+                    max="2100"
+                    required />
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Statut <span class="text-danger">*</span></label>
+                  <label class="form-label"
+                    >Statut <span class="text-danger">*</span></label
+                  >
                   <select class="form-select" v-model="form.statut" required>
                     <option value="ouvert">Ouvert</option>
                     <option value="ferme">Ferme</option>
@@ -91,22 +126,46 @@
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Date de début <span class="text-danger">*</span></label>
-                  <input type="date" class="form-control" v-model="form.date_debut" required />
+                  <label class="form-label"
+                    >Date de début <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="form.date_debut"
+                    required />
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Date de fin <span class="text-danger">*</span></label>
-                  <input type="date" class="form-control" v-model="form.date_fin" required />
+                  <label class="form-label"
+                    >Date de fin <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="form.date_fin"
+                    required />
                 </div>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" @click="closeModal" :disabled="saving">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="save" :disabled="saving">
-              <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
-              {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              @click="closeModal"
+              :disabled="saving">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="save"
+              :disabled="saving">
+              <span
+                v-if="saving"
+                class="spinner-border spinner-border-sm me-2"></span>
+              {{ saving ? "Enregistrement..." : "Enregistrer" }}
             </button>
           </div>
         </div>
@@ -118,54 +177,108 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
-import { useToast } from 'vue-toastification';
-import api from '../../services/api';
-import AdvancedTable from '../../components/advancedTable/AdvancedTable.vue';
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useToast } from "vue-toastification";
+import api from "../../services/api";
+import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 
 const periodes = ref([]);
 const loading = ref(false);
 const saving = ref(false);
-const error = ref('');
+const error = ref("");
 const store = useStore();
 const toast = useToast();
-const queryParams = ref({ page: 1, per_page: 15, search: '', sort_field: '', sort_order: 'asc', filters: {} });
+const queryParams = ref({
+  page: 1,
+  per_page: 15,
+  search: "",
+  sort_field: "",
+  sort_order: "asc",
+  filters: {},
+});
 
 const columns = [
-  { key: 'type', label: 'Type', sortable: true, filterable: true },
-  { key: 'mois', label: 'Mois', sortable: true },
-  { key: 'semestre', label: 'Semestre', sortable: true },
-  { key: 'annee', label: 'Année', sortable: true, filterable: true },
-  { key: 'statut', label: 'Statut', sortable: true, filterable: true },
-  { key: 'date_debut', label: 'Début', sortable: true, formatter: v => v ? new Date(v).toLocaleDateString() : '' },
-  { key: 'date_fin', label: 'Fin', sortable: true, formatter: v => v ? new Date(v).toLocaleDateString() : '' },
+  { key: "type", label: "Type", sortable: true, filterable: true },
+  { key: "mois", label: "Mois", sortable: true },
+  { key: "semestre", label: "Semestre", sortable: true },
+  { key: "annee", label: "Année", sortable: true, filterable: true },
+  { key: "statut", label: "Statut", sortable: true, filterable: true },
+  {
+    key: "date_debut",
+    label: "Début",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
+  {
+    key: "date_fin",
+    label: "Fin",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
 ];
 
-const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const monthLabel = (n) => (n && n >= 1 && n <= 12) ? months[n-1] : '';
-const semesterLabel = (s) => s === 1 ? '1er semestre' : (s === 2 ? '2ème semestre' : '');
+const months = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+];
+const monthLabel = (n) => (n && n >= 1 && n <= 12 ? months[n - 1] : "");
+const semesterLabel = (s) =>
+  s === 1 ? "1er semestre" : s === 2 ? "2ème semestre" : "";
 
-const form = ref({ id: null, type: 'mensuel', month: 1, semester: 1, annee: new Date().getFullYear(), statut: 'open', start_date: '', end_date: '' });
+const form = ref({
+  id: null,
+  type: "mensuel",
+  month: 1,
+  semester: 1,
+  annee: new Date().getFullYear(),
+  statut: "open",
+  start_date: "",
+  end_date: "",
+});
 const showModal = ref(false);
 const isEdit = ref(false);
 
 const fetchPeriodes = async () => {
+  if (store.state.periodes && store.state.periodes.length > 0) {
+    periodes.value = store.state.periodes;
+    return;
+  }
+
   loading.value = true;
   try {
-    const params = { page: queryParams.value.page, per_page: queryParams.value.per_page };
-    if (queryParams.value.search) params.search = queryParams.value.search;
-    if (queryParams.value.sort_field) { params.sort_field = queryParams.value.sort_field; params.sort_order = queryParams.value.sort_order; }
-    Object.entries(queryParams.value.filters).forEach(([k, v]) => { if (v) params[`filter[${k}]`] = v; });
+    const params = {
+      page: queryParams.value.page,
+      per_page: queryParams.value.per_page,
+    };
 
-    const res = await api.get('/periodes', params);
+    if (queryParams.value.search) params.search = queryParams.value.search;
+    if (queryParams.value.sort_field) {
+      params.sort_field = queryParams.value.sort_field;
+      params.sort_order = queryParams.value.sort_order;
+    }
+
+    Object.entries(queryParams.value.filters).forEach(([k, v]) => {
+      if (v) params[`filter[${k}]`] = v;
+    });
+
+    const res = await api.get("/periodes", params);
     periodes.value = res.data || [];
-    store.state.data.periodes = res.data || [];
-    
+    store.state.periodes = res.data || [];
   } catch (e) {
-    console.error('Error fetching periodes:', e);
+    console.error("Error fetching periodes:", e);
     periodes.value = [];
-    store.state.data.periodes = [];
+    store.state.periodes = [];
   } finally {
     loading.value = false;
   }
@@ -173,67 +286,105 @@ const fetchPeriodes = async () => {
 
 const openAdd = () => {
   isEdit.value = false;
-  form.value = { id: null, type: 'mensuel', month: 1, semester: 1, year: new Date().getFullYear(), status: 'open', start_date: '', end_date: '' };
-  error.value = '';
+  form.value = {
+    id: null,
+    type: "mensuel",
+    month: 1,
+    semester: 1,
+    year: new Date().getFullYear(),
+    status: "open",
+    start_date: "",
+    end_date: "",
+  };
+  error.value = "";
   showModal.value = true;
 };
 
 const openEdit = (row) => {
-    console.log(row);
-    
+  console.log(row);
+
   isEdit.value = true;
   form.value = { ...row };
-  error.value = '';
+  error.value = "";
   showModal.value = true;
 };
 
-const closeModal = () => { if (!saving.value) showModal.value = false; };
+const closeModal = () => {
+  if (!saving.value) showModal.value = false;
+};
 
 const save = async () => {
-  saving.value = true; error.value = '';
+  saving.value = true;
+  error.value = "";
   try {
     console.log(form.value);
     const payload = { ...form.value };
-    if (payload.type === 'mensuel') { payload.semestre = null; }
-    if (payload.type === 'semestriel') { payload.mois = null; }
+    if (payload.type === "mensuel") {
+      payload.semestre = null;
+    }
+    if (payload.type === "semestriel") {
+      payload.mois = null;
+    }
 
     if (isEdit.value && payload.id) {
       await api.put(`/periodes/${payload.id}`, payload);
-      toast.success('Période modifiée avec succès');
+      toast.success("Période modifiée avec succès");
     } else {
-      await api.post('/periodes', payload);
-      toast.success('Période enregistrée avec succès');
+      await api.post("/periodes", payload);
+      toast.success("Période enregistrée avec succès");
     }
     await fetchPeriodes();
     showModal.value = false;
   } catch (e) {
-    console.error('Error saving periode:', e);
-    error.value = e?.response?.data?.message || "Erreur lors de l'enregistrement";
+    console.error("Error saving periode:", e);
+    error.value =
+      e?.response?.data?.message || "Erreur lors de l'enregistrement";
   } finally {
     saving.value = false;
   }
 };
 
 const handleDelete = async (row) => {
-    if (!confirm('Supprimer cette période ?')) return;
-    try { 
-        await api.delete(`/periodes/${row.id}`);
-        fetchPeriodes(); 
-        toast.success('Période supprimée avec succès');
-    } catch (e) { 
-        console.error(e); 
-        toast.error('Une erreur est survenue lors de la suppression de la période');
-    }
+  if (!confirm("Supprimer cette période ?")) return;
+  try {
+    await api.delete(`/periodes/${row.id}`);
+
+    fetchPeriodes();
+    toast.success("Période supprimée avec succès");
+  } catch (e) {
+    console.error(e);
+    toast.error("Une erreur est survenue lors de la suppression de la période");
+  }
 };
 
-const handleSearch = (term) => { queryParams.value.search = term; queryParams.value.page = 1; fetchPeriodes(); };
-const handleSort = ({ field, order }) => { queryParams.value.sort_field = field; queryParams.value.sort_order = order; queryParams.value.page = 1; fetchPeriodes(); };
-const handleFilter = (filters) => { queryParams.value.filters = filters; queryParams.value.page = 1; fetchPeriodes(); };
-const handlePageChange = (page) => { queryParams.value.page = page; fetchPeriodes(); };
-const handlePerPageChange = (per) => { queryParams.value.per_page = per; queryParams.value.page = 1; fetchPeriodes(); };
+const handleSearch = (term) => {
+  queryParams.value.search = term;
+  queryParams.value.page = 1;
+  fetchPeriodes();
+};
+const handleSort = ({ field, order }) => {
+  queryParams.value.sort_field = field;
+  queryParams.value.sort_order = order;
+  queryParams.value.page = 1;
+  fetchPeriodes();
+};
+const handleFilter = (filters) => {
+  queryParams.value.filters = filters;
+  queryParams.value.page = 1;
+  fetchPeriodes();
+};
+const handlePageChange = (page) => {
+  queryParams.value.page = page;
+  fetchPeriodes();
+};
+const handlePerPageChange = (per) => {
+  queryParams.value.per_page = per;
+  queryParams.value.page = 1;
+  fetchPeriodes();
+};
 
 const tableData = computed(() => {
-    return store.state.data.periodes;
+  return store.state.data.periodes;
 });
 onMounted(fetchPeriodes);
 </script>
