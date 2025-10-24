@@ -250,39 +250,48 @@ const showModal = ref(false);
 const isEdit = ref(false);
 
 const fetchPeriodes = async () => {
-  if (store.state.periodes && store.state.periodes.length > 0) {
-    periodes.value = store.state.periodes;
-    return;
-  }
-
-  loading.value = true;
-  try {
-    const params = {
-      page: queryParams.value.page,
-      per_page: queryParams.value.per_page,
-    };
-
-    if (queryParams.value.search) params.search = queryParams.value.search;
-    if (queryParams.value.sort_field) {
-      params.sort_field = queryParams.value.sort_field;
-      params.sort_order = queryParams.value.sort_order;
+    loading.value = true;
+  
+    try {
+      const params = {};
+  
+      // Add query parameters
+      params.page = queryParams.value.page;
+      params.per_page = queryParams.value.per_page;
+  
+      if (queryParams.value.search) {
+        params.search = queryParams.value.search;
+      }
+  
+      if (queryParams.value.sort_field) {
+        params.sort_field = queryParams.value.sort_field;
+        params.sort_order = queryParams.value.sort_order;
+      }
+  
+      // Add filters
+      Object.entries(queryParams.value.filters).forEach(([key, value]) => {
+        if (value) {
+          params[`filter[${key}]`] = value;
+        }
+      });
+  
+      const response = await api.get("/periodes",params);
+  
+      console.log(response);
+  
+      // Handle your API response structure
+      if (response.success) {
+        credits.value = response.data || [];
+        store.state.credits = response.data || [];
+      } else {
+        console.error("API Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching periodes:", error);
+    } finally {
+      loading.value = false;
     }
-
-    Object.entries(queryParams.value.filters).forEach(([k, v]) => {
-      if (v) params[`filter[${k}]`] = v;
-    });
-
-    const res = await api.get("/periodes", params);
-    periodes.value = res.data || [];
-    store.state.periodes = res.data || [];
-  } catch (e) {
-    console.error("Error fetching periodes:", e);
-    periodes.value = [];
-    store.state.periodes = [];
-  } finally {
-    loading.value = false;
-  }
-};
+  };
 
 const openAdd = () => {
   isEdit.value = false;
