@@ -212,35 +212,30 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import Chart from 'chart.js/auto';
 
-// ============================================
-// DONNÉES RÉACTIVES DU DASHBOARD
-// ============================================
+// =============================
+// DONNÉES RÉACTIVES
+// =============================
 const stats = ref({
-  cotisationsMois: 295000,          // Cotisations du mois en cours
-  cotisationsCumulatif: 3480000,     // Total cumulé depuis le début
-  evolutionCotisations: 12,          // Pourcentage d'évolution
-  membresActifs: 156,                // Nombre de membres actifs
-  membresInactifs: 24,               // Nombre de membres inactifs
-  creditsTotal: 1850000,             // Total des crédits accordés
-  creditsEnCours: 12,                // Nombre de crédits en cours
-  dettesAttente: 320000,             // Montant des dettes en attente
-  demandesAssistance: 38,            // Nombre de demandes reçues
-  aidesAccordees: 32,                // Nombre d'aides accordées
-  tauxRecouvrement: 92,              // Pourcentage de recouvrement
-  soldeDisponible: 1310000           // Solde disponible en caisse
+  cotisationsMois: 0,
+  cotisationsCumulatif: 0,
+  evolutionCotisations: 0,
+  membresActifs: 0,
+  membresInactifs: 0,
+  creditsTotal: 0,
+  creditsEnCours: 0,
+  dettesAttente: 0,
+  demandesAssistance: 0,
+  aidesAccordees: 0,
+  tauxRecouvrement: 0,
+  soldeDisponible: 0
 });
 
-// ============================================
-// COMPUTED - DATE ACTUELLE FORMATÉE
-// ============================================
-
-
-// ============================================
-// FONCTION DE FORMATAGE DES MONTANTS
-// ============================================
+// =============================
+// FORMATAGE DES MONTANTS
+// =============================
 const formatMontant = (montant) => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -249,20 +244,19 @@ const formatMontant = (montant) => {
   }).format(montant);
 };
 
-// ============================================
-// RÉFÉRENCES POUR LES CANVAS DES GRAPHIQUES
-// ============================================
+// =============================
+// RÉFÉRENCES DES GRAPHIQUES
+// =============================
 const cotisationsChart = ref(null);
 const membresChart = ref(null);
 const creditsChart = ref(null);
 const assistancesChart = ref(null);
 const tendanceChart = ref(null);
 
-// ============================================
+// =============================
 // INITIALISATION DES GRAPHIQUES
-// ============================================
-const initCharts = () => {
-  // Configuration commune pour tous les graphiques
+// =============================
+const initChartsWithData = (chartsData) => {
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: true,
@@ -278,104 +272,63 @@ const initCharts = () => {
     }
   };
 
-  // 1. GRAPHIQUE: Évolution des Cotisations Mensuelles (Courbe)
+  //  Cotisations Mensuelles
   if (cotisationsChart.value) {
     new Chart(cotisationsChart.value, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'],
+        labels: chartsData.cotisations.labels,
         datasets: [{
           label: 'Cotisations (BIF)',
-          data: [180000, 195000, 210000, 225000, 240000, 255000, 270000, 285000, 295000],
+          data: chartsData.cotisations.values,
           borderColor: '#3498db',
           backgroundColor: 'rgba(52, 152, 219, 0.1)',
           tension: 0.4,
-          fill: true,
-          pointBackgroundColor: '#3498db',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointHoverBackgroundColor: '#2980b9',
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 2
+          fill: true
         }]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' BIF';
-              }
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+      options: commonOptions
     });
   }
 
-  // 2. GRAPHIQUE: Répartition Membres (Camembert)
+  //  Répartition Membres
   if (membresChart.value) {
     new Chart(membresChart.value, {
       type: 'doughnut',
       data: {
-        labels: ['Membres Actifs', 'Membres Inactifs'],
+        labels: ['Actifs', 'Inactifs'],
         datasets: [{
-          data: [156, 24],
+          data: [chartsData.membres.actifs, chartsData.membres.inactifs],
           backgroundColor: ['#27ae60', '#e74c3c'],
           borderWidth: 3,
-          borderColor: '#fff',
-          hoverOffset: 10
+          borderColor: '#fff'
         }]
       },
       options: {
         ...commonOptions,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 15,
-              font: {
-                size: 12
-              }
-            }
-          }
-        }
+        plugins: { legend: { position: 'bottom' } }
       }
     });
   }
 
-  // 3. GRAPHIQUE: Crédits vs Remboursements (Barres groupées)
+  //  Crédits vs Remboursements
   if (creditsChart.value) {
     new Chart(creditsChart.value, {
       type: 'bar',
       data: {
-        labels: ['Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'],
+        labels: chartsData.credits.labels,
         datasets: [
           {
             label: 'Crédits accordés',
-            data: [250000, 320000, 280000, 350000, 310000, 340000],
+            data: chartsData.credits.accordes,
             backgroundColor: '#f39c12',
-            borderRadius: 5,
-            borderWidth: 0
+            borderRadius: 5
           },
           {
             label: 'Remboursements',
-            data: [180000, 220000, 250000, 280000, 290000, 310000],
+            data: chartsData.credits.rembourses,
             backgroundColor: '#27ae60',
-            borderRadius: 5,
-            borderWidth: 0
+            borderRadius: 5
           }
         ]
       },
@@ -385,134 +338,90 @@ const initCharts = () => {
           y: {
             beginAtZero: true,
             ticks: {
-              callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' BIF';
-              }
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+              callback: (value) => value.toLocaleString('fr-FR') + ' BIF'
             }
           },
-          x: {
-            grid: {
-              display: false
-            }
-          }
+          x: { grid: { display: false } }
         }
       }
     });
   }
 
-  // 4. GRAPHIQUE: Assistances par Type (Barres horizontales)
+  //  Assistances par Type
   if (assistancesChart.value) {
     new Chart(assistancesChart.value, {
       type: 'bar',
       data: {
-        labels: ['Santé', 'Éducation', 'Urgence', 'Funérailles', 'Autres'],
+        labels: chartsData.assistances.labels,
         datasets: [{
           label: 'Nombre d\'assistances',
-          data: [12, 8, 5, 4, 9],
+          data: chartsData.assistances.values,
           backgroundColor: ['#e74c3c', '#3498db', '#f39c12', '#95a5a6', '#9b59b6'],
-          borderRadius: 5,
-          borderWidth: 0
+          borderRadius: 5
         }]
       },
       options: {
         ...commonOptions,
         indexAxis: 'y',
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          y: {
-            grid: {
-              display: false
-            }
-          }
-        }
+        plugins: { legend: { display: false } }
       }
     });
   }
 
-  // 5. GRAPHIQUE: Tendance Mensuelle (Courbe multiple)
+  //  Tendance Mensuelle
   if (tendanceChart.value) {
     new Chart(tendanceChart.value, {
       type: 'line',
       data: {
-        labels: ['Oct', 'Nov', 'Déc', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'],
+        labels: chartsData.tendance.labels,
         datasets: [
           {
             label: 'Cotisations',
-            data: [150000, 165000, 175000, 180000, 195000, 210000, 225000, 240000, 255000, 270000, 285000, 295000],
+            data: chartsData.tendance.cotisations,
             borderColor: '#3498db',
             backgroundColor: 'rgba(52, 152, 219, 0.1)',
-            tension: 0.4,
             fill: true,
-            pointRadius: 4
+            tension: 0.4
           },
           {
             label: 'Crédits',
-            data: [200000, 220000, 240000, 250000, 320000, 280000, 350000, 310000, 340000, 330000, 350000, 360000],
+            data: chartsData.tendance.credits,
             borderColor: '#f39c12',
             backgroundColor: 'rgba(243, 156, 18, 0.1)',
-            tension: 0.4,
             fill: true,
-            pointRadius: 4
+            tension: 0.4
           },
           {
             label: 'Assistances',
-            data: [50000, 55000, 60000, 65000, 70000, 75000, 72000, 78000, 80000, 82000, 85000, 88000],
+            data: chartsData.tendance.assistances,
             borderColor: '#9b59b6',
             backgroundColor: 'rgba(155, 89, 182, 0.1)',
-            tension: 0.4,
             fill: true,
-            pointRadius: 4
+            tension: 0.4
           }
         ]
       },
-      options: {
-        ...commonOptions,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return value.toLocaleString('fr-FR') + ' BIF';
-              }
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+      options: commonOptions
     });
   }
 };
 
-// ============================================
-// LIFECYCLE HOOK - AU MONTAGE DU COMPOSANT
-// ============================================
-onMounted(() => {
-  // Initialiser tous les graphiques après le rendu du DOM
-  setTimeout(() => {
-    initCharts();
-  }, 100);
+// =============================
+// FETCH DES DONNÉES BACKEND
+// =============================
+onMounted(async () => {
+  try {
+    const response = await fetch('/dashboard');
+    const data = await response.json();
+    stats.value = data.stats;
+    initChartsWithData(data.charts);
+  } catch (err) {
+    console.error('Erreur:', err);
+  }
 });
+
 </script>
+
 
 <style scoped>
 /* ============================================
