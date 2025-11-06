@@ -54,14 +54,14 @@
   --header-height: 60px;
   
   /* Colors */
-  --primary-color: #4f46e5;
-  --primary-light: #eef2ff;
-  --secondary-color: #6b7280;
-  --bg-color: #f9fafb;
-  --text-color: #111827;
-  --text-light: #6b7280;
-  --border-color: #e5e7eb;
-  --hover-bg: #f3f4f6;
+  --primary-color: #cdb4db; 
+  --primary-light: #f5f0f9;
+  --secondary-color: #a2d2ff;
+  --bg-color: #fef7fb;
+  --text-color: #2d1b3d;
+  --text-light: #8b7a99;
+  --border-color: #f0e6f5;
+  --hover-bg: #ffeef6;
   
   /* Transitions */
   --transition-speed: 0.3s;
@@ -84,6 +84,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
 
 #app {
   font-family: 'Noto Sans', system-ui, sans-serif !important;

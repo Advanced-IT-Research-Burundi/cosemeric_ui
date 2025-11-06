@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import Login from '../views/auth/Login.vue'
 import Register from '../views/auth/Register.vue'
 import PageNotFound from '../views/errors/PageNotFound.vue'
+import AdminComponent from '../views/admin/AdminComponent.vue'
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -17,6 +18,18 @@ const requireAuth = (to, from, next) => {
 };
 
 const routes = [
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminComponent,
+    meta: { requiresAuth: true } 
+  },
+  {
+    path: '/reports',
+    name: 'reports',
+    component: () => import('../views/rapports/RapportComponent.vue'),
+    meta: { requiresAuth: true } 
+  },
   // Public routes
   {
     path: '/login',
@@ -27,7 +40,7 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register,
+    component: () => import('../views/auth/Register.vue'),
     meta: { guest: true }
   },
   // 404 route
@@ -126,6 +139,39 @@ const routes = [
     meta: { requiresAuth: true } 
   },
 
+  // Remboursements
+  {
+    path: '/remboursements',
+    name: 'remboursements',
+    children: [
+      {
+        path: '',
+        name: 'remboursementsView',
+        component: () => import('../views/remboursements/Remboursements.vue')
+      },
+      {
+        path: 'add',
+        name: 'remboursementsAdd',
+        component: () => import('../views/remboursements/AddRemboursement.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'remboursementsEdit',
+        component: () => import('../views/remboursements/EditRemboursement.vue'),
+        props: true
+      }
+    ],
+    meta: { requiresAuth: true }
+  },
+
+  // Periodes
+  {
+    path: '/periodes',
+    name: 'periodes',
+    component: () => import('../views/periodes/Periodes.vue'),
+    meta: { requiresAuth: true }
+  },
+
   // Contributions
   {
     path: '/contributions',
@@ -145,6 +191,37 @@ const routes = [
         path: ':id/edit',
         name: 'contributionsEdit',
         component: () => import('../views/contributions/EditContribution.vue')
+      },
+    ],
+    meta: { requiresAuth: true }
+  },
+
+  // Users
+  {
+    path: '/users',
+    name: 'users',
+    children: [
+      {
+        path: '',
+        name: 'usersView',
+        component: () => import('../views/users/Users.vue')
+      },
+      {
+        path: ':id',
+        name: 'usersShow',
+        component: () => import('../views/users/ShowUser.vue'),
+        props: true
+      },
+      {
+        path: 'add',
+        name: 'usersAdd',
+        component: () => import('../views/users/AddUser.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'usersEdit',
+        component: () => import('../views/users/EditUser.vue'),
+        props: true
       },
     ],
     meta: { requiresAuth: true }
@@ -178,6 +255,7 @@ router.beforeEach(async (to, from, next) => {
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
+      console.log("not authenticated");
       authStore.setReturnUrl(to.fullPath)
       return next({ name: 'Login' })
     }

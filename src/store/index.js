@@ -10,6 +10,8 @@ const vuexStore = createStore({
         categories: [],
         credits: [],
         assistances: [],
+        remboursements: [],
+        periodes: [],
       },
       isLoading: false,
       error: null,

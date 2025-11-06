@@ -22,7 +22,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     store.commit('SET_LOADING', true);
-    const token = localStorage.getItem('auth_token');
+    // Align with auth store which saves token under 'token'
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -48,7 +49,10 @@ apiClient.interceptors.response.use(
       // Handle 401 Unauthorized
       if (error.response.status === 401) {
         const authStore = useAuthStore();
-        authStore.logout();
+        const hasToken = !!(authStore?.token || localStorage.getItem('token'));
+        if (hasToken) {
+          authStore.logout();
+        }
       }
 
     } else if (error.request) {

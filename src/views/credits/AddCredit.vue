@@ -18,7 +18,7 @@
             <!-- Membre -->
             <div class="col-md-6">
               <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
-              <select v-select2
+              <select 
                 id="membre_id" 
                 class="form-select" 
                 v-model="formData.membre_id" 
@@ -31,7 +31,8 @@
                   :key="membre.id" 
                   :value="membre.id"
                 >
-                  {{ membre.prenom }} {{ membre.nom }}
+                {{ membre.id }} |
+                  {{ membre.full_name }} | {{ membre.telephone }} | {{ membre.categorie }}
                 </option>
               </select>
               <div v-if="loadingMembers" class="form-text">

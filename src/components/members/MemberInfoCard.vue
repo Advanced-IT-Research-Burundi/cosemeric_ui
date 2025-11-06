@@ -2,7 +2,7 @@
   <div class="card border-0 shadow-sm mb-4 p-0">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
       <h5 class="mb-0">Informations du membre</h5>
-      <router-link v-if="member.id" :to="`/members/edit/${member.id}`" class="btn btn-outline-primary">
+      <router-link v-if="member.id" :to="`/members/${member.id}/edit/`" class="btn btn-outline-primary">
         Modifier
       </router-link>
     </div>

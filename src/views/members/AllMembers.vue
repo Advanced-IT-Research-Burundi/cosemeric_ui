@@ -17,6 +17,7 @@
               :show-filters="true"
               :has-actions="true"
               row-key="id"
+              model="membres"
               @view="handleView"
               @edit="handleEdit"
               @delete="handleDelete"
@@ -65,13 +66,8 @@
   const columns = [
     { key: "matricule", label: "Matricule", width: "100px", sortable: true },
     { key: "full_name", label: "Nom complet", width: "100px", sortable: true },
-    { key: "categorie.description", label: "Catégorie", width: "150px", sortable: true },
+    { key: "categorie", label: "Catégorie", width: "150px", sortable: true },
     {
-      key: "created_at",
-      label: "Créé le",
-      sortable: true,
-      formatter: (value) => new Date(value).toLocaleDateString(),
-    },{
       key: "statut",
       label: "Statut",
       sortable: true,
@@ -82,7 +78,6 @@
   // Fetch data from your API
   const fetchMembres = async () => {
     loading.value = true;
-  
     try {
       const params = {};
   
@@ -105,11 +100,7 @@
           params[`filter[${key}]`] = value;
         }
       });
-  
       const response = await api.get("/membres",params);
-  
-      console.log(response);
-  
       // Handle your API response structure
       if (response.success) {
         membres.value = response.data || [];
