@@ -138,7 +138,11 @@ const routes = [
     ],
     meta: { requiresAuth: true } 
   },
-
+  {
+    path: '/importationMensuel',
+    name: 'importationMensuel',
+    component: () => import('../views/imports/ImportationComponent.vue')
+  },
   // Remboursements
   {
     path: '/remboursements',
@@ -169,6 +173,12 @@ const routes = [
     path: '/periodes',
     name: 'periodes',
     component: () => import('../views/periodes/Periodes.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/cotisationMensuelle',
+    name: 'cotisationMensuelle',
+    component: () => import('../views/cotisations/CotisationMensuelle.vue'),
     meta: { requiresAuth: true }
   },
 
