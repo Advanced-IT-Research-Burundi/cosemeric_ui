@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from '../store'; // importer le store directement
 import { useAuthStore } from '../stores/auth';
 
-const url = import.meta.env.VITE_APP_LOCAL
+const url = import.meta.env.VITE_APP_LOCAL === 'true'
   ? import.meta.env.VITE_API_BASE_URL_LOCAL
   : import.meta.env.VITE_API_BASE_URL;
 
