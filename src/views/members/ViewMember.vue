@@ -66,33 +66,40 @@ const member = ref({
   status: ''
 });
 
-const financialCards = ref([
-  {
-    title: 'Total cotisations',
-    value: '250 000 FBU',
-    icon: 'fas fa-coins',
-    color: 'text-success'
-  },
-  {
-    title: 'Cotisations manquantes',
-    value: '2 mois',
-    icon: 'fas fa-exclamation-triangle',
-    color: 'text-warning'
-  },
-  {
-    title: 'Crédit en cours',
-    value: '500 000 FBU',
-    subtext: 'Reste: 300 000 FBU',
-    icon: 'fas fa-hand-holding-usd',
-    color: 'text-info'
-  },
-  {
-    title: 'Assistances',
-    value: '3 reçues',
-    icon: 'fas fa-hands-helping',
-    color: 'text-primary'
-  }
-]);
+const financialCards = ref([]);
+
+const buildFinancialCards = (data) => {
+  financialCards.value = [
+    {
+      title: 'Total cotisations',
+      value: `${(data.cotisations_total || 0).toLocaleString()} FBU`,
+      icon: 'fas fa-coins',
+      color: 'text-success'
+    },
+    {
+      title: 'Cotisations manquantes',
+      value: `${data.cotisations_manquantes ?? 0} mois`,
+      icon: 'fas fa-exclamation-triangle',
+      color: 'text-warning'
+    },
+    {
+      title: 'Crédit en cours',
+      value: `${(data.credit_encours || 0).toLocaleString()} FBU`,
+      subtext: data.credit_restant
+        ? `Reste: ${(data.credit_restant).toLocaleString()} FBU`
+        : '',
+      icon: 'fas fa-hand-holding-usd',
+      color: 'text-info'
+    },
+    {
+      title: 'Assistances',
+      value: `${data.assistances_recues ?? 0} reçues`,
+      icon: 'fas fa-hands-helping',
+      color: 'text-primary'
+    }
+  ];
+};
+
 
 const contributions = ref([]);
 const assistances = ref([]);
@@ -101,9 +108,8 @@ const fetchMemberDetails = async () => {
   try {
     loading.value = true;
     const response = await api.get(`/membres/${memberId}`);
-    console.log(response.data);
     const memberData = response.data;
-    
+
     member.value = {
       id: memberData.id,
       memberNumber: memberData.matricule,
@@ -114,8 +120,13 @@ const fetchMemberDetails = async () => {
       email: memberData.email,
       category: memberData.categorie_id,
       joinDate: memberData.date_adhesion,
-      status: memberData.statut.charAt(0).toUpperCase() + memberData.statut.slice(1)
+      status: memberData.statut
+        ? memberData.statut.charAt(0).toUpperCase() + memberData.statut.slice(1)
+        : 'Inconnu'
     };
+
+    // Mettre à jour les cartes avec les vraies données
+    buildFinancialCards(memberData);
 
   } catch (err) {
     console.error('Error fetching member details:', err);

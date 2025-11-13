@@ -250,48 +250,48 @@ const showModal = ref(false);
 const isEdit = ref(false);
 
 const fetchPeriodes = async () => {
-    loading.value = true;
-  
-    try {
-      const params = {};
-  
-      // Add query parameters
-      params.page = queryParams.value.page;
-      params.per_page = queryParams.value.per_page;
-  
-      if (queryParams.value.search) {
-        params.search = queryParams.value.search;
-      }
-  
-      if (queryParams.value.sort_field) {
-        params.sort_field = queryParams.value.sort_field;
-        params.sort_order = queryParams.value.sort_order;
-      }
-  
-      // Add filters
-      Object.entries(queryParams.value.filters).forEach(([key, value]) => {
-        if (value) {
-          params[`filter[${key}]`] = value;
-        }
-      });
-  
-      const response = await api.get("/periodes",params);
-  
-      console.log(response);
-  
-      // Handle your API response structure
-      if (response.success) {
-        credits.value = response.data || [];
-        store.state.credits = response.data || [];
-      } else {
-        console.error("API Error:", response.message);
-      }
-    } catch (error) {
-      console.error("Error fetching periodes:", error);
-    } finally {
-      loading.value = false;
+  loading.value = true;
+
+  try {
+    const params = {};
+
+    // Add query parameters
+    params.page = queryParams.value.page;
+    params.per_page = queryParams.value.per_page;
+
+    if (queryParams.value.search) {
+      params.search = queryParams.value.search;
     }
-  };
+
+    if (queryParams.value.sort_field) {
+      params.sort_field = queryParams.value.sort_field;
+      params.sort_order = queryParams.value.sort_order;
+    }
+
+    // Add filters
+    Object.entries(queryParams.value.filters).forEach(([key, value]) => {
+      if (value) {
+        params[`filter[${key}]`] = value;
+      }
+    });
+
+    const response = await api.get("/periodes", params);
+
+    console.log(response);
+
+    // Handle your API response structure
+    if (response.success) {
+      credits.value = response.data || [];
+      store.state.credits = response.data || [];
+    } else {
+      console.error("API Error:", response.message);
+    }
+  } catch (error) {
+    console.error("Error fetching periodes:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 
 const openAdd = () => {
   isEdit.value = false;
@@ -328,6 +328,15 @@ const save = async () => {
   try {
     console.log(form.value);
     const payload = { ...form.value };
+
+    // Mapper les champs pour correspondre à ceux du backend
+    payload.mois = form.value.month;
+    payload.semestre = form.value.semester;
+    payload.annee = form.value.year;
+    payload.statut = form.value.status;
+    payload.date_debut = form.value.start_date;
+    payload.date_fin = form.value.end_date;
+
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }

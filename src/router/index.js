@@ -188,6 +188,12 @@ const routes = [
         component: () => import('../views/contributions/AddContribution.vue')
       },
       {
+        path: '/contributions/:id',
+        name: 'viewContribution',
+        component: () => import('../views/contributions/ViewContribution.vue')
+      },
+
+      {
         path: ':id/edit',
         name: 'contributionsEdit',
         component: () => import('../views/contributions/EditContribution.vue')
