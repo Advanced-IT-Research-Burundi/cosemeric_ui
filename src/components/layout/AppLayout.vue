@@ -7,7 +7,7 @@
         <h2 v-else><i class="fas fa-hand-holding-droplet"></i></h2>
       </div>
       <nav class="nav-menu">
-        {{ isAdmin  }} - {{isMember}}
+        
         <template v-for="(item, index) in menuItems" :key="index">
            
               <router-link :to="item.path" class="menu-section" v-if="item.requireAdmin">
