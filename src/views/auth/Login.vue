@@ -1,6 +1,7 @@
 <template>
   <div class="login-page d-flex align-items-center justify-content-center">
     <div class="login-card">
+      
       <!-- Panneau gauche -->
       <div class="login-info d-none d-lg-flex flex-column p-5">
         <div class="text-center mb-5">
@@ -44,25 +45,30 @@
         </div>
 
         <form @submit.prevent="login" class="login-form">
+
           <div v-if="error" class="error-message">{{ error }}</div>
 
-          <div class="input-group mb-3">
+          <!-- EMAIL -->
+          <div class="form-field mb-3">
             <input
               type="email"
               placeholder="Email"
               v-model="email"
               required
               :disabled="isLoading"
+              class="custom-input"
             />
           </div>
 
-          <div class="input-group mb-3 position-relative">
+          <!-- PASSWORD -->
+          <div class="form-field mb-4 position-relative">
             <input
               :type="showPassword ? 'text' : 'password'"
               placeholder="Mot de passe"
               v-model="password"
               required
               :disabled="isLoading"
+              class="custom-input"
             />
             <i
               :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
@@ -83,6 +89,7 @@
             </router-link>
           </div>
 
+          <!-- BUTTON -->
           <button type="submit" class="submit-btn w-100" :disabled="isLoading">
             <span v-if="!isLoading">Se connecter</span>
             <div v-else class="loading-content">
@@ -99,6 +106,7 @@
               </router-link>
             </small>
           </div>
+
         </form>
       </div>
     </div>
@@ -142,8 +150,6 @@ async function login() {
   try {
     const success = await authStore.login(email.value, password.value)
     if (!success) throw new Error('Email ou mot de passe incorrect')
-
-    toast.success('Connexion réussie !', { timeout: 3000 })
     await router.push('/dashboard')
   } catch (err) {
     error.value = err.message || 'Erreur de connexion'
@@ -156,11 +162,11 @@ async function login() {
 
 <style scoped>
 .login-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f8fafc;
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -174,73 +180,37 @@ async function login() {
   background-color: #fff;
 }
 
-/* --- Panneau gauche --- */
+/* Panel gauche */
 .login-info {
   flex: 1;
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
   color: white;
-  display: flex;
-  flex-direction: column;
 }
 
-.text-white { color: #fff !important; }
-.text-white-75 { color: rgba(255,255,255,0.75) !important; }
-.text-white-50 { color: rgba(255,255,255,0.5) !important; }
-
-.logo-circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-.feature-item .feature-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: #fff;
-}
-
-/* --- Panneau droit --- */
-.login-form-wrapper {
-  flex: 1;
-  padding: 3rem;
-  animation: fadeInUp 0.6s ease-out;
-  background-color: #fff;
-}
-
-/* === Inputs === */
-.login-form input[type="email"],
-.login-form input[type="password"],
-.login-form input[type="text"] {
-  background-color: #fff !important;
-  border: 1px solid #d1d5db !important;
-  color: #111827;
-  border-radius: 8px;
-  padding: 10px 14px;
+/* FORMULAIRE – Inputs customisés */
+.form-field {
   width: 100%;
-  transition: all 0.2s ease;
-  box-shadow: none;
+  position: relative;
 }
 
-.login-form input:focus {
-  outline: none;
+.custom-input {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #000000;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.custom-input:focus {
   border-color: #3b82f6;
+  outline: none;
   box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
 }
 
+/* Icône œil */
 .toggle-password {
   cursor: pointer;
   color: #6b7280;
@@ -251,7 +221,7 @@ async function login() {
   font-size: 1.1rem;
 }
 
-/* === Bouton === */
+/* Button */
 .submit-btn {
   padding: 1rem;
   border-radius: 12px;
@@ -261,8 +231,8 @@ async function login() {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
   transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
 }
 
 .submit-btn:hover {
@@ -270,36 +240,14 @@ async function login() {
   box-shadow: 0 12px 40px rgba(59,130,246,0.4);
 }
 
-.loading-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #ffffff;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-/* === Erreur === */
+/* Error */
 .error-message {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #ef4444;
   color: white;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   border-radius: 12px;
   margin-bottom: 1rem;
   text-align: center;
-}
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {

@@ -104,7 +104,7 @@ const menuItems = ref([
     icon: '<svg xmlns="http://www.w3.org/2000/svg" class="me-1" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Huge Icons by Hugeicons - undefined --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M14.5 10.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0"/><path d="M22 10.5V5.427c0-.568-.324-1.082-.867-1.25C20.19 3.883 18.479 3.5 16 3.5c-4.58 0-5.803 1.677-12.122.424C2.921 3.734 2 4.445 2 5.42v10.017c0 .688.473 1.293 1.145 1.441c5.567 1.228 7.412.32 10.355-.093"/><path d="M2 7.5c1.951 0 3.705-1.595 3.929-3.246M18.5 4c0 2.04 1.765 3.969 3.5 3.969M6 16.996a4 4 0 0 0-4-4M16 15.5a1 1 0 0 1 1-1h5l-1.5-2m1.5 5a1 1 0 0 1-1 1h-5l1.5 2"/></g></svg>',
     title: 'Cotisations',
     path: '/contributions',
-    requireAdmin: isAdmin.value
+    requireAdmin: (isAdmin.value || isMember.value)
   },
   {
     icon: '<svg xmlns="http://www.w3.org/2000/svg" class="me-1" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Huge Icons by Hugeicons - undefined --><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M17.5 11V7.3c0-2.263 0-3.394-.775-4.097c-.776-.703-2.023-.703-4.52-.703h-4.41c-2.497 0-3.744 0-4.52.703S2.5 5.037 2.5 7.3v6.4c0 2.263 0 3.394.775 4.097c.776.703 2.023.703 4.52.703H11"/><path stroke-linecap="round" stroke-linejoin="round" d="M5.5 6.5h9m-9 4h1m3 0h1m3 0h1m-9 4h1m3 0h1"/><circle cx="17.5" cy="17.5" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="m18.5 18l-1-.5V16"/></g></svg>',

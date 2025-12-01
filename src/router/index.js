@@ -102,6 +102,12 @@ const routes = [
         component: () => import('../views/credits/AddCredit.vue')
       },
       {
+        path: 'view/:id',
+        name: 'creditsShow',
+        component: () => import('../views/credits/ViewCredit.vue'),
+        props: true
+      },
+      {
         path: ':id/edit',
         name: 'creditsEdit',
         component: () => import('../views/credits/EditCredit.vue'),
