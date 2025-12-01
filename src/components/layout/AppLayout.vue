@@ -183,7 +183,7 @@ const userName = computed(() => {
   if (user.firstName && user.lastName) {
     return `${user.firstName} ${user.lastName}`;
   }
-  return authStore.user.name ?? 'Utilisateur';
+  return authStore.user?.name ?? 'Utilisateur';
 });
 
 // Methods
