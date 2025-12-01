@@ -120,6 +120,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+     // normalize roles: always return array of role strings
+  const roles = computed(() => {
+    if (!user.value) return [];
+    const r = user.value.role ?? user.value.roles ?? [];
+    if (Array.isArray(r)) return r.map(String);
+    if (typeof r === 'string') return r.split(',').map(s => s.trim());
+    return [];
+  });
+
+  function hasRole(role) {
+    if (!role) return false;
+    return roles.value.includes(role);
+  }
+
+  function hasAnyRole(required = []) {
+    if (!required || !required.length) return true;
+    const req = Array.isArray(required) ? required : [required];
+    return req.some(r => roles.value.includes(r));
+  }
+
   function logout() {
     // Clear state
     user.value = null;
@@ -171,7 +191,9 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     setReturnUrl,
-    initialize
+    initialize,
+    hasRole,
+    hasAnyRole
   };
 }, {
   persist: true // This will persist the store in localStorage

@@ -2,7 +2,11 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Périodes</h2>
-      <button class="btn btn-primary" @click="openAdd">
+      <button
+        class="btn btn-primary"
+        @click="openAdd"
+        v-if="auth.hasAnyRole('admin')"
+      >
         <i class="fas fa-plus me-2"></i>Nouvelle période
       </button>
     </div>
@@ -108,8 +112,6 @@
                   </select>
                 </div>
 
-                
-
                 <div class="col-md-6">
                   <label class="form-label"
                     >Année <span class="text-danger">*</span></label
@@ -196,7 +198,9 @@ import { useStore } from "vuex";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
+import useAuthStore from "../../stores/auth";
 
+const auth = useAuthStore();
 const periodes = ref([]);
 const loading = ref(false);
 const saving = ref(false);

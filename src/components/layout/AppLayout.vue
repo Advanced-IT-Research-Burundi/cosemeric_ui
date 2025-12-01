@@ -56,6 +56,13 @@
               <div class="dropdown-item" @click="navigateToProfile">
                 Mon Profil
               </div>
+              <div
+                class="dropdown-item"
+                @click="navigateToUserManagement"
+                v-if="isAdmin"
+              >
+                Gestion des Utilisateurs
+              </div>
               <div class="dropdown-divider"></div>
               <div class="dropdown-item logout" @click="handleLogout">
                 Déconnexion
@@ -228,6 +235,11 @@ const toggleUserDropdown = () => {
 
 const navigateToProfile = () => {
   router.push("/profile");
+  showUserDropdown.value = false;
+};
+
+const navigateToUserManagement = () => {
+  router.push("/users");
   showUserDropdown.value = false;
 };
 
