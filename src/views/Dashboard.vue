@@ -2,6 +2,7 @@
   <div class="dashboard-container">
     <!-- Navbar -->
 
+    {{   }}
     <div class="container-fluid px-4">
       <!-- Cartes de statistiques principales -->
       <div class="row g-4 mb-4">
