@@ -292,7 +292,6 @@ const fetchPeriodes = async () => {
         params[`filter[${key}]`] = value;
       }
     });
-
     const response = await api.get("/periodes", params);
 
     console.log(response);

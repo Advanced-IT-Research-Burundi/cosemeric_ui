@@ -143,7 +143,11 @@ const fetchCotisations = async () => {
       }
     });
 
-    const response = await api.get("/cotisations", params);
+    if (!auth.hasAnyRole("admin")) {
+      const response = await api.get("/mescotisations", params);
+    } else {
+      const response = await api.get("/cotisations", params);
+    }
 
     // Handle your API response structure
     if (response.success) {

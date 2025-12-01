@@ -130,7 +130,11 @@ const fetchCredits = async () => {
       }
     });
 
-    const response = await api.get("/credits", params);
+    if (!auth.hasAnyRole("admin")) {
+      const response = await api.get("/mescredits", params);
+    } else {
+      const response = await api.get("/credits", params);
+    }
 
     console.log(response);
 
