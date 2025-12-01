@@ -1,17 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
 // Import your components
-import Login from '../views/auth/Login.vue'
-import Register from '../views/auth/Register.vue'
-import PageNotFound from '../views/errors/PageNotFound.vue'
-import AdminComponent from '../views/admin/AdminComponent.vue'
+import Login from "../views/auth/Login.vue";
+import Register from "../views/auth/Register.vue";
+import PageNotFound from "../views/errors/PageNotFound.vue";
+import AdminComponent from "../views/admin/AdminComponent.vue";
 
 // Auth guard
 const requireAuth = (to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  const isAuthenticated = localStorage.getItem("isAuthenticated");
   if (!isAuthenticated) {
-    next('/login');
+    next("/login");
   } else {
     next();
   }
@@ -19,278 +19,287 @@ const requireAuth = (to, from, next) => {
 
 const routes = [
   {
-    path: '/admin',
-    name: 'admin',
+    path: "/admin",
+    name: "admin",
     component: AdminComponent,
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true },
   },
   {
-    path: '/reports',
-    name: 'reports',
-    component: () => import('../views/rapports/RapportComponent.vue'),
-    meta: { requiresAuth: true } 
+    path: "/reports",
+    name: "reports",
+    component: () => import("../views/rapports/RapportComponent.vue"),
+    meta: { requiresAuth: true },
   },
   // Public routes
   {
-    path: '/login',
-    name: 'Login',
+    path: "/login",
+    name: "Login",
     component: Login,
-    meta: { guest: true }
+    meta: { guest: true },
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: () => import('../views/auth/Register.vue'),
-    meta: { guest: true }
+    path: "/register",
+    name: "Register",
+    component: () => import("../views/auth/Register.vue"),
+    meta: { guest: true },
   },
   // 404 route
-  
+
   // Authenticated routes
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('../views/Dashboard.vue'),
-    alias: '/',
-    meta: { requiresAuth: true } 
+    path: "/dashboard",
+    name: "dashboard",
+    component: () => import("../views/Dashboard.vue"),
+    alias: "/",
+    meta: { requiresAuth: true },
   },
   // Test AdvancedTable
   {
-    path: '/test',
-    name: 'TestAdvancedTable',
-    component: () => import('../views/TestAdvancedTable.vue'),
-    meta: { requiresAuth: true } 
+    path: "/test",
+    name: "TestAdvancedTable",
+    component: () => import("../views/TestAdvancedTable.vue"),
+    meta: { requiresAuth: true },
   },
-  
+
   // Assistances
   {
     path: "/assistances",
     name: "assistances",
     children: [
       {
-        path: '',
-        name: 'assistancesView',
-        component: () => import('../views/assistances/AssistanceView.vue')
+        path: "",
+        name: "assistancesView",
+        component: () => import("../views/assistances/AssistanceView.vue"),
       },
       {
-        path: 'add',
-        name: 'assistancesAdd',
-        component: () => import('../views/assistances/AddAssistance.vue')
+        path: "add",
+        name: "assistancesAdd",
+        component: () => import("../views/assistances/AddAssistance.vue"),
       },
       {
-        path: ':id/edit',
-        name: 'assistancesEdit',
-        component: () => import('../views/assistances/EditAssistance.vue'),
-        props: true
-      }
+        path: ":id/edit",
+        name: "assistancesEdit",
+        component: () => import("../views/assistances/EditAssistance.vue"),
+        props: true,
+      },
     ],
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true },
   },
 
   // Credits
   {
-    path: '/credits',
-    name: 'credits',
+    path: "/credits",
+    name: "credits",
     children: [
       {
-        path: '',
-        name: 'creditsView',
-        component: () => import('../views/credits/Credits.vue')
+        path: "",
+        name: "creditsView",
+        component: () => import("../views/credits/Credits.vue"),
       },
       {
-        path: 'add',
-        name: 'creditsAdd',
-        component: () => import('../views/credits/AddCredit.vue')
+        path: "add",
+        name: "creditsAdd",
+        component: () => import("../views/credits/AddCredit.vue"),
       },
       {
-        path: 'view/:id',
-        name: 'creditsShow',
-        component: () => import('../views/credits/ViewCredit.vue'),
-        props: true
+        path: "view/:id",
+        name: "creditsShow",
+        component: () => import("../views/credits/ViewCredit.vue"),
+        props: true,
       },
       {
-        path: ':id/edit',
-        name: 'creditsEdit',
-        component: () => import('../views/credits/EditCredit.vue'),
-        props: true
-      }
+        path: ":id/edit",
+        name: "creditsEdit",
+        component: () => import("../views/credits/EditCredit.vue"),
+        props: true,
+      },
     ],
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true },
   },
   // Members
   {
-    path: '/members',
-    name: 'members',
+    path: "/members",
+    name: "members",
     children: [
       {
-        path: '',
-        name: 'membersView',
-        component: () => import('../views/members/AllMembers.vue')
+        path: "",
+        name: "membersView",
+        component: () => import("../views/members/AllMembers.vue"),
       },
       {
-        path: ':id',
-        name: 'memberView',
-        component: () => import('../views/members/ViewMember.vue')
+        path: ":id",
+        name: "memberView",
+        component: () => import("../views/members/ViewMember.vue"),
       },
       {
-        path: 'add',
-        name: 'membersAdd',
-        component: () => import('../views/members/CreateMember.vue')
+        path: "add",
+        name: "membersAdd",
+        component: () => import("../views/members/CreateMember.vue"),
       },
       {
-        path: ':id/edit',
-        name: 'membersEdit',
-        component: () => import('../views/members/EditMember.vue')
+        path: ":id/edit",
+        name: "membersEdit",
+        component: () => import("../views/members/EditMember.vue"),
       },
     ],
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true },
   },
   {
-    path: '/importationMensuel',
-    name: 'importationMensuel',
-    component: () => import('../views/imports/ImportationComponent.vue')
+    path: "/importationMensuel",
+    name: "importationMensuel",
+    component: () => import("../views/imports/ImportationComponent.vue"),
   },
   // Remboursements
   {
-    path: '/remboursements',
-    name: 'remboursements',
+    path: "/remboursements",
+    name: "remboursements",
     children: [
       {
-        path: '',
-        name: 'remboursementsView',
-        component: () => import('../views/remboursements/Remboursements.vue')
+        path: "",
+        name: "remboursementsView",
+        component: () => import("../views/remboursements/Remboursements.vue"),
       },
       {
-        path: 'add',
-        name: 'remboursementsAdd',
-        component: () => import('../views/remboursements/AddRemboursement.vue')
+        path: "add",
+        name: "remboursementsAdd",
+        component: () => import("../views/remboursements/AddRemboursement.vue"),
       },
       {
-        path: ':id/edit',
-        name: 'remboursementsEdit',
-        component: () => import('../views/remboursements/EditRemboursement.vue'),
-        props: true
-      }
+        path: ":id/edit",
+        name: "remboursementsEdit",
+        component: () =>
+          import("../views/remboursements/EditRemboursement.vue"),
+        props: true,
+      },
     ],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
 
   // Periodes
   {
-    path: '/periodes',
-    name: 'periodes',
-    component: () => import('../views/periodes/Periodes.vue'),
-    meta: { requiresAuth: true }
+    path: "/periodes",
+    name: "periodes",
+    component: () => import("../views/periodes/Periodes.vue"),
+    meta: { requiresAuth: true },
   },
   {
-    path: '/cotisationMensuelle',
-    name: 'cotisationMensuelle',
-    component: () => import('../views/cotisations/CotisationMensuelle.vue'),
-    meta: { requiresAuth: true }
+    path: "/cotisationMensuelle",
+    name: "cotisationMensuelle",
+    component: () => import("../views/cotisations/CotisationMensuelle.vue"),
+    meta: { requiresAuth: true },
   },
 
   // Contributions
   {
-    path: '/contributions',
-    name: 'contributions',
+    path: "/contributions",
+    name: "contributions",
     children: [
       {
-        path: '',
-        name: 'contributionsView',
-        component: () => import('../views/contributions/ContributionView.vue')
+        path: "",
+        name: "contributionsView",
+        component: () => import("../views/contributions/ContributionView.vue"),
       },
       {
-        path: 'add',
-        name: 'contributionsAdd',
-        component: () => import('../views/contributions/AddContribution.vue')
+        path: "add",
+        name: "contributionsAdd",
+        component: () => import("../views/contributions/AddContribution.vue"),
       },
       {
-        path: '/contributions/:id',
-        name: 'viewContribution',
-        component: () => import('../views/contributions/ViewContribution.vue')
+        path: "/contributions/:id",
+        name: "viewContribution",
+        component: () => import("../views/contributions/ViewContribution.vue"),
       },
 
       {
-        path: ':id/edit',
-        name: 'contributionsEdit',
-        component: () => import('../views/contributions/EditContribution.vue')
+        path: ":id/edit",
+        name: "contributionsEdit",
+        component: () => import("../views/contributions/EditContribution.vue"),
       },
     ],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
 
   // Users
   {
-    path: '/users',
-    name: 'users',
+    path: "/users",
+    name: "users",
     children: [
       {
-        path: '',
-        name: 'usersView',
-        component: () => import('../views/users/Users.vue')
+        path: "",
+        name: "usersView",
+        component: () => import("../views/users/Users.vue"),
       },
       {
-        path: ':id',
-        name: 'usersShow',
-        component: () => import('../views/users/ShowUser.vue'),
-        props: true
+        path: ":id",
+        name: "usersShow",
+        component: () => import("../views/users/ShowUser.vue"),
+        props: true,
       },
       {
-        path: 'add',
-        name: 'usersAdd',
-        component: () => import('../views/users/AddUser.vue')
+        path: "add",
+        name: "usersAdd",
+        component: () => import("../views/users/AddUser.vue"),
       },
       {
-        path: ':id/edit',
-        name: 'usersEdit',
-        component: () => import('../views/users/EditUser.vue'),
-        props: true
+        path: ":id/edit",
+        name: "usersEdit",
+        component: () => import("../views/users/EditUser.vue"),
+        props: true,
       },
     ],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+  },
+
+  // Profile
+  {
+    path: "/profile",
+    name: "profile",
+    component: () => import("../views/profile/profile.vue"),
+    meta: { requiresAuth: true },
   },
 
   // 404 - Keep this as last route
   {
-    path: '/:pathMatch(.*)*',
-    name: 'PageNotFound',
+    path: "/:pathMatch(.*)*",
+    name: "PageNotFound",
     component: PageNotFound,
-    meta: { title: 'Page non trouvée', requiresAuth: true }
+    meta: { title: "Page non trouvée", requiresAuth: true },
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     // Always scroll to top when navigating to a new route
-    return { top: 0, behavior: 'smooth' }
-  }
-})
+    return { top: 0, behavior: "smooth" };
+  },
+});
 
 // Navigation guard
 router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore()
-  
+  const authStore = useAuthStore();
+
   // Set page title
-  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : 'COSEMERIC'
-  
+  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : "COSEMERIC";
+
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
       console.log("not authenticated");
-      authStore.setReturnUrl(to.fullPath)
-      return next({ name: 'Login' })
+      authStore.setReturnUrl(to.fullPath);
+      return next({ name: "Login" });
     }
-    
-    return next()
+
+    return next();
   }
-  
+
   // Redirect to dashboard if user is already authenticated and trying to access guest pages
   if (to.meta.guest && authStore.isAuthenticated) {
-    return next({ name: 'dashboard' })
+    return next({ name: "dashboard" });
   }
-  
-  next()
-})
+
+  next();
+});
 
 export default router;
