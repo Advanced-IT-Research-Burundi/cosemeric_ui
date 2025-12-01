@@ -1,6 +1,7 @@
 <template>
   <div class="login-page d-flex align-items-center justify-content-center">
     <div class="login-card">
+      
       <!-- Panneau gauche -->
       <div class="login-info d-none d-lg-flex flex-column p-5">
         <div class="text-center mb-5">
@@ -8,13 +9,13 @@
             <i class="fas fa-coins fa-3x"></i>
           </div>
 
-          <h1 class="h2 fw-bold mb-2">{{ APP_CONFIG.name }}</h1>
-          <p class="opacity-75 mb-0">{{ APP_CONFIG.description }}</p>
-          <small class="opacity-50">Version {{ APP_CONFIG.version }}</small>
+          <h1 class="h2 fw-bold mb-2 text-white">{{ APP_CONFIG.name }}</h1>
+          <p class="text-white-75 mb-0">{{ APP_CONFIG.description }}</p>
+          <small class="text-white-50">Version {{ APP_CONFIG.version }}</small>
         </div>
 
         <div class="flex-grow-1">
-          <h5 class="mb-4 fw-bold">Fonctionnalités principales</h5>
+          <h5 class="mb-4 fw-bold text-white">Fonctionnalités principales</h5>
           <div
             v-for="(feature, index) in FEATURES"
             :key="index"
@@ -24,19 +25,19 @@
               <i :class="feature.icon"></i>
             </div>
             <div>
-              <h6 class="mb-1 fw-bold">{{ feature.label }}</h6>
-              <p class="mb-0 opacity-75 small">{{ feature.description }}</p>
+              <h6 class="mb-1 fw-bold text-white">{{ feature.label }}</h6>
+              <p class="mb-0 small text-white-75">{{ feature.description }}</p>
             </div>
           </div>
         </div>
 
-        <div class="mt-auto d-flex align-items-center">
-          <i class="fas fa-shield-alt opacity-75 me-2"></i>
-          <small class="opacity-75">Connexion sécurisée SSL</small>
+        <div class="mt-auto d-flex align-items-center text-white-75">
+          <i class="fas fa-shield-alt me-2"></i>
+          <small>Connexion sécurisée SSL</small>
         </div>
       </div>
 
-      <!-- Panneau droit (formulaire) -->
+      <!-- Panneau droit -->
       <div class="login-form-wrapper d-flex flex-column justify-content-center p-5">
         <div class="text-center mb-5">
           <h2 class="h3 fw-bold mb-2 text-dark">Connexion</h2>
@@ -44,27 +45,30 @@
         </div>
 
         <form @submit.prevent="login" class="login-form">
+
           <div v-if="error" class="error-message">{{ error }}</div>
 
-          <div class="input-group">
+          <!-- EMAIL -->
+          <div class="form-field mb-3">
             <input
               type="email"
               placeholder="Email"
               v-model="email"
-              class="form-input"
-              :disabled="isLoading"
               required
+              :disabled="isLoading"
+              class="custom-input"
             />
           </div>
 
-          <div class="input-group">
+          <!-- PASSWORD -->
+          <div class="form-field mb-4 position-relative">
             <input
               :type="showPassword ? 'text' : 'password'"
               placeholder="Mot de passe"
               v-model="password"
-              class="form-input"
-              :disabled="isLoading"
               required
+              :disabled="isLoading"
+              class="custom-input"
             />
             <i
               :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
@@ -85,7 +89,8 @@
             </router-link>
           </div>
 
-          <button type="submit" class="submit-btn" :disabled="isLoading">
+          <!-- BUTTON -->
+          <button type="submit" class="submit-btn w-100" :disabled="isLoading">
             <span v-if="!isLoading">Se connecter</span>
             <div v-else class="loading-content">
               <div class="spinner"></div>
@@ -95,10 +100,10 @@
 
           <div class="form-links mt-4 text-center">
             <small class="text-muted">
-            Pas encore de compte ?
-           <router-link to="/register" style="color: #3b82f6" class="fw-semibold">
-              Créer un compte
-           </router-link>
+              Pas encore de compte ?
+              <router-link to="/register" style="color: #3b82f6" class="fw-semibold">
+                Créer un compte
+              </router-link>
             </small>
           </div>
 
@@ -112,9 +117,11 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const APP_CONFIG = {
   name: "CASOMIREC",
@@ -143,10 +150,10 @@ async function login() {
   try {
     const success = await authStore.login(email.value, password.value)
     if (!success) throw new Error('Email ou mot de passe incorrect')
-
     await router.push('/dashboard')
   } catch (err) {
     error.value = err.message || 'Erreur de connexion'
+    toast.error(error.value)
   } finally {
     isLoading.value = false
   }
@@ -155,12 +162,12 @@ async function login() {
 
 <style scoped>
 .login-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .login-card {
@@ -173,87 +180,48 @@ async function login() {
   background-color: #fff;
 }
 
-/* Panneau gauche */
+/* Panel gauche */
 .login-info {
   flex: 1;
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
   color: white;
-  display: flex;
-  flex-direction: column;
 }
 
-.logo-circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-.feature-item .feature-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
-
-.login-form-wrapper {
-  flex: 1;
-  padding: 3rem;
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  background: #ffffff; 
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  margin-bottom: 1.2rem;
-  border: 2px solid #e5e7eb;
+/* FORMULAIRE – Inputs customisés */
+.form-field {
+  width: 100%;
   position: relative;
 }
 
-
-.input-group:focus-within {
-  border-color: #1e40af; 
-}
-
-.form-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  background-color: white;
-  color: black;
-}
-
-.form-input::placeholder {
+.custom-input {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
   color: #000000;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
+.custom-input:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
 
+/* Icône œil */
 .toggle-password {
   cursor: pointer;
   color: #6b7280;
-  font-size: 1.2rem;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
 }
 
+/* Button */
 .submit-btn {
   padding: 1rem;
   border-radius: 12px;
@@ -263,8 +231,8 @@ async function login() {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
   transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
 }
 
 .submit-btn:hover {
@@ -272,38 +240,14 @@ async function login() {
   box-shadow: 0 12px 40px rgba(59,130,246,0.4);
 }
 
-.loading-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #ffffff;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
+/* Error */
 .error-message {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #ef4444;
   color: white;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   border-radius: 12px;
   margin-bottom: 1rem;
   text-align: center;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {

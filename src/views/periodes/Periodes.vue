@@ -342,6 +342,15 @@ const save = async () => {
   try {
     console.log(form.value);
     const payload = { ...form.value };
+
+    // Mapper les champs pour correspondre à ceux du backend
+    payload.mois = form.value.month;
+    payload.semestre = form.value.semester;
+    payload.annee = form.value.year;
+    payload.statut = form.value.status;
+    payload.date_debut = form.value.start_date;
+    payload.date_fin = form.value.end_date;
+
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }

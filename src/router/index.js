@@ -102,6 +102,12 @@ const routes = [
         component: () => import('../views/credits/AddCredit.vue')
       },
       {
+        path: 'view/:id',
+        name: 'creditsShow',
+        component: () => import('../views/credits/ViewCredit.vue'),
+        props: true
+      },
+      {
         path: ':id/edit',
         name: 'creditsEdit',
         component: () => import('../views/credits/EditCredit.vue'),
@@ -138,7 +144,11 @@ const routes = [
     ],
     meta: { requiresAuth: true } 
   },
-
+  {
+    path: '/importationMensuel',
+    name: 'importationMensuel',
+    component: () => import('../views/imports/ImportationComponent.vue')
+  },
   // Remboursements
   {
     path: '/remboursements',
@@ -171,6 +181,12 @@ const routes = [
     component: () => import('../views/periodes/Periodes.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/cotisationMensuelle',
+    name: 'cotisationMensuelle',
+    component: () => import('../views/cotisations/CotisationMensuelle.vue'),
+    meta: { requiresAuth: true }
+  },
 
   // Contributions
   {
@@ -187,6 +203,12 @@ const routes = [
         name: 'contributionsAdd',
         component: () => import('../views/contributions/AddContribution.vue')
       },
+      {
+        path: '/contributions/:id',
+        name: 'viewContribution',
+        component: () => import('../views/contributions/ViewContribution.vue')
+      },
+
       {
         path: ':id/edit',
         name: 'contributionsEdit',

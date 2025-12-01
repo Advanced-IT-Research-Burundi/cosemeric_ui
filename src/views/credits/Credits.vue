@@ -17,6 +17,7 @@
               :show-filters="true"
               :has-actions="true"
               row-key="id"
+              @show="handleShow"
               @edit="handleEdit"
               @delete="handleDelete"
               @search="handleSearch"
@@ -180,7 +181,11 @@
     queryParams.value.page = 1;
     fetchCredits();
   };
-  
+
+  const handleShow = (credit) => {
+  router.push({ name: 'creditsShow', params: { id: credit.id } });
+};
+
   const handleEdit = (credit) => {
     router.push({ name: 'creditsEdit', params: { id: credit.id } });
   };

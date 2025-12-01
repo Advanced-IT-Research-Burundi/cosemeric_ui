@@ -31,6 +31,7 @@
                   {{ ucFirst(value) }}
                   </span>
               </template>
+              
           </AdvancedTable>
       </div>
     </div>
@@ -185,7 +186,10 @@ const ucFirst = (str) => {
     console.log(cotisation);
     router.push({ name: 'contributionsEdit', params: { id: cotisation.id } });
   };
-  
+  const handleView = (cotisation) => {
+  router.push({ name: 'viewContribution', params: { id: cotisation.id } });
+};
+
   const handleDelete = (cotisation) => {
     if(confirm("Etês-vous sûr de vouloir supprimer ce cotisation?")){
       api.delete(`/cotisations/${cotisation.id}`)

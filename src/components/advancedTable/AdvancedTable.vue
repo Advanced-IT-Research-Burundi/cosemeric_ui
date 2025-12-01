@@ -121,7 +121,7 @@
                 <div class="btn-group">
                   <button
                     class="btn btn-outline-secondary btn-sm"
-                    @click="$emit('view', item)"
+                    @click="$emit('show', item)"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -216,6 +216,7 @@ const props = defineProps({
 const emit = defineEmits([
   "edit",
   "delete",
+  "show",
   "row-click",
   "search",
   "sort",
