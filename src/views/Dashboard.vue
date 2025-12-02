@@ -1,8 +1,9 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" v-if="authStore.hasAnyRole('admin')">
     <!-- Navbar -->
 
-    {{   }}
+    {{ test }}
+
     <div class="container-fluid px-4">
       <!-- Cartes de statistiques principales -->
       <div class="row g-4 mb-4">
@@ -153,6 +154,162 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Section Graphiques -->
+    <h2 class="section-title">
+      <i class="bi bi-bar-chart-line-fill me-2"></i>
+      Analyses et Tendances
+    </h2>
+
+    <div class="row g-4 mb-4">
+      <!-- Graphique Cotisations Mensuelles -->
+      <div class="col-12 col-lg-8">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-graph-up me-2"></i>
+            Évolution des Cotisations Mensuelles
+          </div>
+          <div class="card-body">
+            <canvas ref="cotisationsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Répartition Membres -->
+      <div class="col-12 col-lg-4">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-pie-chart-fill me-2"></i>
+            Répartition des Membres
+          </div>
+          <div
+            class="card-body d-flex align-items-center justify-content-center"
+          >
+            <canvas ref="membresChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Crédits vs Remboursements -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-cash-stack me-2"></i>
+            Crédits vs Remboursements (6 derniers mois)
+          </div>
+          <div class="card-body">
+            <canvas ref="creditsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Assistances par Type -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-heart-pulse-fill me-2"></i>
+            Assistances par Type
+          </div>
+          <div class="card-body">
+            <canvas ref="assistancesChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Tendance Mensuelle -->
+      <div class="col-12">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-calendar3 me-2"></i>
+            Vue d'ensemble - Cotisations et Dépenses (12 derniers mois)
+          </div>
+          <div class="card-body">
+            <canvas ref="tendanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container" v-else>
+    <!-- Navbar -->
+
+    <div class="container-fluid px-4">
+      <!-- Cartes de statistiques principales -->
+      <div class="row g-4 mb-4">
+        <!-- Total Cotisations Mensuelles -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
+              <div class="stat-label">Total Cotisations Mensuelles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
+              <div class="stat-label">État de remboursement des crédits</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
+              <div class="stat-label">Montants reçus en assistance</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
+              <div class="stat-label">Anomalies ou retards éventuels</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Section Graphiques -->
       <h2 class="section-title">
@@ -162,7 +319,7 @@
 
       <div class="row g-4 mb-4">
         <!-- Graphique Cotisations Mensuelles -->
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-graph-up me-2"></i>
@@ -175,7 +332,7 @@
         </div>
 
         <!-- Graphique Répartition Membres -->
-        <div class="col-12 col-lg-4">
+        <!-- <div class="col-12 col-lg-4">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-pie-chart-fill me-2"></i>
@@ -187,7 +344,7 @@
               <canvas ref="membresChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Crédits vs Remboursements -->
         <div class="col-12 col-lg-6">
@@ -203,7 +360,7 @@
         </div>
 
         <!-- Graphique Assistances par Type -->
-        <div class="col-12 col-lg-6">
+        <!-- <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-heart-pulse-fill me-2"></i>
@@ -213,7 +370,7 @@
               <canvas ref="assistancesChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Tendance Mensuelle -->
         <div class="col-12">
@@ -236,6 +393,12 @@
 import { ref, onMounted } from "vue";
 import Chart from "chart.js/auto";
 import api from "../services/api"; // Assurez-vous que le chemin est correct
+
+import auth from "../stores/auth";
+import { useStore } from "vuex";
+
+const store = useStore();
+const authStore = auth();
 
 // =============================
 // DONNÉES RÉACTIVES
@@ -265,6 +428,8 @@ const formatMontant = (montant) => {
     minimumFractionDigits: 0,
   }).format(montant);
 };
+
+const test = "okok";
 
 // =============================
 // RÉFÉRENCES DES GRAPHIQUES
@@ -504,6 +669,7 @@ onMounted(async () => {
   background-color: var(--light-bg);
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1.5rem 1.5rem;
 }
 
 /* ============================================
