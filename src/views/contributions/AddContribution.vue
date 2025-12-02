@@ -335,6 +335,31 @@
         }, 300) 
     }
 
+<<<<<<< HEAD
+=======
+    // API search
+    const searchMembers = async (searchTerm) => {
+        loadingMembers.value = true
+        try {
+            
+            const res = await api.get('/membres', { params: { search: searchTerm, per_page: 20 } })
+            
+            
+            
+            members.value = res.data.data || [];
+            
+            
+        } catch (err) {
+            console.error('Error searching members:', err);
+            toast.error('Erreur lors du chargement des membres')
+            members.value = []
+        } finally {
+            loadingMembers.value = false
+        }
+    }
+
+    // Select a member from results
+>>>>>>> d20d2a3eb41ab52da78bf0a585bb21a0168bde81
     const selectMember = (member) => {
         
         if (!member.full_name) {
