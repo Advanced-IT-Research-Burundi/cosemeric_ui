@@ -335,8 +335,7 @@
         }, 300) 
     }
 
-<<<<<<< HEAD
-=======
+
     // API search
     const searchMembers = async (searchTerm) => {
         loadingMembers.value = true
@@ -359,7 +358,7 @@
     }
 
     // Select a member from results
->>>>>>> d20d2a3eb41ab52da78bf0a585bb21a0168bde81
+
     const selectMember = (member) => {
         
         if (!member.full_name) {
