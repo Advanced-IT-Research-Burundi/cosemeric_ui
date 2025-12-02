@@ -139,6 +139,7 @@ const fetchCotisations = async () => {
       }
     });
 
+    let response = null;
     if (!auth.hasAnyRole("admin")) {
       response = await api.get("/mescotisations", { params }); 
     } else {
