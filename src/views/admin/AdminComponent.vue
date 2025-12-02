@@ -1,19 +1,14 @@
 <template>
   <div class="admin-dashboard">
     <!-- Top Navigation -->
-   
+
     <!-- Main Content -->
     <main class="main-content">
       <!-- Header -->
-     
 
       <!-- Statistics Cards -->
       <div class="stats-grid">
-        <div 
-          v-for="stat in statistics" 
-          :key="stat.id"
-          class="stat-card"
-        >
+        <div v-for="stat in statistics" :key="stat.id" class="stat-card">
           <div class="stat-icon" :style="{ background: stat.gradient }">
             <i :class="stat.icon"></i>
           </div>
@@ -22,7 +17,13 @@
             <h3 class="stat-value">{{ stat.value }}</h3>
             <div class="stat-footer">
               <span class="stat-change" :class="stat.trend">
-                <i :class="stat.trend === 'up' ? 'bi bi-arrow-up-short' : 'bi bi-arrow-down-short'"></i>
+                <i
+                  :class="
+                    stat.trend === 'up'
+                      ? 'bi bi-arrow-up-short'
+                      : 'bi bi-arrow-down-short'
+                  "
+                ></i>
                 {{ stat.change }}
               </span>
               <small class="text-muted">vs mois dernier</small>
@@ -58,10 +59,16 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="transaction in recentTransactions" :key="transaction.id">
+                <tr
+                  v-for="transaction in recentTransactions"
+                  :key="transaction.id"
+                >
                   <td>
                     <div class="d-flex align-items-center">
-                      <div class="avatar-circle me-3" :style="{ background: transaction.avatarColor }">
+                      <div
+                        class="avatar-circle me-3"
+                        :style="{ background: transaction.avatarColor }"
+                      >
                         {{ transaction.membre.charAt(0) }}
                       </div>
                       <div>
@@ -75,7 +82,9 @@
                       {{ transaction.type }}
                     </span>
                   </td>
-                  <td class="fw-bold">{{ formatCurrency(transaction.montant) }}</td>
+                  <td class="fw-bold">
+                    {{ formatCurrency(transaction.montant) }}
+                  </td>
                   <td class="text-muted">{{ transaction.date }}</td>
                   <td>
                     <span :class="getStatusBadge(transaction.status)">
@@ -84,7 +93,10 @@
                     </span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-light me-1" title="Voir détails">
+                    <button
+                      class="btn btn-sm btn-light me-1"
+                      title="Voir détails"
+                    >
                       <i class="bi bi-eye"></i>
                     </button>
                     <button class="btn btn-sm btn-light" title="Plus d'options">
@@ -106,11 +118,12 @@
             </h5>
           </div>
           <div class="quick-actions-grid">
-            <button 
-              v-for="action in quickActions" 
+            <button
+              v-for="action in quickActions"
               :key="action.id"
               class="quick-action-card"
               :style="{ borderColor: action.color }"
+              @click="$router.push(action.url)"
             >
               <div class="action-icon" :style="{ background: action.gradient }">
                 <i :class="action.icon"></i>
@@ -129,12 +142,15 @@
             </h5>
           </div>
           <div class="activity-timeline">
-            <div 
-              v-for="activity in recentActivity" 
+            <div
+              v-for="activity in recentActivity"
               :key="activity.id"
               class="timeline-item"
             >
-              <div class="timeline-marker" :style="{ background: activity.color }">
+              <div
+                class="timeline-marker"
+                :style="{ background: activity.color }"
+              >
                 <i :class="activity.icon"></i>
               </div>
               <div class="timeline-content">
@@ -157,13 +173,13 @@
             Évolution des transactions
           </h5>
           <div class="d-flex gap-2">
-            <select class="form-select form-select-sm" style="width: auto;">
+            <select class="form-select form-select-sm" style="width: auto">
               <option>Tous les types</option>
               <option>Cotisations</option>
               <option>Crédits</option>
               <option>Dettes</option>
             </select>
-            <select class="form-select form-select-sm" style="width: auto;">
+            <select class="form-select form-select-sm" style="width: auto">
               <option>2024</option>
               <option>2023</option>
             </select>
@@ -174,7 +190,9 @@
             <i class="bi bi-bar-chart-line-fill"></i>
           </div>
           <h5 class="mb-2">Graphique des transactions mensuelles</h5>
-          <p class="text-muted mb-3">Visualisez l'évolution de vos transactions sur l'année</p>
+          <p class="text-muted mb-3">
+            Visualisez l'évolution de vos transactions sur l'année
+          </p>
           <button class="btn btn-outline-primary btn-sm">
             <i class="bi bi-plus-circle me-2"></i>
             Intégrer Chart.js ou Recharts
@@ -186,124 +204,234 @@
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 export default {
-  name: 'AdminDashboard',
+  name: "AdminDashboard",
   data() {
     return {
-      activeMenu: 'dashboard',
+      activeMenu: "dashboard",
       menuItems: [
-        { id: 'dashboard', label: 'Tableau de bord', icon: 'bi bi-speedometer2' },
-        { id: 'members', label: 'Membres', icon: 'bi bi-people' },
-        { id: 'transactions', label: 'Transactions', icon: 'bi bi-arrow-left-right' },
-        { id: 'reports', label: 'Rapports', icon: 'bi bi-file-earmark-text' },
-        { id: 'loans', label: 'Crédits', icon: 'bi bi-credit-card' }
+        {
+          id: "dashboard",
+          label: "Tableau de bord",
+          icon: "bi bi-speedometer2",
+        },
+        { id: "members", label: "Membres", icon: "bi bi-people" },
+        {
+          id: "transactions",
+          label: "Transactions",
+          icon: "bi bi-arrow-left-right",
+        },
+        { id: "reports", label: "Rapports", icon: "bi bi-file-earmark-text" },
+        { id: "loans", label: "Crédits", icon: "bi bi-credit-card" },
       ],
       statistics: [
-        { 
-          id: 1, 
-          label: 'Solde total', 
-          value: '2 450 000 BIF', 
-          change: '+12.5%', 
-          trend: 'up',
-          icon: 'bi bi-wallet2',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        {
+          id: 1,
+          label: "Solde total",
+          value: "2 450 000 BIF",
+          change: "+12.5%",
+          trend: "up",
+          icon: "bi bi-wallet2",
+          gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         },
-        { 
-          id: 2, 
-          label: 'Membres actifs', 
-          value: '156', 
-          change: '+8 nouveaux', 
-          trend: 'up',
-          icon: 'bi bi-people-fill',
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+        {
+          id: 2,
+          label: "Membres actifs",
+          value: "156",
+          change: "+8 nouveaux",
+          trend: "up",
+          icon: "bi bi-people-fill",
+          gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
         },
-        { 
-          id: 3, 
-          label: 'Crédits en cours', 
-          value: '24', 
-          change: '-3 ce mois', 
-          trend: 'down',
-          icon: 'bi bi-credit-card-2-front',
-          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+        {
+          id: 3,
+          label: "Crédits en cours",
+          value: "24",
+          change: "-3 ce mois",
+          trend: "down",
+          icon: "bi bi-credit-card-2-front",
+          gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
         },
-        { 
-          id: 4, 
-          label: 'Transactions du mois', 
-          value: '89', 
-          change: '+15.3%', 
-          trend: 'up',
-          icon: 'bi bi-arrow-left-right',
-          gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
-        }
+        {
+          id: 4,
+          label: "Transactions du mois",
+          value: "89",
+          change: "+15.3%",
+          trend: "up",
+          icon: "bi bi-arrow-left-right",
+          gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+        },
       ],
       recentTransactions: [
-        { id: 'T-001', membre: 'Jean Dupont', type: 'Cotisation', montant: 5000, date: '02 Oct 2024', status: 'Validé', avatarColor: '#667eea' },
-        { id: 'T-002', membre: 'Marie Martin', type: 'Crédit', montant: 15000, date: '02 Oct 2024', status: 'En attente', avatarColor: '#f093fb' },
-        { id: 'T-003', membre: 'Paul Durand', type: 'Dette', montant: 8000, date: '01 Oct 2024', status: 'Validé', avatarColor: '#4facfe' },
-        { id: 'T-004', membre: 'Sophie Bernard', type: 'Assistance', montant: 3000, date: '01 Oct 2024', status: 'Validé', avatarColor: '#43e97b' },
-        { id: 'T-005', membre: 'Luc Petit', type: 'Cotisation', montant: 5000, date: '30 Sep 2024', status: 'Rejeté', avatarColor: '#f5576c' }
+        {
+          id: "T-001",
+          membre: "Jean Dupont",
+          type: "Cotisation",
+          montant: 5000,
+          date: "02 Oct 2024",
+          status: "Validé",
+          avatarColor: "#667eea",
+        },
+        {
+          id: "T-002",
+          membre: "Marie Martin",
+          type: "Crédit",
+          montant: 15000,
+          date: "02 Oct 2024",
+          status: "En attente",
+          avatarColor: "#f093fb",
+        },
+        {
+          id: "T-003",
+          membre: "Paul Durand",
+          type: "Dette",
+          montant: 8000,
+          date: "01 Oct 2024",
+          status: "Validé",
+          avatarColor: "#4facfe",
+        },
+        {
+          id: "T-004",
+          membre: "Sophie Bernard",
+          type: "Assistance",
+          montant: 3000,
+          date: "01 Oct 2024",
+          status: "Validé",
+          avatarColor: "#43e97b",
+        },
+        {
+          id: "T-005",
+          membre: "Luc Petit",
+          type: "Cotisation",
+          montant: 5000,
+          date: "30 Sep 2024",
+          status: "Rejeté",
+          avatarColor: "#f5576c",
+        },
       ],
       quickActions: [
-        { id: 1, label: 'Ajouter membre', icon: 'bi bi-person-plus-fill', color: '#667eea', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-        { id: 2, label: 'Nouvelle cotisation', icon: 'bi bi-cash-coin', color: '#43e97b', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-        { id: 3, label: 'Accorder crédit', icon: 'bi bi-credit-card-fill', color: '#4facfe', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-        { id: 4, label: 'Générer rapport', icon: 'bi bi-file-earmark-pdf-fill', color: '#f5576c', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }
+        {
+          id: 1,
+          label: "Ajouter membre",
+          icon: "bi bi-person-plus-fill",
+          color: "#667eea",
+          gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          url: "/members",
+        },
+        {
+          id: 2,
+          label: "Nouvelle cotisation",
+          icon: "bi bi-cash-coin",
+          color: "#43e97b",
+          gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+          url: "/contributions",
+        },
+        {
+          id: 3,
+          label: "Accorder crédit",
+          icon: "bi bi-credit-card-fill",
+          color: "#4facfe",
+          gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+          url: "/credits",
+        },
+        {
+          id: 4,
+          label: "Générer rapport",
+          icon: "bi bi-file-earmark-pdf-fill",
+          color: "#f5576c",
+          gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+          url: "/reports",
+        },
       ],
       recentActivity: [
-        { id: 1, text: 'Nouveau membre inscrit : Emma Rousseau', time: 'Il y a 5 min', icon: 'bi bi-person-check-fill', color: '#43e97b' },
-        { id: 2, text: 'Cotisation validée pour Jean Dupont', time: 'Il y a 12 min', icon: 'bi bi-check-circle-fill', color: '#667eea' },
-        { id: 3, text: 'Crédit de 15 000 BIF approuvé', time: 'Il y a 1h', icon: 'bi bi-credit-card-fill', color: '#4facfe' },
-        { id: 4, text: 'Rapport mensuel généré avec succès', time: 'Il y a 2h', icon: 'bi bi-file-earmark-check', color: '#f093fb' },
-        { id: 5, text: 'Mise à jour du système effectuée', time: 'Il y a 3h', icon: 'bi bi-gear-fill', color: '#ffa726' }
-      ]
+        {
+          id: 1,
+          text: "Nouveau membre inscrit : Emma Rousseau",
+          time: "Il y a 5 min",
+          icon: "bi bi-person-check-fill",
+          color: "#43e97b",
+        },
+        {
+          id: 2,
+          text: "Cotisation validée pour Jean Dupont",
+          time: "Il y a 12 min",
+          icon: "bi bi-check-circle-fill",
+          color: "#667eea",
+        },
+        {
+          id: 3,
+          text: "Crédit de 15 000 BIF approuvé",
+          time: "Il y a 1h",
+          icon: "bi bi-credit-card-fill",
+          color: "#4facfe",
+        },
+        {
+          id: 4,
+          text: "Rapport mensuel généré avec succès",
+          time: "Il y a 2h",
+          icon: "bi bi-file-earmark-check",
+          color: "#f093fb",
+        },
+        {
+          id: 5,
+          text: "Mise à jour du système effectuée",
+          time: "Il y a 3h",
+          icon: "bi bi-gear-fill",
+          color: "#ffa726",
+        },
+      ],
     };
   },
   methods: {
     getCurrentDate() {
-      return new Date().toLocaleDateString('fr-FR', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+      return new Date().toLocaleDateString("fr-FR", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     },
     formatCurrency(amount) {
-      return new Intl.NumberFormat('fr-FR', { 
-        style: 'currency', 
-        currency: 'BIF' 
+      return new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: "BIF",
       }).format(amount);
     },
     getTypeBadge(type) {
       const badges = {
-        'Cotisation': 'badge bg-primary',
-        'Crédit': 'badge bg-success',
-        'Dette': 'badge bg-warning text-dark',
-        'Assistance': 'badge bg-info text-dark'
+        Cotisation: "badge bg-primary",
+        Crédit: "badge bg-success",
+        Dette: "badge bg-warning text-dark",
+        Assistance: "badge bg-info text-dark",
       };
-      return badges[type] || 'badge bg-secondary';
+      return badges[type] || "badge bg-secondary";
     },
     getStatusBadge(status) {
       const badges = {
-        'Validé': 'status-badge success',
-        'En attente': 'status-badge warning',
-        'Rejeté': 'status-badge danger'
+        Validé: "status-badge success",
+        "En attente": "status-badge warning",
+        Rejeté: "status-badge danger",
       };
-      return badges[status] || 'status-badge secondary';
+      return badges[status] || "status-badge secondary";
     },
     getStatusIcon(status) {
       const icons = {
-        'Validé': 'bi bi-check-circle-fill',
-        'En attente': 'bi bi-clock-fill',
-        'Rejeté': 'bi bi-x-circle-fill'
+        Validé: "bi bi-check-circle-fill",
+        "En attente": "bi bi-clock-fill",
+        Rejeté: "bi bi-x-circle-fill",
       };
-      return icons[status] || 'bi bi-circle-fill';
+      return icons[status] || "bi bi-circle-fill";
     },
     logout() {
-      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        alert('Déconnexion en cours...');
+      if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+        alert("Déconnexion en cours...");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -317,7 +445,7 @@ export default {
 .admin-dashboard {
   min-height: 100vh;
   background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* TOP NAVBAR */
@@ -773,7 +901,7 @@ export default {
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .large-card {
     grid-row: auto;
   }
@@ -784,7 +912,7 @@ export default {
     flex-wrap: wrap;
     padding: 1rem;
   }
-  
+
   .navbar-menu {
     width: 100%;
     order: 3;
@@ -792,25 +920,25 @@ export default {
     overflow-x: auto;
     justify-content: flex-start;
   }
-  
+
   .nav-link span {
     display: none;
   }
-  
+
   .main-content {
     padding: 1.5rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .content-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .quick-actions-grid {
     grid-template-columns: 1fr;
   }

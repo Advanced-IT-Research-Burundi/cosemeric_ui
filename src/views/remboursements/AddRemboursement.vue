@@ -9,7 +9,6 @@
 
     <div class="card">
       <div class="card-body">
-        <!-- Step 1: Select Credit -->
         <div v-if="currentStep === 1" class="row g-3">
           <div class="col-md-12">
             <div class="input-group">
@@ -17,7 +16,7 @@
               <input
                 type="search"
                 class="form-control py-2"
-                placeholder="Rechercher un crédit (au moins 2 caractères)"
+                placeholder="Rechercher un crédit par ID, Nom ou Prénom (au moins 2 caractères)"
                 aria-label="Crédit"
                 v-model="searchCredit"
                 @input="onSearchInput"
@@ -28,9 +27,9 @@
               <i class="fas fa-spinner fa-spin me-1"></i>Chargement des crédits...
             </div>
 
-            <ul v-if="credits.length > 0" class="list-group mt-2" style="max-height: 240px; overflow-y: auto;">
+            <ul v-if="filteredCredits.length > 0" class="list-group mt-2" style="max-height: 240px; overflow-y: auto;">
               <li
-                v-for="c in credits"
+                v-for="c in filteredCredits"
                 :key="c.id"
                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                 :class="{ active: form.credit_id === c.id }"
@@ -44,13 +43,12 @@
               </li>
             </ul>
 
-            <div v-if="!loadingCredits && searchCredit && credits.length === 0" class="form-text text-muted mt-2">
+            <div v-if="!loadingCredits && searchCredit && filteredCredits.length === 0" class="form-text text-muted mt-2">
               Aucun crédit trouvé pour "{{ searchCredit }}"
             </div>
           </div>
         </div>
 
-        <!-- Step 2: Remboursement Details -->
         <form v-if="currentStep === 2" @submit.prevent="handleSubmit">
           <div v-if="error" class="alert alert-danger mb-4">{{ error }}</div>
 
@@ -128,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import api from '../../services/api';
@@ -139,7 +137,7 @@ const toast = useToast();
 const saving = ref(false);
 const error = ref('');
 const loadingCredits = ref(false);
-const credits = ref([]);
+const allCredits = ref([]);
 const currentStep = ref(1);
 const searchCredit = ref('');
 
@@ -155,26 +153,45 @@ const form = ref({
   penalite: 0,
 });
 
-const searchCredits = async () => {
+const fetchAllCredits = async () => {
+  if (allCredits.value.length > 0 || loadingCredits.value) return; 
+
   loadingCredits.value = true;
   try {
-    const res = await api.get('/credits', { search: searchCredit.value, per_page: 20 });
-    credits.value = Array.isArray(res?.data) ? res.data : (res?.data?.data || res?.data || []);
+    const res = await api.get('/credits?per_page=9999'); 
+    
+    allCredits.value = Array.isArray(res?.data) ? res.data : (res?.data?.data || res?.data || []);
   } catch (e) {
-    console.error('Error searching credits', e);
+    console.error('Error fetching all credits', e);
     toast.error('Erreur lors du chargement des crédits');
-    credits.value = [];
+    allCredits.value = [];
   } finally {
     loadingCredits.value = false;
   }
 };
 
+const filteredCredits = computed(() => {
+    const searchTerm = searchCredit.value.trim().toLowerCase();
+    
+    if (searchTerm.length < 2) {
+        return [];
+    }
+
+    return allCredits.value.filter(c => {
+        if (String(c.id).includes(searchTerm)) {
+            return true;
+        }
+
+        const nomComplet = (c.membre?.nom + ' ' + c.membre?.prenom || '').toLowerCase();
+        
+        return nomComplet.includes(searchTerm);
+    });
+});
+
 const onSearchInput = () => {
-  if (!searchCredit.value || searchCredit.value.trim().length < 2) {
-    credits.value = [];
-    return;
-  }
-  searchCredits();
+    if (searchCredit.value.trim().length >= 2) {
+        fetchAllCredits(); 
+    }
 };
 
 const selectCredit = (c) => {
@@ -182,11 +199,9 @@ const selectCredit = (c) => {
   form.value.credit = c;
   form.value.membre = c.membre;
 
-  // Optional UX: fill the input and collapse results
   searchCredit.value = `${c.membre.nom} ${c.membre.prenom}`
-  credits.value = []
-
-  // Auto-advance to Step 2
+  allCredits.value = []
+  
   currentStep.value = 2
 };
 
@@ -194,7 +209,11 @@ const handleSubmit = async () => {
   saving.value = true; error.value = '';
   try {
     const payload = { ...form.value };
-    // Ensure numbers are numbers
+    
+    payload.credit_id = payload.credit.id; 
+    delete payload.credit; 
+    delete payload.membre;
+
     payload.numero_echeance = Number(payload.numero_echeance);
     payload.montant_prevu = Number(payload.montant_prevu);
     payload.montant_paye = Number(payload.montant_paye || 0);
@@ -211,6 +230,4 @@ const handleSubmit = async () => {
     saving.value = false;
   }
 };
-
-// No initial fetch; user searches for a credit in Step 1
 </script>

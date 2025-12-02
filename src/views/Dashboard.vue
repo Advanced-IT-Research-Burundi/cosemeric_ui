@@ -1,7 +1,6 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" v-if="authStore.hasAnyRole('admin')">
     <!-- Navbar -->
-   
 
     <div class="container-fluid px-4">
       <!-- Cartes de statistiques principales -->
@@ -13,10 +12,14 @@
               <div class="stat-icon bg-primary-gradient">
                 <i class="bi bi-wallet2"></i>
               </div>
-              <div class="stat-value text-primary">{{ formatMontant(stats.cotisationsMois) }}</div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
               <div class="stat-label">Cotisations ce mois</div>
               <div class="stat-change text-success">
-                <i class="bi bi-arrow-up"></i> +{{ stats.evolutionCotisations }}%
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
               </div>
             </div>
           </div>
@@ -29,11 +32,11 @@
               <div class="stat-icon bg-info-gradient">
                 <i class="bi bi-piggy-bank"></i>
               </div>
-              <div class="stat-value text-info">{{ formatMontant(stats.cotisationsCumulatif) }}</div>
-              <div class="stat-label">Cotisations cumulées</div>
-              <div class="stat-change text-muted">
-                Total depuis début
+              <div class="stat-value text-info">
+                {{ formatMontant(stats.cotisationsCumulatif) }}
               </div>
+              <div class="stat-label">Cotisations cumulées</div>
+              <div class="stat-change text-muted">Total depuis début</div>
             </div>
           </div>
         </div>
@@ -45,10 +48,13 @@
               <div class="stat-icon bg-success-gradient">
                 <i class="bi bi-people-fill"></i>
               </div>
-              <div class="stat-value text-success">{{ stats.membresActifs }}</div>
+              <div class="stat-value text-success">
+                {{ stats.membresActifs }}
+              </div>
               <div class="stat-label">Membres Actifs</div>
               <div class="stat-change text-danger">
-                <i class="bi bi-person-x"></i> {{ stats.membresInactifs }} inactifs
+                <i class="bi bi-person-x"></i>
+                {{ stats.membresInactifs }} inactifs
               </div>
             </div>
           </div>
@@ -61,10 +67,13 @@
               <div class="stat-icon bg-warning-gradient">
                 <i class="bi bi-credit-card"></i>
               </div>
-              <div class="stat-value text-warning">{{ formatMontant(stats.creditsTotal) }}</div>
+              <div class="stat-value text-warning">
+                {{ formatMontant(stats.creditsTotal) }}
+              </div>
               <div class="stat-label">Crédits Accordés</div>
               <div class="stat-change text-warning">
-                <i class="bi bi-hourglass-split"></i> {{ stats.creditsEnCours }} en cours
+                <i class="bi bi-hourglass-split"></i>
+                {{ stats.creditsEnCours }} en cours
               </div>
             </div>
           </div>
@@ -77,7 +86,9 @@
               <div class="stat-icon bg-danger-gradient">
                 <i class="bi bi-exclamation-triangle-fill"></i>
               </div>
-              <div class="stat-value text-danger">{{ formatMontant(stats.dettesAttente) }}</div>
+              <div class="stat-value text-danger">
+                {{ formatMontant(stats.dettesAttente) }}
+              </div>
               <div class="stat-label">Dettes en Attente</div>
               <div class="stat-change text-danger">
                 <i class="bi bi-bell-fill"></i> Action requise
@@ -93,10 +104,13 @@
               <div class="stat-icon bg-purple-gradient">
                 <i class="bi bi-hand-thumbs-up-fill"></i>
               </div>
-              <div class="stat-value text-purple">{{ stats.demandesAssistance }}</div>
+              <div class="stat-value text-purple">
+                {{ stats.demandesAssistance }}
+              </div>
               <div class="stat-label">Demandes Assistance</div>
               <div class="stat-change text-success">
-                <i class="bi bi-check-circle"></i> {{ stats.aidesAccordees }} accordées
+                <i class="bi bi-check-circle"></i>
+                {{ stats.aidesAccordees }} accordées
               </div>
             </div>
           </div>
@@ -109,7 +123,9 @@
               <div class="stat-icon bg-teal-gradient">
                 <i class="bi bi-graph-up-arrow"></i>
               </div>
-              <div class="stat-value text-teal">{{ stats.tauxRecouvrement }}%</div>
+              <div class="stat-value text-teal">
+                {{ stats.tauxRecouvrement }}%
+              </div>
               <div class="stat-label">Taux Recouvrement</div>
               <div class="stat-change text-success">
                 <i class="bi bi-star-fill"></i> Excellent
@@ -125,10 +141,168 @@
               <div class="stat-icon bg-dark-gradient">
                 <i class="bi bi-bank2"></i>
               </div>
-              <div class="stat-value text-dark">{{ formatMontant(stats.soldeDisponible) }}</div>
+              <div class="stat-value text-dark">
+                {{ formatMontant(stats.soldeDisponible) }}
+              </div>
               <div class="stat-label">Solde Disponible</div>
               <div class="stat-change text-info">
                 <i class="bi bi-shield-check"></i> Sécurisé
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Graphiques -->
+    <h2 class="section-title">
+      <i class="bi bi-bar-chart-line-fill me-2"></i>
+      Analyses et Tendances
+    </h2>
+
+    <div class="row g-4 mb-4">
+      <!-- Graphique Cotisations Mensuelles -->
+      <div class="col-12 col-lg-8">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-graph-up me-2"></i>
+            Évolution des Cotisations Mensuelles
+          </div>
+          <div class="card-body">
+            <canvas ref="cotisationsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Répartition Membres -->
+      <div class="col-12 col-lg-4">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-pie-chart-fill me-2"></i>
+            Répartition des Membres
+          </div>
+          <div
+            class="card-body d-flex align-items-center justify-content-center"
+          >
+            <canvas ref="membresChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Crédits vs Remboursements -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-cash-stack me-2"></i>
+            Crédits vs Remboursements (6 derniers mois)
+          </div>
+          <div class="card-body">
+            <canvas ref="creditsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Assistances par Type -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-heart-pulse-fill me-2"></i>
+            Assistances par Type
+          </div>
+          <div class="card-body">
+            <canvas ref="assistancesChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Tendance Mensuelle -->
+      <div class="col-12">
+        <div class="card chart-card">
+          <div class="card-header">
+            <i class="bi bi-calendar3 me-2"></i>
+            Vue d'ensemble - Cotisations et Dépenses (12 derniers mois)
+          </div>
+          <div class="card-body">
+            <canvas ref="tendanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container" v-else>
+    <!-- Navbar -->
+
+    <div class="container-fluid px-4">
+      <!-- Cartes de statistiques principales -->
+      <div class="row g-4 mb-4">
+        <!-- Total Cotisations Mensuelles -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.cotisationsMois) }}
+              </div>
+              <div class="stat-label">Total Cotisations Mensuelles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-cash"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.creditsTotalPaye) }}
+              </div>
+              <div class="stat-label">État de remboursement des crédits</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.montantsAssistancesRecus) }}
+              </div>
+              <div class="stat-label">Montants reçus en assistance</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-primary-gradient">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-value text-primary">
+                {{ formatMontant(stats.anomalies) }}
+              </div>
+              <div class="stat-label">Anomalies ou retards éventuels</div>
+              <div class="stat-change text-success">
+                <i class="bi bi-arrow-up"></i> +{{
+                  stats.evolutionCotisations
+                }}%
               </div>
             </div>
           </div>
@@ -143,7 +317,7 @@
 
       <div class="row g-4 mb-4">
         <!-- Graphique Cotisations Mensuelles -->
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-graph-up me-2"></i>
@@ -156,17 +330,19 @@
         </div>
 
         <!-- Graphique Répartition Membres -->
-        <div class="col-12 col-lg-4">
+        <!-- <div class="col-12 col-lg-4">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-pie-chart-fill me-2"></i>
               Répartition des Membres
             </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
+            <div
+              class="card-body d-flex align-items-center justify-content-center"
+            >
               <canvas ref="membresChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Crédits vs Remboursements -->
         <div class="col-12 col-lg-6">
@@ -182,7 +358,7 @@
         </div>
 
         <!-- Graphique Assistances par Type -->
-        <div class="col-12 col-lg-6">
+        <!-- <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-heart-pulse-fill me-2"></i>
@@ -192,7 +368,7 @@
               <canvas ref="assistancesChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Tendance Mensuelle -->
         <div class="col-12">
@@ -212,8 +388,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import Chart from 'chart.js/auto';
+import { ref, onMounted } from "vue";
+import Chart from "chart.js/auto";
+import api from "../services/api"; // Assurez-vous que le chemin est correct
+
+import auth from "../stores/auth";
+import { useStore } from "vuex";
+
+const store = useStore();
+const authStore = auth();
 
 // =============================
 // DONNÉES RÉACTIVES
@@ -230,17 +413,20 @@ const stats = ref({
   demandesAssistance: 0,
   aidesAccordees: 0,
   tauxRecouvrement: 0,
-  soldeDisponible: 0
+  soldeDisponible: 0,
+  anomalies: 0,
+  creditsTotalPaye: 0,
+  montantsAssistancesRecus: 0,
 });
 
 // =============================
 // FORMATAGE DES MONTANTS
 // =============================
 const formatMontant = (montant) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'BIF',
-    minimumFractionDigits: 0
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "BIF",
+    minimumFractionDigits: 0,
   }).format(montant);
 };
 
@@ -265,72 +451,76 @@ const initChartsWithData = (chartsData) => {
         labels: {
           font: {
             size: 12,
-            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-          }
-        }
-      }
-    }
+            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          },
+        },
+      },
+    },
   };
 
-  //  Cotisations Mensuelles
+  // Cotisations Mensuelles
   if (cotisationsChart.value) {
     new Chart(cotisationsChart.value, {
-      type: 'line',
+      type: "line",
       data: {
         labels: chartsData.cotisations.labels,
-        datasets: [{
-          label: 'Cotisations (BIF)',
-          data: chartsData.cotisations.values,
-          borderColor: '#3498db',
-          backgroundColor: 'rgba(52, 152, 219, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
+        datasets: [
+          {
+            label: "Cotisations (BIF)",
+            data: chartsData.cotisations.values,
+            borderColor: "#3498db",
+            backgroundColor: "rgba(52, 152, 219, 0.1)",
+            tension: 0.4,
+            fill: true,
+          },
+        ],
       },
-      options: commonOptions
+      options: commonOptions,
     });
   }
 
-  //  Répartition Membres
+  // Répartition Membres
   if (membresChart.value) {
     new Chart(membresChart.value, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
-        labels: ['Actifs', 'Inactifs'],
-        datasets: [{
-          data: [chartsData.membres.actifs, chartsData.membres.inactifs],
-          backgroundColor: ['#27ae60', '#e74c3c'],
-          borderWidth: 3,
-          borderColor: '#fff'
-        }]
+        labels: ["Actifs", "Inactifs"],
+        datasets: [
+          {
+            data: [chartsData.membres.actifs, chartsData.membres.inactifs],
+            backgroundColor: ["#27ae60", "#e74c3c"],
+            borderWidth: 3,
+            borderColor: "#fff",
+          },
+        ],
       },
       options: {
         ...commonOptions,
-        plugins: { legend: { position: 'bottom' } }
-      }
+        plugins: { legend: { position: "bottom" } },
+      },
     });
   }
 
-  //  Crédits vs Remboursements
+  // Crédits vs Remboursements
   if (creditsChart.value) {
     new Chart(creditsChart.value, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: chartsData.credits.labels,
         datasets: [
           {
-            label: 'Crédits accordés',
+            label: "Crédits accordés",
             data: chartsData.credits.accordes,
-            backgroundColor: '#f39c12',
-            borderRadius: 5
+            backgroundColor: "#f39c12",
+            borderRadius: 5,
           },
           {
-            label: 'Remboursements',
+            label: "Remboursements",
             data: chartsData.credits.rembourses,
-            backgroundColor: '#27ae60',
-            borderRadius: 5
-          }
-        ]
+            backgroundColor: "#27ae60",
+            borderRadius: 5,
+          },
+        ],
       },
       options: {
         ...commonOptions,
@@ -338,70 +528,78 @@ const initChartsWithData = (chartsData) => {
           y: {
             beginAtZero: true,
             ticks: {
-              callback: (value) => value.toLocaleString('fr-FR') + ' BIF'
-            }
+              callback: (value) => value.toLocaleString("fr-FR") + " BIF",
+            },
           },
-          x: { grid: { display: false } }
-        }
-      }
+          x: { grid: { display: false } },
+        },
+      },
     });
   }
 
-  //  Assistances par Type
+  // Assistances par Type
   if (assistancesChart.value) {
     new Chart(assistancesChart.value, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: chartsData.assistances.labels,
-        datasets: [{
-          label: 'Nombre d\'assistances',
-          data: chartsData.assistances.values,
-          backgroundColor: ['#e74c3c', '#3498db', '#f39c12', '#95a5a6', '#9b59b6'],
-          borderRadius: 5
-        }]
+        datasets: [
+          {
+            label: "Nombre d'assistances",
+            data: chartsData.assistances.values,
+            backgroundColor: [
+              "#e74c3c",
+              "#3498db",
+              "#f39c12",
+              "#95a5a6",
+              "#9b59b6",
+            ],
+            borderRadius: 5,
+          },
+        ],
       },
       options: {
         ...commonOptions,
-        indexAxis: 'y',
-        plugins: { legend: { display: false } }
-      }
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+      },
     });
   }
 
-  //  Tendance Mensuelle
+  // Tendance Mensuelle
   if (tendanceChart.value) {
     new Chart(tendanceChart.value, {
-      type: 'line',
+      type: "line",
       data: {
         labels: chartsData.tendance.labels,
         datasets: [
           {
-            label: 'Cotisations',
+            label: "Cotisations",
             data: chartsData.tendance.cotisations,
-            borderColor: '#3498db',
-            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            borderColor: "#3498db",
+            backgroundColor: "rgba(52, 152, 219, 0.1)",
             fill: true,
-            tension: 0.4
+            tension: 0.4,
           },
           {
-            label: 'Crédits',
+            label: "Crédits",
             data: chartsData.tendance.credits,
-            borderColor: '#f39c12',
-            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+            borderColor: "#f39c12",
+            backgroundColor: "rgba(243, 156, 18, 0.1)",
             fill: true,
-            tension: 0.4
+            tension: 0.4,
           },
           {
-            label: 'Assistances',
+            label: "Assistances",
             data: chartsData.tendance.assistances,
-            borderColor: '#9b59b6',
-            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+            borderColor: "#9b59b6",
+            backgroundColor: "rgba(155, 89, 182, 0.1)",
             fill: true,
-            tension: 0.4
-          }
-        ]
+            tension: 0.4,
+          },
+        ],
       },
-      options: commonOptions
+      options: commonOptions,
     });
   }
 };
@@ -411,17 +609,53 @@ const initChartsWithData = (chartsData) => {
 // =============================
 onMounted(async () => {
   try {
-    const response = await fetch('/dashboard');
-    const data = await response.json();
-    stats.value = data.stats;
-    initChartsWithData(data.charts);
+    let response;
+
+    if (!authStore.hasAnyRole("admin")) {
+      response = await api.get("/dashboard-member");
+    } else {
+      response = await api.get("/dashboard");
+    }
+
+    store.state.dashboard = response;
+    const data = store.state.dashboard;
+
+    // Vérifier que la réponse est valide
+    if (data.success && data.stats && data.charts) {
+      // Mettre à jour les statistiques
+      stats.value = {
+        cotisationsMois: data.stats.cotisationsMois || 0,
+        cotisationsCumulatif: data.stats.cotisationsCumulatif || 0,
+        evolutionCotisations: data.stats.evolutionCotisations || 0,
+        membresActifs: data.stats.membresActifs || 0,
+        membresInactifs: data.stats.membresInactifs || 0,
+        creditsTotal: data.stats.creditsTotal || 0,
+        creditsEnCours: data.stats.creditsEnCours || 0,
+        dettesAttente: data.stats.dettesAttente || 0,
+        demandesAssistance: data.stats.demandesAssistance || 0,
+        aidesAccordees: data.stats.aidesAccordees || 0,
+        tauxRecouvrement: data.stats.tauxRecouvrement || 0,
+        soldeDisponible: data.stats.soldeDisponible || 0,
+        anomalies: data.stats.anomalies || 0,
+        creditsTotalPaye: data.stats.creditsTotalPaye || 0,
+        montantsAssistancesRecus: data.stats.montantsAssistancesRecus || 0,
+      };
+
+      console.log("Données du dashboard reçues:", data);
+
+      // Initialiser les graphiques avec les données
+      initChartsWithData(data.charts);
+    } else {
+      console.warn("Format de réponse invalide:", data);
+    }
   } catch (err) {
-    console.error('Erreur:', err);
+    console.error(
+      "Erreur lors de la récupération des données du dashboard:",
+      err
+    );
   }
 });
-
 </script>
-
 
 <style scoped>
 /* ============================================
@@ -445,7 +679,8 @@ onMounted(async () => {
 .dashboard-container {
   background-color: var(--light-bg);
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1.5rem 1.5rem;
 }
 
 /* ============================================
@@ -612,7 +847,7 @@ onMounted(async () => {
   .stat-value {
     font-size: 1.7rem;
   }
-  
+
   .stat-icon {
     width: 55px;
     height: 55px;

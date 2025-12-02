@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import Dashboard from '../views/Dashboard.vue';
 
 // Create a new store instance.
 const vuexStore = createStore({
@@ -13,6 +14,7 @@ const vuexStore = createStore({
         assistances: [],
         remboursements: [],
         periodes: [],
+        Dashboard: [],
       },
       isLoading: false,
       error: null,

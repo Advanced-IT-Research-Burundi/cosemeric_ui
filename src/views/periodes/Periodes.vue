@@ -2,7 +2,11 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Périodes</h2>
-      <button class="btn btn-primary" @click="openAdd">
+      <button
+        class="btn btn-primary"
+        @click="openAdd"
+        v-if="auth.hasAnyRole('admin')"
+      >
         <i class="fas fa-plus me-2"></i>Nouvelle période
       </button>
     </div>
@@ -23,30 +27,17 @@
         @sort="handleSort"
         @filter="handleFilter"
         @page-change="handlePageChange"
-        @per-page-change="handlePerPageChange">
-        <!-- Status badge -->
-        <!-- <template #column-status="{ value }">
-          <span class="badge rounded-1" :class="value === 'ouvert' ? 'bg-success' : 'bg-danger'">
-            {{ value === 'ouvert' ? 'Ouvert' : 'Ferme' }}
-          </span>
-        </template> -->
-        <!-- Month label -->
-        <!-- <template #column-month="{ row }">
-          <span v-if="row.type === 'mensuel'">{{ monthLabel(row.mois) }}</span>
-        </template> -->
-        <!-- Semester label -->
-        <!-- <template #column-semester="{ row }">
-          <span v-if="row.type === 'semestriel'">{{ semesterLabel(row.semestre) }}</span>
-        </template> -->
-      </AdvancedTable>
+        @per-page-change="handlePerPageChange"
+      >
+        </AdvancedTable>
     </div>
 
-    <!-- Add/Edit Modal -->
     <div
       v-if="showModal"
       class="modal fade show d-block"
       tabindex="-1"
-      role="dialog">
+      role="dialog"
+    >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -56,7 +47,8 @@
             <button
               type="button"
               class="btn-close"
-              @click="closeModal"></button>
+              @click="closeModal"
+            ></button>
           </div>
           <div class="modal-body">
             <div v-if="error" class="alert alert-danger mb-3">{{ error }}</div>
@@ -78,12 +70,14 @@
                   >
                   <select
                     class="form-select"
-                    v-model.number="form.month"
-                    required>
+                    v-model.number="form.mois"
+                    required
+                  >
                     <option
                       v-for="(m, idx) in months"
                       :key="idx"
-                      :value="idx + 1">
+                      :value="idx + 1"
+                    >
                       {{ m }}
                     </option>
                   </select>
@@ -95,8 +89,9 @@
                   >
                   <select
                     class="form-select"
-                    v-model.number="form.semester"
-                    required>
+                    v-model.number="form.semestre"
+                    required
+                  >
                     <option :value="1">1er semestre</option>
                     <option :value="2">2ème semestre</option>
                   </select>
@@ -112,7 +107,8 @@
                     v-model.number="form.annee"
                     min="2000"
                     max="2100"
-                    required />
+                    required
+                  />
                 </div>
 
                 <div class="col-md-6">
@@ -133,7 +129,8 @@
                     type="date"
                     class="form-control"
                     v-model="form.date_debut"
-                    required />
+                    required
+                  />
                 </div>
 
                 <div class="col-md-6">
@@ -144,7 +141,8 @@
                     type="date"
                     class="form-control"
                     v-model="form.date_fin"
-                    required />
+                    required
+                  />
                 </div>
               </div>
             </form>
@@ -154,24 +152,26 @@
               type="button"
               class="btn btn-outline-secondary"
               @click="closeModal"
-              :disabled="saving">
+              :disabled="saving"
+            >
               Annuler
             </button>
             <button
               type="button"
               class="btn btn-primary"
               @click="save"
-              :disabled="saving">
+              :disabled="saving"
+            >
               <span
                 v-if="saving"
-                class="spinner-border spinner-border-sm me-2"></span>
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
               {{ saving ? "Enregistrement..." : "Enregistrer" }}
             </button>
           </div>
         </div>
       </div>
     </div>
-    <!-- modal backdrop -->
     <div v-if="showModal" class="modal-backdrop fade show"></div>
   </div>
 </template>
@@ -182,7 +182,9 @@ import { useStore } from "vuex";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
+import useAuthStore from "../../stores/auth";
 
+const auth = useAuthStore();
 const periodes = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -239,12 +241,12 @@ const semesterLabel = (s) =>
 const form = ref({
   id: null,
   type: "mensuel",
-  month: 1,
-  semester: 1,
-  annee: new Date().getFullYear(),
-  statut: "open",
-  start_date: "",
-  end_date: "",
+  mois: 1, 
+  semestre: 1, 
+  annee: new Date().getFullYear(), 
+  statut: "ouvert", 
+  date_debut: "", 
+  date_fin: "", 
 });
 const showModal = ref(false);
 const isEdit = ref(false);
@@ -274,15 +276,14 @@ const fetchPeriodes = async () => {
         params[`filter[${key}]`] = value;
       }
     });
-
     const response = await api.get("/periodes", params);
 
     console.log(response);
 
     // Handle your API response structure
     if (response.success) {
-      credits.value = response.data || [];
-      store.state.credits = response.data || [];
+      periodes.value = response.data || [];
+      store.state.periodes = response.data || [];
     } else {
       console.error("API Error:", response.message);
     }
@@ -298,12 +299,12 @@ const openAdd = () => {
   form.value = {
     id: null,
     type: "mensuel",
-    month: 1,
-    semester: 1,
-    year: new Date().getFullYear(),
-    status: "open",
-    start_date: "",
-    end_date: "",
+    mois: 1,
+    semestre: 1,
+    annee: new Date().getFullYear(),
+    statut: "ouvert",
+    date_debut: "",
+    date_fin: "",
   };
   error.value = "";
   showModal.value = true;
@@ -313,6 +314,7 @@ const openEdit = (row) => {
   console.log(row);
 
   isEdit.value = true;
+  // Assurez-vous que l'objet 'row' de l'API a les clés en français pour la fusion
   form.value = { ...row };
   error.value = "";
   showModal.value = true;
@@ -329,14 +331,7 @@ const save = async () => {
     console.log(form.value);
     const payload = { ...form.value };
 
-    // Mapper les champs pour correspondre à ceux du backend
-    payload.mois = form.value.month;
-    payload.semestre = form.value.semester;
-    payload.annee = form.value.year;
-    payload.statut = form.value.status;
-    payload.date_debut = form.value.start_date;
-    payload.date_fin = form.value.end_date;
-
+    
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }
@@ -355,8 +350,19 @@ const save = async () => {
     showModal.value = false;
   } catch (e) {
     console.error("Error saving periode:", e);
-    error.value =
-      e?.response?.data?.message || "Erreur lors de l'enregistrement";
+    
+    const apiErrors = e?.response?.data?.errors;
+    if (apiErrors) {
+      
+      let errorMessages = e.response.data.message + "<br>";
+      for (const key in apiErrors) {
+        errorMessages += `**${key}**: ${apiErrors[key].join(", ")}<br>`;
+      }
+      error.value = errorMessages;
+    } else {
+      error.value =
+        e?.response?.data?.message || "Erreur lors de l'enregistrement";
+    }
   } finally {
     saving.value = false;
   }
@@ -402,7 +408,7 @@ const handlePerPageChange = (per) => {
 };
 
 const tableData = computed(() => {
-  return store.state.data.periodes;
+  return store.state.periodes;
 });
 onMounted(fetchPeriodes);
 </script>
