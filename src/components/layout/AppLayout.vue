@@ -108,7 +108,7 @@ const menuItems = ref([
     icon: '<svg xmlns="http://www.w3.org/2000/svg" class="me-1" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Huge Icons by Hugeicons - undefined --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="m22 10.5l-9.117-7.678a1.37 1.37 0 0 0-1.765 0L2 10.5"/><path d="M20.5 5v10.5c0 2.828 0 4.243-.879 5.121c-.878.879-2.293.879-5.121.879h-5c-2.828 0-4.243 0-5.121-.879C3.5 19.743 3.5 18.328 3.5 15.5v-6"/><path d="M15 21.5v-5c0-1.414 0-2.121-.44-2.56c-.439-.44-1.146-.44-2.56-.44s-2.121 0-2.56.44C9 14.378 9 15.085 9 16.5v5"/></g></svg>',
     title: "Tableau de bord",
     path: "/dashboard",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isMember.value,
   },
   {
     icon: '<svg xmlns="http://www.w3.org/2000/svg" class="me-1" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Huge Icons by Hugeicons - undefined --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M15.5 11a3.5 3.5 0 1 0-7 0a3.5 3.5 0 0 0 7 0"/><path d="M15.483 11.35q.484.149 1.017.15a3.5 3.5 0 1 0-3.483-3.85m-2.034 0a3.5 3.5 0 1 0-2.466 3.7M22 16.5c0-2.761-2.462-5-5.5-5m1 8c0-2.761-2.462-5-5.5-5s-5.5 2.239-5.5 5"/><path d="M7.5 11.5c-3.038 0-5.5 2.239-5.5 5"/></g></svg>',
