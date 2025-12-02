@@ -175,9 +175,7 @@ const fetchMembers = async () => {
 // Calculate total amount and monthly payment
 const calculatePayments = () => {
   const m_demande = formData.value.montant_demande;
-
   const tatR = m_demande + ((m_demande * 3) / 100)
-
   formData.value.montant_total_rembourser = tatR
   formData.value.montant_mensualite = tatR / 12
 
