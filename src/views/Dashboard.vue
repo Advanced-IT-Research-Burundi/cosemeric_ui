@@ -258,7 +258,7 @@
                 <i class="bi bi-wallet2"></i>
               </div>
               <div class="stat-value text-primary">
-                {{ formatMontant(stats.cotisationsMois) }}
+                {{ formatMontant(stats.creditsTotalPaye) }}
               </div>
               <div class="stat-label">État de remboursement des crédits</div>
               <div class="stat-change text-success">
@@ -277,7 +277,7 @@
                 <i class="bi bi-wallet2"></i>
               </div>
               <div class="stat-value text-primary">
-                {{ formatMontant(stats.cotisationsMois) }}
+                {{ formatMontant(stats.montantsAssistancesRecus) }}
               </div>
               <div class="stat-label">Montants reçus en assistance</div>
               <div class="stat-change text-success">
@@ -296,7 +296,7 @@
                 <i class="bi bi-wallet2"></i>
               </div>
               <div class="stat-value text-primary">
-                {{ formatMontant(stats.cotisationsMois) }}
+                {{ formatMontant(stats.anomalies) }}
               </div>
               <div class="stat-label">Anomalies ou retards éventuels</div>
               <div class="stat-change text-success">
@@ -414,6 +414,9 @@ const stats = ref({
   aidesAccordees: 0,
   tauxRecouvrement: 0,
   soldeDisponible: 0,
+  anomalies: 0,
+  creditsTotalPaye: 0,
+  montantsAssistancesRecus: 0,
 });
 
 // =============================
@@ -606,7 +609,13 @@ const initChartsWithData = (chartsData) => {
 // =============================
 onMounted(async () => {
   try {
-    const response = await api.get("/dashboard");
+    let response;
+
+    if (!authStore.hasAnyRole("admin")) {
+      response = await api.get("/dashboard-member");
+    } else {
+      response = await api.get("/dashboard");
+    }
 
     store.state.dashboard = response;
     const data = store.state.dashboard;
@@ -627,6 +636,9 @@ onMounted(async () => {
         aidesAccordees: data.stats.aidesAccordees || 0,
         tauxRecouvrement: data.stats.tauxRecouvrement || 0,
         soldeDisponible: data.stats.soldeDisponible || 0,
+        anomalies: data.stats.anomalies || 0,
+        creditsTotalPaye: data.stats.creditsTotalPaye || 0,
+        montantsAssistancesRecus: data.stats.montantsAssistancesRecus || 0,
       };
 
       console.log("Données du dashboard reçues:", data);
