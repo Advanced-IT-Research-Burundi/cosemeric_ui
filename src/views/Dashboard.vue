@@ -255,7 +255,7 @@
           <div class="card stat-card">
             <div class="card-body">
               <div class="stat-icon bg-primary-gradient">
-                <i class="bi bi-wallet2"></i>
+                <i class="bi bi-cash"></i>
               </div>
               <div class="stat-value text-primary">
                 {{ formatMontant(stats.creditsTotalPaye) }}
