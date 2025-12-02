@@ -427,8 +427,6 @@ const formatMontant = (montant) => {
   }).format(montant);
 };
 
-const test = "okok";
-
 // =============================
 // RÉFÉRENCES DES GRAPHIQUES
 // =============================
@@ -609,8 +607,9 @@ const initChartsWithData = (chartsData) => {
 onMounted(async () => {
   try {
     const response = await api.get("/dashboard");
-    store;
-    const data = await response.json();
+
+    store.state.dashboard = response;
+    const data = store.state.dashboard;
 
     // Vérifier que la réponse est valide
     if (data.success && data.stats && data.charts) {
@@ -629,6 +628,8 @@ onMounted(async () => {
         tauxRecouvrement: data.stats.tauxRecouvrement || 0,
         soldeDisponible: data.stats.soldeDisponible || 0,
       };
+
+      console.log("Données du dashboard reçues:", data);
 
       // Initialiser les graphiques avec les données
       initChartsWithData(data.charts);
