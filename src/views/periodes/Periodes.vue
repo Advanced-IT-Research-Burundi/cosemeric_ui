@@ -29,24 +29,9 @@
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
       >
-        <!-- Status badge -->
-        <!-- <template #column-status="{ value }">
-          <span class="badge rounded-1" :class="value === 'ouvert' ? 'bg-success' : 'bg-danger'">
-            {{ value === 'ouvert' ? 'Ouvert' : 'Ferme' }}
-          </span>
-        </template> -->
-        <!-- Month label -->
-        <!-- <template #column-month="{ row }">
-          <span v-if="row.type === 'mensuel'">{{ monthLabel(row.mois) }}</span>
-        </template> -->
-        <!-- Semester label -->
-        <!-- <template #column-semester="{ row }">
-          <span v-if="row.type === 'semestriel'">{{ semesterLabel(row.semestre) }}</span>
-        </template> -->
-      </AdvancedTable>
+        </AdvancedTable>
     </div>
 
-    <!-- Add/Edit Modal -->
     <div
       v-if="showModal"
       class="modal fade show d-block"
@@ -85,7 +70,7 @@
                   >
                   <select
                     class="form-select"
-                    v-model.number="form.month"
+                    v-model.number="form.mois"
                     required
                   >
                     <option
@@ -104,7 +89,7 @@
                   >
                   <select
                     class="form-select"
-                    v-model.number="form.semester"
+                    v-model.number="form.semestre"
                     required
                   >
                     <option :value="1">1er semestre</option>
@@ -187,7 +172,6 @@
         </div>
       </div>
     </div>
-    <!-- modal backdrop -->
     <div v-if="showModal" class="modal-backdrop fade show"></div>
   </div>
 </template>
@@ -257,12 +241,12 @@ const semesterLabel = (s) =>
 const form = ref({
   id: null,
   type: "mensuel",
-  month: 1,
-  semester: 1,
-  annee: new Date().getFullYear(),
-  statut: "open",
-  start_date: "",
-  end_date: "",
+  mois: 1, 
+  semestre: 1, 
+  annee: new Date().getFullYear(), 
+  statut: "ouvert", 
+  date_debut: "", 
+  date_fin: "", 
 });
 const showModal = ref(false);
 const isEdit = ref(false);
@@ -315,12 +299,12 @@ const openAdd = () => {
   form.value = {
     id: null,
     type: "mensuel",
-    month: 1,
-    semester: 1,
-    year: new Date().getFullYear(),
-    status: "open",
-    start_date: "",
-    end_date: "",
+    mois: 1,
+    semestre: 1,
+    annee: new Date().getFullYear(),
+    statut: "ouvert",
+    date_debut: "",
+    date_fin: "",
   };
   error.value = "";
   showModal.value = true;
@@ -330,6 +314,7 @@ const openEdit = (row) => {
   console.log(row);
 
   isEdit.value = true;
+  // Assurez-vous que l'objet 'row' de l'API a les clés en français pour la fusion
   form.value = { ...row };
   error.value = "";
   showModal.value = true;
@@ -346,14 +331,7 @@ const save = async () => {
     console.log(form.value);
     const payload = { ...form.value };
 
-    // Mapper les champs pour correspondre à ceux du backend
-    payload.mois = form.value.month;
-    payload.semestre = form.value.semester;
-    payload.annee = form.value.year;
-    payload.statut = form.value.status;
-    payload.date_debut = form.value.start_date;
-    payload.date_fin = form.value.end_date;
-
+    
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }
@@ -372,8 +350,19 @@ const save = async () => {
     showModal.value = false;
   } catch (e) {
     console.error("Error saving periode:", e);
-    error.value =
-      e?.response?.data?.message || "Erreur lors de l'enregistrement";
+    
+    const apiErrors = e?.response?.data?.errors;
+    if (apiErrors) {
+      
+      let errorMessages = e.response.data.message + "<br>";
+      for (const key in apiErrors) {
+        errorMessages += `**${key}**: ${apiErrors[key].join(", ")}<br>`;
+      }
+      error.value = errorMessages;
+    } else {
+      error.value =
+        e?.response?.data?.message || "Erreur lors de l'enregistrement";
+    }
   } finally {
     saving.value = false;
   }

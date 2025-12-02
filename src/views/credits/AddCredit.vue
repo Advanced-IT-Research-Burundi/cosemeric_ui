@@ -15,7 +15,6 @@
           </div>
 
           <div class="row g-3">
-            <!-- Membre -->
             <div class="col-md-6">
               <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
               <select 
@@ -40,7 +39,6 @@
               </div>
             </div>
 
-            <!-- Montant Demandé -->
             <div class="col-md-6">
               <label for="montant_demande" class="form-label">Montant Demandé <span class="text-danger">*</span></label>
               <div class="input-group">
@@ -58,7 +56,6 @@
               </div>
             </div>
 
-            <!-- Montant Accordé -->
             <div class="col-md-6">
               <label for="montant_accorde" class="form-label">Montant Accordé <span class="text-danger">*</span></label>
               <div class="input-group">
@@ -76,7 +73,6 @@
               </div>
             </div>
 
-            <!-- Taux d'Intérêt -->
             <div class="col-md-6">
               <label for="taux_interet" class="form-label">Taux d'Intérêt (%) <span class="text-danger">*</span></label>
               <div class="input-group">
@@ -95,7 +91,6 @@
               </div>
             </div>
 
-            <!-- Durée en Mois -->
             <div class="col-md-6">
               <label for="duree_mois" class="form-label">Durée (mois) <span class="text-danger">*</span></label>
               <input 
@@ -109,7 +104,6 @@
               >
             </div>
 
-            <!-- Montant Total à Rembourser -->
             <div class="col-md-6">
               <label class="form-label">Montant Total à Rembourser</label>
               <div class="form-control bg-light">
@@ -117,7 +111,6 @@
               </div>
             </div>
 
-            <!-- Montant de la Mensualité -->
             <div class="col-md-6">
               <label class="form-label">Mensualité</label>
               <div class="form-control bg-light">
@@ -125,7 +118,6 @@
               </div>
             </div>
 
-            <!-- Date de Demande -->
             <div class="col-md-6">
               <label for="date_demande" class="form-label">Date de Demande <span class="text-danger">*</span></label>
               <input 
@@ -137,7 +129,6 @@
               >
             </div>
 
-            <!-- Date d'Approbation -->
             <div class="col-md-6">
               <label for="date_approbation" class="form-label">Date d'Approbation</label>
               <input 
@@ -148,7 +139,6 @@
               >
             </div>
 
-            <!-- Statut -->
             <div class="col-md-6">
               <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
               <select 
@@ -165,7 +155,6 @@
               </select>
             </div>
 
-            <!-- Motif -->
             <div class="col-12">
               <label for="motif" class="form-label">Motif du Crédit <span class="text-danger">*</span></label>
               <textarea 
@@ -236,7 +225,8 @@ const formData = ref({
 const fetchMembers = async () => {
   try {
     const response = await api.get('/membres');
-    members.value = response.data.data || [];
+    // Assurez-vous que members.value est bien un tableau
+    members.value = response.data?.data || [];
   } catch (err) {
     console.error('Error fetching members:', err);
     toast.error('Erreur lors du chargement des membres');
@@ -258,8 +248,9 @@ const calculatePayments = () => {
   // Calculate monthly payment
   const mensualite = duree > 0 ? total / duree : 0;
   
-  formData.value.montant_total_rembourser = total.toFixed(0);
-  formData.value.montant_mensualite = mensualite.toFixed(0);
+  // Utiliser Math.round pour un arrondi simple
+  formData.value.montant_total_rembourser = Math.round(total);
+  formData.value.montant_mensualite = Math.round(mensualite);
 };
 
 // Handle form submission
@@ -268,30 +259,31 @@ const handleSubmit = async () => {
   error.value = '';
   
   try {
-    // Prepare the data for API
+    // Prepare the data for API (Les nombres sont déjà gérés par v-model.number)
     const payload = {
-      ...formData.value,
-      // Convert string numbers to numbers
-      montant_demande: formData.value.montant_demande,
-      montant_accorde: formData.value.montant_accorde,
-      taux_interet: formData.value.taux_interet,
-      duree_mois: formData.value.duree_mois
+      ...formData.value
     };
 
-    console.log(payload);
+    console.log("Payload envoyé :", payload);
     
     const response = await api.post('/credits', payload);
     
+    // Vérification de la réponse (l'API devrait retourner un objet de crédit en cas de succès)
     if (response.data) {
       toast.success('Crédit enregistré avec succès');
       router.push('/credits');
     } else {
+      // Une réponse sans 'data' peut indiquer un problème non HTTP 4xx/5xx
       throw new Error('Réponse inattendue du serveur');
     }
   } catch (err) {
     console.error('Error saving credit:', err);
-    error.value = err.response?.data?.message || 'Erreur lors de l\'enregistrement du crédit';
-    toast.error(error.value);
+    // Gérer les erreurs spécifiques de l'API (ex: Laravel validation errors)
+    const apiErrorMessage = err.response?.data?.message || 
+                          err.message || 
+                          'Erreur lors de l\'enregistrement du crédit';
+    error.value = apiErrorMessage;
+    toast.error(apiErrorMessage);
   } finally {
     loading.value = false;
   }
@@ -301,7 +293,4 @@ onMounted(() => {
   fetchMembers();
   calculatePayments();
 });
-
-
-
 </script>

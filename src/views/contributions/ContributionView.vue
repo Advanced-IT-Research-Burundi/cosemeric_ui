@@ -29,7 +29,6 @@
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
       >
-        <!-- Custom column slot -->
         <template #column-statut="{ value }">
           <span class="badge rounded-1" :class="getClassByStatut(value)">
             {{ ucFirst(value) }}
@@ -53,7 +52,6 @@ const store = useStore();
 const cotisations = ref([]);
 const loading = ref(false);
 
-// Query parameters for API
 const queryParams = ref({
   page: 1,
   per_page: 15,
@@ -94,7 +92,6 @@ const columns = [
   },
 ];
 
-// Méthodes utilitaires
 const formatMontant = (montant) => {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
@@ -116,14 +113,14 @@ const ucFirst = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-// Fetch data from your API
 const fetchCotisations = async () => {
   loading.value = true;
+  
+  let response = null; 
 
   try {
     const params = {};
 
-    // Add query parameters
     params.page = queryParams.value.page;
     params.per_page = queryParams.value.per_page;
 
@@ -136,7 +133,6 @@ const fetchCotisations = async () => {
       params.sort_order = queryParams.value.sort_order;
     }
 
-    // Add filters
     Object.entries(queryParams.value.filters).forEach(([key, value]) => {
       if (value) {
         params[`filter[${key}]`] = value;
@@ -144,17 +140,16 @@ const fetchCotisations = async () => {
     });
 
     if (!auth.hasAnyRole("admin")) {
-      const response = await api.get("/mescotisations", params);
+      response = await api.get("/mescotisations", { params }); 
     } else {
-      const response = await api.get("/cotisations", params);
+      response = await api.get("/cotisations", { params }); 
     }
 
-    // Handle your API response structure
-    if (response.success) {
-      cotisations.value = response.data || [];
-      store.state.cotisations = response.data || [];
+    if (response && response.data) {
+      cotisations.value = response.data.data || response.data || [];
+      store.state.cotisations = response.data;
     } else {
-      console.error("API Error:", response.message);
+      console.error("API Error: Réponse non valide ou vide.");
     }
   } catch (error) {
     console.error("Error fetching cotisations:", error);
@@ -175,7 +170,6 @@ const getClassByStatut = (statut) => {
   }
 };
 
-// Event handlers
 const handleSearch = (searchTerm) => {
   queryParams.value.search = searchTerm;
   queryParams.value.page = 1;
@@ -207,18 +201,14 @@ const handlePerPageChange = (perPage) => {
 };
 
 const handleEdit = (cotisation) => {
-  console.log(cotisation);
   router.push({ name: "contributionsEdit", params: { id: cotisation.id } });
-};
-const handleView = (cotisation) => {
-  router.push({ name: "viewContribution", params: { id: cotisation.id } });
 };
 
 const handleDelete = (cotisation) => {
   if (confirm("Etês-vous sûr de vouloir supprimer ce cotisation?")) {
     api
       .delete(`/cotisations/${cotisation.id}`)
-      .then((response) => {
+      .then(() => {
         console.log("Cotisation supprimée avec succès!");
         fetchCotisations();
       })

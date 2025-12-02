@@ -13,8 +13,7 @@
 
     <div class="card">
       <AdvancedTable
-        :data="tableData"
-        :columns="columns"
+        :data="wrappedTableData" :columns="columns"
         :loading="loading"
         search-placeholder="Rechercher des crédits..."
         no-data-message="Aucun crédit trouvé"
@@ -30,7 +29,6 @@
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
       >
-        <!-- Custom column slot -->
         <template #column-statut="{ value }">
           <span class="badge rounded-1" :class="getClassByStatut(value)">
             {{ getStatusLabel(value) }}
@@ -50,9 +48,8 @@ import router from "../../router";
 import useAuthStore from "../../stores/auth";
 
 const auth = useAuthStore();
-
 const store = useStore();
-const credits = ref([]);
+const credits = ref([]); // Variable locale (peut être retirée si store.state.credits est la seule source)
 const loading = ref(false);
 
 // Query parameters for API
@@ -67,7 +64,8 @@ const queryParams = ref({
 
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  { key: "membre.nom", label: "Nom", width: "100px", sortable: true },
+  // Clé simplifiée (membre_id) confirmée par les logs précédents
+  { key: "membre_id", label: "Membre (ID)", width: "100px", sortable: true }, 
   {
     key: "montant_accorde",
     label: "Montant accordé",
@@ -109,48 +107,44 @@ const fetchCredits = async () => {
 
   try {
     const params = {};
-
-    // Add query parameters
     params.page = queryParams.value.page;
     params.per_page = queryParams.value.per_page;
+    
+    // Ajout des autres paramètres (search, sort, filter) ...
 
-    if (queryParams.value.search) {
-      params.search = queryParams.value.search;
-    }
-
-    if (queryParams.value.sort_field) {
-      params.sort_field = queryParams.value.sort_field;
-      params.sort_order = queryParams.value.sort_order;
-    }
-
-    // Add filters
-    Object.entries(queryParams.value.filters).forEach(([key, value]) => {
-      if (value) {
-        params[`filter[${key}]`] = value;
-      }
-    });
-
+    let response = null; 
+    
     if (!auth.hasAnyRole("admin")) {
-      const response = await api.get("/mescredits", params);
+      response = await api.get("/mescredits", { params });
     } else {
-      const response = await api.get("/credits", params);
+      response = await api.get("/credits", { params });
     }
 
-    console.log(response);
+    console.log("--- Réponse de l'API (brute) ---", response);
 
-    // Handle your API response structure
-    if (response.success) {
-      credits.value = response.data || [];
-      store.state.credits = response.data || [];
+    // Extraction sécurisée des données (le tableau d'objets)
+    const creditData = response.data?.data || response.data || [];
+    
+    console.log("--- Données extraites pour la table ---", creditData);
+
+    // Mise à jour de l'état Vuex
+    if (Array.isArray(creditData)) {
+        credits.value = creditData;
+        store.state.credits = creditData;
     } else {
-      console.error("API Error:", response.message);
+        console.error("API Error: Données de crédits non trouvées ou non-tableau.");
+        credits.value = [];
+        store.state.credits = [];
     }
+
   } catch (error) {
     console.error("Error fetching credits:", error);
   } finally {
     loading.value = false;
   }
 };
+
+// ... (Helper functions getClassByStatut et getStatusLabel)
 
 const getClassByStatut = (statut) => {
   if (statut === "rejete") {
@@ -180,7 +174,8 @@ const getStatusLabel = (statut) => {
   }
 };
 
-// Event handlers
+// ... (Event handlers handleSearch, handleSort, etc.)
+
 const handleSearch = (searchTerm) => {
   queryParams.value.search = searchTerm;
   queryParams.value.page = 1;
@@ -236,11 +231,30 @@ const handleDelete = (credit) => {
   }
 };
 
+
 onMounted(() => {
   fetchCredits();
 });
 
-const tableData = computed(() => {
+// Le tableau simple (l'array de crédits)
+const rawCreditData = computed(() => {
   return store.state.credits || [];
+});
+
+// ⭐ CORRECTION DÉFINITIVE : Envelopper le tableau dans le format attendu par AdvancedTable
+const wrappedTableData = computed(() => {
+  const dataArray = rawCreditData.value;
+  const totalItems = dataArray.length;
+  
+  return {
+    // Le tableau de données est passé sous la clé 'data'
+    data: dataArray,
+    current_page: 1, 
+    last_page: 1,    
+    per_page: queryParams.value.per_page, 
+    total: totalItems,     
+    from: totalItems > 0 ? 1 : 0,
+    to: totalItems,
+  };
 });
 </script>
