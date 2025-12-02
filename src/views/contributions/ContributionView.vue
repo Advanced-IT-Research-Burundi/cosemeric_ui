@@ -143,12 +143,13 @@ const fetchCotisations = async () => {
       }
     });
 
+    let response = null;
     if (!auth.hasAnyRole("admin")) {
-      const response = await api.get("/mescotisations", params);
+      response = await api.get("/mescotisations", params);
     } else {
-      const response = await api.get("/cotisations", params);
+      response = await api.get("/cotisations", params);
     }
-
+    console.log(response);
     // Handle your API response structure
     if (response.success) {
       cotisations.value = response.data || [];
