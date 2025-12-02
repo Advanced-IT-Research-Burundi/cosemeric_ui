@@ -6,11 +6,10 @@
           <i class="fas fa-arrow-left me-2"></i>Retour à la liste
         </router-link>
       </div>
-  
+ 
       <div class="card">
         <div class="card-body">
-
-          <!-- Step 1: Select Member -->
+ 
           <div v-if="currentStep === 1" class="row g-3">
             <div class="col-md-12">
               <div class="input-group">
@@ -24,13 +23,11 @@
                   @input="onSearchInput"
                 >
               </div>
-
-              <!-- Loading -->
+ 
               <div v-if="loadingMembers" class="form-text mt-2">
                 <i class="fas fa-spinner fa-spin me-1"></i>Chargement des membres...
               </div>
-
-              <!-- Results -->
+ 
               <ul v-if="members.length > 0"
                 class="list-group mt-2"
                 style="max-height: 240px; overflow-y: auto;"
@@ -44,47 +41,52 @@
                   @click="selectMember(member)"
                 >
                   <span>
-                   Nom : {{ member.full_name }} |  
-                   Matricule :  {{member.matricule}} | 
-                   Téléphone :  {{member.telephone}} | 
-                   Catégorie :  {{member.categorie}}
+                    Nom : **{{ member.full_name }}** |  
+                    Matricule :  {{member.matricule}} | 
+                    Téléphone :  {{member.telephone}} | 
+                    Catégorie :  {{member.categorie}}
                   </span>
                   <i v-if="formData.membre_id === member.id" class="fas fa-check"></i>
                 </li>
               </ul>
-
-              <!-- No results -->
+ 
               <div
-                v-if="!loadingMembers && searchMember && members.length === 0"
+                v-if="!loadingMembers && searchMember && searchMember.trim().length >= 2 && members.length === 0"
                 class="form-text text-muted mt-2"
               >
-                Aucun membre trouvé pour "{{ searchMember }}"
+                Aucun membre trouvé pour "**{{ searchMember }}**"
               </div>
 
-              <!-- Selected summary -->
-              <div v-if="formData.membre_id" class="alert alert-info d-flex align-items-center mt-2" role="alert">
+               <div v-if="formData.membre_id" class="alert alert-info d-flex align-items-center mt-2" role="alert">
                 <i class="fas fa-user me-2"></i>
                 <div>
                   Membre sélectionné :
-                  <strong>{{ formData.membre?.nom }} {{ formData.membre?.prenom }}</strong>
+                  <strong>{{ formData.membre?.full_name }}</strong>
                 </div>
               </div>
             </div>
+             <div class="col-12 text-end">
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="goNext"
+                    :disabled="!formData.membre_id"
+                >
+                    Continuer <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
           </div>
-
-          <!-- Step 2: Cotisation details -->
+ 
           <div v-if="currentStep === 2">
             <form @submit.prevent="handleSubmit" class="row g-3">
-              <!-- Show selected member name -->
               <div v-if="formData.membre_id" class="alert alert-info d-flex align-items-center mt-2" role="alert">
                 <i class="fas fa-user me-2"></i>
                 <div>
                   Membre sélectionné :
-                  <strong>{{ formData.membre?.nom }} {{ formData.membre?.prenom }}</strong>
+                  <strong>{{ formData.membre?.full_name }}</strong>
                 </div>
               </div>
-
-              <!-- Période -->
+ 
               <div class="col-md-6">
                 <label for="periode_id" class="form-label">Période <span class="text-danger">*</span></label>
                 <select
@@ -103,8 +105,7 @@
                   <i class="fas fa-spinner fa-spin me-1"></i>Chargement des périodes...
                 </div>
               </div>
-
-              <!-- Montant et Devise -->
+ 
               <div class="col-md-6">
                 <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -128,8 +129,7 @@
                   </select>
                 </div>
               </div>
-
-              <!-- Date de Paiement -->
+ 
               <div class="col-md-6">
                 <label for="date_paiement" class="form-label">Date de Paiement <span class="text-danger">*</span></label>
                 <input
@@ -140,8 +140,7 @@
                   required
                 >
               </div>
-
-              <!-- Mode de Paiement -->
+ 
               <div class="col-md-6">
                 <label for="mode_paiement" class="form-label">Mode de Paiement <span class="text-danger">*</span></label>
                 <select
@@ -156,8 +155,7 @@
                   <option value="4">Mobile Money</option>
                 </select>
               </div>
-
-              <!-- Référence de Paiement -->
+ 
               <div class="col-md-6">
                 <label for="reference_paiement" class="form-label">Référence de Paiement</label>
                 <input
@@ -168,8 +166,7 @@
                   placeholder="Numéro de référence ou de transaction"
                 >
               </div>
-
-              <!-- Statut -->
+ 
               <div class="col-md-6">
                 <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
                 <div class="d-flex gap-4">
@@ -187,8 +184,7 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Notes -->
+ 
               <div class="col-12">
                 <label for="notes" class="form-label">Notes</label>
                 <textarea
@@ -199,8 +195,7 @@
                   placeholder="Notes supplémentaires..."
                 ></textarea>
               </div>
-
-              <!-- Footer buttons for Step 2 -->
+ 
               <div class="d-flex justify-content-between gap-2 mt-4">
                 <button
                   type="button"
@@ -209,7 +204,7 @@
                 >
                   Précédent
                 </button>
-
+ 
                 <div class="d-flex gap-2">
                   <button
                     type="button"
@@ -231,177 +226,9 @@
               </div>
             </form>
           </div>
-
+ 
           <form @submit.prevent="handleSubmit" class="d-none">
-            <div v-if="error" class="alert alert-danger mb-4" role="alert">
-              <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
-            </div>
-  
-            <div class="row g-3">
-              <!-- Membre -->
-              <div class="col-md-6">
-                <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
-                <select 
-                  id="membre_id" 
-                  class="form-select select2" 
-                  v-model="formData.membre_id" 
-                  required
-                  :disabled="loadingMembers"
-                >
-                  <option value="" disabled>Sélectionnez un membre</option>
-                  <option 
-                    v-for="membre in members" 
-                    :key="membre.id" 
-                    :value="membre.id"
-                  >
-                    {{ membre.prenom }} {{ membre.nom }}
-                  </option>
-                </select>
-                <div v-if="loadingMembers" class="form-text">
-                  <i class="fas fa-spinner fa-spin me-1"></i>Chargement des membres...
-                </div>
-              </div>
-  
-              <!-- Période -->
-              <div class="col-md-6">
-                <label for="periode_id" class="form-label">Période <span class="text-danger">*</span></label>
-                <select 
-                  id="periode_id" 
-                  class="form-select" 
-                  v-model="formData.periode_id" 
-                  required
-                  :disabled="loadingPeriodes"
-                >
-                  <option value="" disabled>Sélectionnez une période</option>
-                  <option 
-                    v-for="periode in periodes" 
-                    :key="periode.id" 
-                    :value="periode.id"
-                  >
-                    {{ periode.libelle }} ({{ formatDate(periode.date_debut) }} - {{ formatDate(periode.date_fin) }})
-                  </option>
-                </select>
-                <div v-if="loadingPeriodes" class="form-text">
-                  <i class="fas fa-spinner fa-spin me-1"></i>Chargement des périodes...
-                </div>
-              </div>
-  
-              <!-- Montant et Devise -->
-              <div class="col-md-6">
-                <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <input 
-                    type="number" 
-                    class="form-control" 
-                    id="montant" 
-                    v-model.number="formData.montant" 
-                    min="0" 
-                    step="0.01"
-                    required
-                  >
-                  <select 
-                    class="form-select" 
-                    style="max-width: 100px;" 
-                    v-model="formData.devise"
-                    required
-                  >
-                    <option value="FBU">FBU</option>
-                    <option value="USD">USD</option>
-                  </select>
-                </div>
-              </div>
-  
-              <!-- Date de Paiement -->
-              <div class="col-md-6">
-                <label for="date_paiement" class="form-label">Date de Paiement <span class="text-danger">*</span></label>
-                <input 
-                  type="date" 
-                  class="form-control" 
-                  id="date_paiement" 
-                  v-model="formData.date_paiement" 
-                  required
-                >
-              </div>
-  
-              <!-- Mode de Paiement -->
-              <div class="col-md-6">
-                <label for="mode_paiement" class="form-label">Mode de Paiement <span class="text-danger">*</span></label>
-                <select 
-                  id="mode_paiement" 
-                  class="form-select" 
-                  v-model="formData.mode_paiement" 
-                  required
-                >
-                  <option value="1">Espèces</option>
-                  <option value="2">Virement</option>
-                  <option value="3">Chèque</option>
-                  <option value="4">Mobile Money</option>
-                </select>
-              </div>
-  
-              <!-- Référence de Paiement -->
-              <div class="col-md-6">
-                <label for="reference_paiement" class="form-label">Référence de Paiement</label>
-                <input 
-                  type="string" 
-                  class="form-control" 
-                  id="reference_paiement" 
-                  v-model="formData.reference_paiement"
-                  placeholder="Numéro de référence ou de transaction"
-                >
-              </div>
-  
-              <!-- Statut -->
-              <div class="col-12">
-                <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
-                <div class="d-flex gap-4">
-                    <div class="form-radio">
-                    <input type="radio" name="statut" class="form-check-input" id="paye" v-model="formData.statut" value="paye">
-                    <label for="paye" class="form-check-label ps-1">Payé</label>
-                    </div>
-                    <div class="form-radio">
-                    <input type="radio" name="statut" class="form-check-input" id="en_attente" v-model="formData.statut" value="en_attente">
-                    <label for="en_attente" class="form-check-label ps-1">En attente</label>
-                    </div>
-
-                    <div class="form-radio">
-                    <input type="radio" name="statut" class="form-check-input" id="en_retard" v-model="formData.statut" value="en_retard">
-                    <label for="en_retard" class="form-check-label ps-1">En retard</label>
-                    </div>
-                </div>
-              </div>  
-              <!-- Notes -->
-              <div class="col-12">
-                <label for="notes" class="form-label">Notes</label>
-                <textarea 
-                  class="form-control" 
-                  id="notes" 
-                  v-model="formData.notes"
-                  rows="3"
-                  placeholder="Notes supplémentaires..."
-                ></textarea>
-              </div>
-            </div>
-  
-            <div class="d-flex justify-content-end gap-2 mt-4">
-              <button 
-                type="button" 
-                class="btn btn-outline-secondary" 
-                @click="$router.push('/contributions')"
-                :disabled="loading"
-              >
-                Annuler
-              </button>
-              <button 
-                type="submit" 
-                class="btn btn-primary" 
-                :disabled="loading || loadingMembers || loadingPeriodes"
-              >
-                <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
-              </button>
-            </div>
-          </form>
+            </form>
         </div>
       </div>
     </div>
@@ -424,21 +251,24 @@
     const members = ref([]);
     const periodes = ref([]);
 
+    // Pour le débouncing de la recherche
+    const searchTimeout = ref(null); 
+
     const formData = ref({
-      membre: {},
+      membre: null, 
       membre_id: '',
       periode_id: '',
       montant: 0,
       devise: 'FBU',
       date_paiement: new Date().toISOString().split('T')[0],
-      mode_paiement: 'espece',
+      mode_paiement: '1', 
       reference_paiement: '',
-      statut: null,
+      statut: 'en_attente', 
       notes: ''
     });
 
-    // below existing refs
     const currentStep = ref(1);
+    const searchMember = ref('')
 
     const goNext = () => {
       if (!formData.value.membre_id) {
@@ -448,101 +278,118 @@
       currentStep.value = 2;
     };
 
-    // New refs
-    const searchMember = ref('')
-
-    // Debounced input handler
+    // Debounced input handler (avec debounce de 300ms)
     const onSearchInput = () => {
+        
+        if (searchTimeout.value) {
+            clearTimeout(searchTimeout.value)
+        }
 
-      // simple threshold: only search when >= 2 chars
-      if (!searchMember.value || searchMember.value.trim().length < 2) {
-        members.value = []
-        return
-      }
+        const trimmedSearch = searchMember.value.trim()
 
-      loadingMembers.value = true
-      searchMembers()
+        // Simple threshold: only search when >= 2 chars
+        if (trimmedSearch.length < 2) {
+            members.value = []
+            loadingMembers.value = false
+            return
+        }
+
+        loadingMembers.value = true
+        
+        // Définir un nouveau timeout
+        searchTimeout.value = setTimeout(() => {
+            searchMembers(trimmedSearch)
+        }, 300) 
     }
 
     // API search
-    const searchMembers = async () => {
-      loadingMembers.value = true
-      try {
-        const res = await api.get('/membres', { search: searchMember.value, per_page: 20 })
-        members.value = res?.data?.data || []
-        console.log(members.value);        
-      } catch (err) {
-        toast.error('Erreur lors du chargement des membres')
-        members.value = []
-      } finally {
-        loadingMembers.value = false
-      }
+    const searchMembers = async (searchTerm) => {
+        loadingMembers.value = true
+        try {
+            
+            const res = await api.get('/membres', { params: { search: searchTerm, per_page: 20 } })
+            
+            
+            members.value = res.data.data || [];
+            
+            
+        } catch (err) {
+            console.error('Error searching members:', err);
+            toast.error('Erreur lors du chargement des membres')
+            members.value = []
+        } finally {
+            loadingMembers.value = false
+        }
     }
 
     // Select a member from results
     const selectMember = (member) => {
-      formData.value.membre = member
-      formData.value.membre_id = member.id
+        
+        if (!member.full_name) {
+            member.full_name = `${member.nom} ${member.prenom}`
+        }
 
-      // Optional UX: fill the input and collapse results
-      searchMember.value = `${member.nom} ${member.prenom}`
-      members.value = []
+        formData.value.membre = member
+        formData.value.membre_id = member.id
 
-      // Auto-advance to Step 2
-      currentStep.value = 2
+        
+        searchMember.value = member.full_name
+        members.value = []
+
+        
+        currentStep.value = 2
     }
 
     // Fetch periods
     const fetchPeriodes = async () => {
-    try {
-        const response = await api.get('/periodes');
-        periodes.value = response.data || [];
-    } catch (err) {
-        console.error('Error fetching periods:', err);
-        toast.error('Erreur lors du chargement des périodes');
-    } finally {
-        loadingPeriodes.value = false;
-    }
+        try {
+            const response = await api.get('/periodes');
+            
+            periodes.value = response.data.data || response.data || []; 
+        } catch (err) {
+            console.error('Error fetching periods:', err);
+            toast.error('Erreur lors du chargement des périodes');
+        } finally {
+            loadingPeriodes.value = false;
+        }
     };
 
     // Format date for display
     const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR');
+        if (!dateString) return '';
+        
+        const date = new Date(dateString.includes('T') ? dateString : `${dateString}T00:00:00Z`);
+        return date.toLocaleDateString('fr-FR');
     };
 
     // Handle form submission
     const handleSubmit = async () => {
-    loading.value = true;
-    error.value = '';
+        loading.value = true;
+        error.value = '';
 
-    try {
-        // Prepare the data for API
-        const payload = {
-        ...formData.value,
-        statut: formData.value.statut,
-        };
-        
-        const response = await api.post('/cotisations', payload);
-        
-        if (response.data) {
-        toast.success('Cotisation enregistrée avec succès');
-        router.push('/contributions');
-        } else {
-        throw new Error('Réponse inattendue du serveur');
+        try {
+            
+            const { membre, ...payload } = formData.value;
+            
+            const response = await api.post('/cotisations', payload);
+            
+            if (response.data) {
+                toast.success('Cotisation enregistrée avec succès');
+                router.push('/contributions');
+            } else {
+                throw new Error('Réponse inattendue du serveur');
+            }
+        } catch (err) {
+            console.error('Error saving contribution:', err);
+            error.value = err.response?.data?.message || 'Erreur lors de l\'enregistrement de la cotisation';
+            toast.error(error.value);
+        } finally {
+            loading.value = false;
         }
-    } catch (err) {
-        console.error('Error saving contribution:', err);
-        error.value = err.response?.data?.message || 'Erreur lors de l\'enregistrement de la cotisation';
-        toast.error(error.value);
-    } finally {
-        loading.value = false;
-    }
     };
 
     // Fetch data on component mount
     onMounted(() => {
-    fetchPeriodes();
+        fetchPeriodes();
     });
 </script>
