@@ -16,29 +16,7 @@
 
           <div class="row g-3">
             <!-- Membre -->
-            <div class="col-md-6">
-              <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
-              <select 
-                id="membre_id" 
-                class="form-select" 
-                v-model="formData.membre_id" 
-                required
-                :disabled="loadingMembers"
-              >
-                <option value="" disabled>Sélectionnez un membre</option>
-                <option 
-                  v-for="membre in members" 
-                  :key="membre.id" 
-                  :value="membre.id"
-                >
-                {{ membre.id }} |
-                  {{ membre.full_name }} | {{ membre.telephone }} | {{ membre.categorie }}
-                </option>
-              </select>
-              <div v-if="loadingMembers" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des membres...
-              </div>
-            </div>
+          
 
             <!-- Montant Demandé -->
             <div class="col-md-6">
@@ -59,23 +37,7 @@
             </div>
 
             <!-- Montant Accordé -->
-            <div class="col-md-6">
-              <label for="montant_accorde" class="form-label">Montant Accordé <span class="text-danger">*</span></label>
-              <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="montant_accorde" 
-                  v-model.number="formData.montant_accorde" 
-                  min="0" 
-                  step="1"
-                  required
-                  @input="calculatePayments"
-                >
-                <span class="input-group-text">FBU</span>
-              </div>
-            </div>
-
+ 
             <!-- Taux d'Intérêt -->
             <div class="col-md-6">
               <label for="taux_interet" class="form-label">Taux d'Intérêt (%) <span class="text-danger">*</span></label>
@@ -88,7 +50,8 @@
                   min="0" 
                   max="100"
                   step="1"
-                  required
+                  disabled
+
                   @input="calculatePayments"
                 >
                 <span class="input-group-text">%</span>
@@ -105,7 +68,7 @@
                 v-model.number="formData.duree_mois" 
                 min="1" 
                 required
-                @input="calculatePayments"
+                disabled
               >
             </div>
 
@@ -126,44 +89,10 @@
             </div>
 
             <!-- Date de Demande -->
-            <div class="col-md-6">
-              <label for="date_demande" class="form-label">Date de Demande <span class="text-danger">*</span></label>
-              <input 
-                type="date" 
-                class="form-control" 
-                id="date_demande" 
-                v-model="formData.date_demande" 
-                required
-              >
-            </div>
+          
 
             <!-- Date d'Approbation -->
-            <div class="col-md-6">
-              <label for="date_approbation" class="form-label">Date d'Approbation</label>
-              <input 
-                type="date" 
-                class="form-control" 
-                id="date_approbation" 
-                v-model="formData.date_approbation"
-              >
-            </div>
-
-            <!-- Statut -->
-            <div class="col-md-6">
-              <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
-              <select 
-                id="statut" 
-                class="form-select" 
-                v-model="formData.statut" 
-                required
-              >
-                <option value="en_attente">En attente</option>
-                <option value="approuve">Approuvé</option>
-                <option value="rejete">Rejeté</option>
-                <option value="en_cours">En cours</option>
-                <option value="termine">Terminé</option>
-              </select>
-            </div>
+           
 
             <!-- Motif -->
             <div class="col-12">
@@ -219,11 +148,9 @@ const error = ref('');
 const members = ref([]);
 
 const formData = ref({
-  membre_id: '',
   montant_demande: 0,
-  montant_accorde: 0,
-  taux_interet: 0,
-  duree_mois: 1,
+  taux_interet: 3,
+  duree_mois: 12,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
   date_demande: new Date().toISOString().split('T')[0],
@@ -247,19 +174,14 @@ const fetchMembers = async () => {
 
 // Calculate total amount and monthly payment
 const calculatePayments = () => {
-  const montant = parseFloat(formData.value.montant_accorde) || 0;
-  const taux = parseFloat(formData.value.taux_interet) || 0;
-  const duree = parseInt(formData.value.duree_mois) || 1;
-  
-  // Calculate total amount with interest
-  const interet = (montant * taux * duree) / (12 * 100);
-  const total = montant + interet;
-  
-  // Calculate monthly payment
-  const mensualite = duree > 0 ? total / duree : 0;
-  
-  formData.value.montant_total_rembourser = total.toFixed(0);
-  formData.value.montant_mensualite = mensualite.toFixed(0);
+  const m_demande = formData.value.montant_demande;
+
+  const tatR = m_demande + ((m_demande * 3) / 100)
+
+  formData.value.montant_total_rembourser = tatR
+  formData.value.montant_mensualite = tatR / 12
+
+
 };
 
 // Handle form submission
