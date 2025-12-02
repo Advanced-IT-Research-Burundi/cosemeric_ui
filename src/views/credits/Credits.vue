@@ -241,7 +241,7 @@ const rawCreditData = computed(() => {
   return store.state.credits || [];
 });
 
-// ⭐ CORRECTION DÉFINITIVE : Envelopper le tableau dans le format attendu par AdvancedTable
+
 const wrappedTableData = computed(() => {
   const dataArray = rawCreditData.value;
   const totalItems = dataArray.length;
