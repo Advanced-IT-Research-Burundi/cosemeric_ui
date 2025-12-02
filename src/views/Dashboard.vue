@@ -2,8 +2,6 @@
   <div class="dashboard-container" v-if="authStore.hasAnyRole('admin')">
     <!-- Navbar -->
 
-    {{ test }}
-
     <div class="container-fluid px-4">
       <!-- Cartes de statistiques principales -->
       <div class="row g-4 mb-4">
