@@ -56,6 +56,7 @@
               </div>
             </div>
 
+            <!-- Montant Accordé -->
             <div class="col-md-6">
               <label for="montant_accorde" class="form-label">Montant Accordé <span class="text-danger">*</span></label>
               <div class="input-group">
@@ -73,6 +74,7 @@
               </div>
             </div>
 
+            <!-- Taux d'Intérêt -->
             <div class="col-md-6">
               <label for="taux_interet" class="form-label">Taux d'Intérêt (%) <span class="text-danger">*</span></label>
               <div class="input-group">
@@ -84,7 +86,8 @@
                   min="0" 
                   max="100"
                   step="1"
-                  required
+                  disabled
+
                   @input="calculatePayments"
                 >
                 <span class="input-group-text">%</span>
@@ -100,7 +103,7 @@
                 v-model.number="formData.duree_mois" 
                 min="1" 
                 required
-                @input="calculatePayments"
+                disabled
               >
             </div>
 
@@ -118,6 +121,7 @@
               </div>
             </div>
 
+            <!-- Date de Demande -->
             <div class="col-md-6">
               <label for="date_demande" class="form-label">Date de Demande <span class="text-danger">*</span></label>
               <input 
@@ -129,6 +133,7 @@
               >
             </div>
 
+            <!-- Date d'Approbation -->
             <div class="col-md-6">
               <label for="date_approbation" class="form-label">Date d'Approbation</label>
               <input 
@@ -139,6 +144,7 @@
               >
             </div>
 
+            <!-- Statut -->
             <div class="col-md-6">
               <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
               <select 
@@ -208,11 +214,9 @@ const error = ref('');
 const members = ref([]);
 
 const formData = ref({
-  membre_id: '',
   montant_demande: 0,
-  montant_accorde: 0,
-  taux_interet: 0,
-  duree_mois: 1,
+  taux_interet: 3,
+  duree_mois: 12,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
   date_demande: new Date().toISOString().split('T')[0],
@@ -248,9 +252,8 @@ const calculatePayments = () => {
   // Calculate monthly payment
   const mensualite = duree > 0 ? total / duree : 0;
   
-  // Utiliser Math.round pour un arrondi simple
-  formData.value.montant_total_rembourser = Math.round(total);
-  formData.value.montant_mensualite = Math.round(mensualite);
+  formData.value.montant_total_rembourser = total.toFixed(0);
+  formData.value.montant_mensualite = mensualite.toFixed(0);
 };
 
 // Handle form submission

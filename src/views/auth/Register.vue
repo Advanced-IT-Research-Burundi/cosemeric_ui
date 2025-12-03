@@ -7,7 +7,6 @@
           <div class="logo-circle mb-3">
             <i class="fas fa-user-plus fa-3x"></i>
           </div>
-
           <h1 class="h2 fw-bold mb-2 text-white">{{ APP_CONFIG.name }}</h1>
           <p class="text-white-75 mb-0">{{ APP_CONFIG.description }}</p>
           <small class="text-white-50">Version {{ APP_CONFIG.version }}</small>
@@ -43,18 +42,18 @@
           <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input type="text" placeholder="Matricule" v-model="form.matricule" required />
-            <select v-model="form.categorie_id" required>
-              <option value="" disabled>Sélectionnez une catégorie</option>
+            <input type="text" placeholder="Matricule" v-model="form.matricule"  class="mb-3" />
+            <select v-model="form.categorie_id" class="mb-3"  required>
+              <option value="" disabled  >Sélectionnez une catégorie</option>
               <option v-for="categorie in categories" :key="categorie.id" :value="categorie.id">
                 {{ categorie.proper_name }}
               </option>
             </select>
 
-            <input type="text" placeholder="Nom" v-model="form.nom" required />
-            <input type="text" placeholder="Prénom" v-model="form.prenom" required />
-            <input type="email" placeholder="Email" v-model="form.email" required />
-            <input type="tel" placeholder="Téléphone" v-model="form.telephone" required />
+            <input type="text" placeholder="Nom" v-model="form.nom" required  class="mb-3" />
+            <input type="text" placeholder="Prénom" v-model="form.prenom" required class="mb-3"  />
+            <input type="email" placeholder="Email" v-model="form.email" required class="mb-3"  />
+            <input type="tel" placeholder="Téléphone" v-model="form.telephone" required class="mb-3"  />
 
             <div class="position-relative">
               <input
@@ -62,6 +61,7 @@
                 placeholder="Mot de passe"
                 v-model="form.password"
                 required
+                class="mb-3" 
               />
               <i
                 :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
@@ -76,6 +76,7 @@
                 placeholder="Confirmer le mot de passe"
                 v-model="form.password_confirmation"
                 required
+                class="mb-3" 
               />
               <i
                 :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
