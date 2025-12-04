@@ -1,7 +1,6 @@
 <template>
   <div class="login-page d-flex align-items-center justify-content-center">
     <div class="login-card">
-      
       <!-- Panneau gauche -->
       <div class="login-info d-none d-lg-flex flex-column p-5">
         <div class="text-center mb-5">
@@ -38,14 +37,17 @@
       </div>
 
       <!-- Panneau droit -->
-      <div class="login-form-wrapper d-flex flex-column justify-content-center p-5">
+      <div
+        class="login-form-wrapper d-flex flex-column justify-content-center p-5"
+      >
         <div class="text-center mb-5">
           <h2 class="h3 fw-bold mb-2 text-dark">Connexion</h2>
-          <p class="text-muted mb-0">Accédez à votre espace de gestion des cotisations</p>
+          <p class="text-muted mb-0">
+            Accédez à votre espace de gestion des cotisations
+          </p>
         </div>
 
         <form @submit.prevent="login" class="login-form">
-
           <div v-if="error" class="error-message">{{ error }}</div>
 
           <!-- EMAIL -->
@@ -84,7 +86,11 @@
                 Se souvenir de moi
               </label>
             </div>
-            <router-link to="/forgot-password" class="text-decoration-none fw-semibold" style="color: #3b82f6">
+            <router-link
+              to="/forgot-password"
+              class="text-decoration-none fw-semibold"
+              style="color: #3b82f6"
+            >
               Mot de passe oublié ?
             </router-link>
           </div>
@@ -101,12 +107,15 @@
           <div class="form-links mt-4 text-center">
             <small class="text-muted">
               Pas encore de compte ?
-              <router-link to="/register" style="color: #3b82f6" class="fw-semibold">
+              <router-link
+                to="/register"
+                style="color: #3b82f6"
+                class="fw-semibold"
+              >
                 Créer un compte
               </router-link>
             </small>
           </div>
-
         </form>
       </div>
     </div>
@@ -114,48 +123,68 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useAuthStore } from '../../stores/auth'
-import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
+import { ref } from "vue";
+import { useAuthStore } from "../../stores/auth";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 
-const authStore = useAuthStore()
-const router = useRouter()
-const toast = useToast()
+const authStore = useAuthStore();
+const router = useRouter();
+const toast = useToast();
 
 const APP_CONFIG = {
   name: "CASOMIREC",
   description: "Système de gestion des cotisations et adhérents",
   version: "1.0.0",
-}
+};
 
 const FEATURES = [
-  { icon: "fas fa-wallet", label: "Gestion des cotisations", description: "Enregistrement et suivi des paiements" },
-  { icon: "fas fa-users", label: "Gestion des membres", description: "Base de données des adhérents" },
-  { icon: "fas fa-chart-bar", label: "Rapports", description: "Suivi des performances financières" },
-  { icon: "fas fa-lock", label: "Sécurité", description: "Accès sécurisé et rôles utilisateurs" },
-]
+  {
+    icon: "fas fa-wallet",
+    label: "Gestion des cotisations",
+    description: "Enregistrement et suivi des paiements",
+  },
+  {
+    icon: "fas fa-users",
+    label: "Gestion des membres",
+    description: "Base de données des adhérents",
+  },
+  {
+    icon: "fas fa-chart-bar",
+    label: "Rapports",
+    description: "Suivi des performances financières",
+  },
+  {
+    icon: "fas fa-lock",
+    label: "Sécurité",
+    description: "Accès sécurisé et rôles utilisateurs",
+  },
+];
 
-const email = ref('')
-const password = ref('')
-const isLoading = ref(false)
-const error = ref('')
-const showPassword = ref(false)
+const email = ref("");
+const password = ref("");
+const isLoading = ref(false);
+const error = ref("");
+const showPassword = ref(false);
 
 async function login() {
-  if (isLoading.value) return
-  isLoading.value = true
-  error.value = ''
+  if (isLoading.value) return;
+  isLoading.value = true;
+  error.value = "";
 
   try {
-    const success = await authStore.login(email.value, password.value)
-    if (!success) throw new Error('Email ou mot de passe incorrect')
-    await router.push('/dashboard')
+    const success = await authStore.login(email.value, password.value);
+    if (!success) throw new Error("Email ou mot de passe incorrect");
+    if (authStore.hasRole("admin")) {
+      await router.push("/dashboard");
+    } else {
+      await router.push("/contributions");
+    }
   } catch (err) {
-    error.value = err.message || 'Erreur de connexion'
-    toast.error(error.value)
+    error.value = err.message || "Erreur de connexion";
+    toast.error(error.value);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
@@ -167,7 +196,7 @@ async function login() {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 .login-card {
@@ -176,7 +205,7 @@ async function login() {
   max-width: 1000px;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   background-color: #fff;
 }
 
@@ -207,7 +236,7 @@ async function login() {
 .custom-input:focus {
   border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 /* Icône œil */
@@ -232,12 +261,12 @@ async function login() {
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(59,130,246,0.4);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
 }
 
 /* Error */
@@ -251,7 +280,11 @@ async function login() {
 }
 
 @media (max-width: 768px) {
-  .login-card { flex-direction: column; }
-  .login-info { display: none; }
+  .login-card {
+    flex-direction: column;
+  }
+  .login-info {
+    display: none;
+  }
 }
 </style>
