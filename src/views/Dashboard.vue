@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container" v-if="authStore.hasAnyRole('admin')">
+  <div class="dashboard-container" v-if="isAdmin">
     <!-- Navbar -->
 
     <div class="container-fluid px-4">
@@ -230,7 +230,7 @@
     </div>
   </div>
 
-  <div class="dashboard-container" v-else>
+  <div class="dashboard-container">
     <!-- Navbar -->
 
     <div class="container-fluid px-4">
@@ -394,9 +394,11 @@ import api from "../services/api"; // Assurez-vous que le chemin est correct
 
 import auth from "../stores/auth";
 import { useStore } from "vuex";
+import useAuthGuard from "../utils/useAuthGuard";
 
 const store = useStore();
 const authStore = auth();
+const {isAdmin} = useAuthGuard()
 
 // =============================
 // DONNÉES RÉACTIVES
@@ -655,6 +657,9 @@ onMounted(async () => {
     );
   }
 });
+
+// user auth
+
 </script>
 
 <style scoped>
