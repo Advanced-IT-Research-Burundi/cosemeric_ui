@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4 px-4">
+  <div class="container-fluid py-1">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
       <router-link
@@ -65,7 +65,10 @@ const queryParams = ref({
 const columns = [
   { key: "id", label: "ID", sortable: true },
   // Clé simplifiée (membre_id) confirmée par les logs précédents
-  { key: "membre_id", label: "Membre (ID)", width: "100px", sortable: true }, 
+  {
+    key: "membre.nom",
+    label: "Membre", width: "100px", sortable: true
+  }, 
   {
     key: "montant_accorde",
     label: "Montant accordé",

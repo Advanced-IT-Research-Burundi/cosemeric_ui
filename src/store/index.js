@@ -11,6 +11,7 @@ const vuexStore = createStore({
         members: [],
         categories: [],
         credits: [],
+        mescredits: [],
         assistances: [],
         remboursements: [],
         periodes: [],

@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4 px-4">
+  <div class="container py-1">
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -26,9 +26,9 @@
     </div>
 
     <!-- Content -->
-    <div v-else class="card p-4">
+    <div v-else class="card p-1">
 
-      <div class="row g-4">
+      <div class="row g-1">
 
         <!-- ID -->
         <div class="col-md-6">

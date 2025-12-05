@@ -132,12 +132,18 @@ const menuItems = ref([
     icon: '<i class="bi bi-credit-card"></i>',
     title: "Crédits",
     path: "/credits",
-    requireAdmin: isAdmin.value || isMember.value,
+    requireAdmin: isAdmin.value,
+  },
+  {
+    icon: '<i class="bi bi-credit-card"></i>',
+    title: "Mes Crédits",
+    path: "/credits/mescredits",
+    requireAdmin: isMember.value,
   },
   {
     icon: '<i class="bi bi-credit-card"></i>',
     title: "Demande de Credit",
-    path: "credits/demande",
+    path: "/credits/demande",
     requireAdmin: isMember.value,
   },
   {
