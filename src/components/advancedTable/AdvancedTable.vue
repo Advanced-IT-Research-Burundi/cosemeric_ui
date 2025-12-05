@@ -1,7 +1,7 @@
 <template>
   <div class="advanced-table-container">
     <!-- Search and Controls -->
-    <div class="row mb-3">
+    <div class="row mb-1">
       <div class="col-md-6">
         <TableSearch
           v-model="searchQuery"
