@@ -97,6 +97,11 @@ const routes = [
         component: () => import("../views/credits/Credits.vue"),
       },
       {
+        path: "demande",
+        name: "creditsDemande",
+        component: () => import("../views/credits/DemandeCredit.vue"),
+      },
+      {
         path: "add",
         name: "creditsAdd",
         component: () => import("../views/credits/AddCredit.vue"),

@@ -135,6 +135,12 @@ const menuItems = ref([
     requireAdmin: isAdmin.value || isMember.value,
   },
   {
+    icon: '<i class="bi bi-credit-card"></i>',
+    title: "Demande de Credit",
+    path: "credits/demande",
+    requireAdmin: isMember.value,
+  },
+  {
     icon: '<i class="bi bi-life-preserver"></i>',
     title: "Assistances",
     path: "/assistances",
@@ -168,11 +174,13 @@ const menuItems = ref([
     icon: '<i class="bi bi-shield-lock"></i>',
     title: "Administration",
     path: "/admin",
+    requireAdmin: isAdmin.value,
   },
   {
     icon: '<i class="bi bi-person-badge"></i>',
     title: "Utilisateurs",
     path: "/users",
+    requireAdmin: isAdmin.value,
   },
 ]);
 
