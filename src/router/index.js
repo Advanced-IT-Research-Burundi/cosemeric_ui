@@ -60,7 +60,12 @@ const routes = [
     component: () => import("../views/TestAdvancedTable.vue"),
     meta: { requiresAuth: true },
   },
-
+  {
+    path: "/mesCotisations",
+    name: "mesCotisations",
+    component: () => import("../views/cotisations/MesCotisations.vue"),
+    meta: { requiresAuth: true },
+  },
   // Assistances
   {
     path: "/assistances",

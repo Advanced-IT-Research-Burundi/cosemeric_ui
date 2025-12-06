@@ -2,9 +2,6 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Demande de Crédit</h2>
-      <router-link to="/credits" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
-      </router-link>
     </div>
 
     <div class="card">

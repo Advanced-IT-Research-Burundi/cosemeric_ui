@@ -321,7 +321,13 @@ const menuItems = ref([
     icon: '<i class="bi bi-wallet-fill"></i>',
     title: "Cotisations",
     path: "/contributions",
-    requireAdmin: isAdmin.value || isMember.value,
+    requireAdmin: isAdmin.value,
+  },
+  {
+    icon: '<i class="bi bi-wallet-fill"></i>',
+    title: "Mes Cotisations",
+    path: "/mesCotisations",
+    requireAdmin: isMember.value,
   },
   {
     icon: '<i class="bi bi-calendar-event-fill"></i>',
