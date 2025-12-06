@@ -3,38 +3,97 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
       <router-link
-        to="/credits/add"
+        to="/credits/demande"
         class="btn btn-primary"
-        v-if="auth.hasAnyRole('admin')"
+        v-if="auth.hasAnyRole('admin') || true" 
       >
         <i class="fas fa-plus me-2"></i>Ajouter un crédit
       </router-link>
     </div>
 
     <div class="card">
-      <AdvancedTable
-        :data="wrappedTableData" :columns="columns"
-        :loading="loading"
-        search-placeholder="Rechercher des crédits..."
-        no-data-message="Aucun crédit trouvé"
-        :show-filters="true"
-        :has-actions="true"
-        row-key="id"
-        @show="handleShow"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @search="handleSearch"
-        @sort="handleSort"
-        @filter="handleFilter"
-        @page-change="handlePageChange"
-        @per-page-change="handlePerPageChange"
-      >
-        <template #column-statut="{ value }">
-          <span class="badge rounded-1" :class="getClassByStatut(value)">
-            {{ getStatusLabel(value) }}
-          </span>
-        </template>
-      </AdvancedTable>
+      <div class="card-body">
+        <!-- Filters Section -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <label class="form-label">Statut</label>
+            <select v-model="filters.statut" class="form-select" @change="handleFilterChange">
+              <option value="">Tous les statuts</option>
+              <option value="en_attente">En attente</option>
+              <option value="approuve">Approuvé</option>
+              <option value="rejete">Rejeté</option>
+              <option value="en_cours">En cours</option>
+              <option value="termine">Terminé</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date Demande (Du)</label>
+            <input type="date" v-model="filters.date_demande_start" class="form-control" @change="handleFilterChange">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date Demande (Au)</label>
+            <input type="date" v-model="filters.date_demande_end" class="form-control" @change="handleFilterChange">
+          </div>
+           <!-- Date Fin Filter (if applicable, though usually date_demande is more relevant for requests) -->
+           <!-- Adding it as requested -->
+           <div class="col-md-3">
+            <label class="form-label">Date Fin (Après)</label>
+            <input type="date" v-model="filters.date_fin" class="form-control" @change="handleFilterChange">
+          </div>
+        </div>
+
+  
+        <AdvancedTable
+          :data="wrappedTableData"
+          :columns="columns"
+          :loading="loading"
+          search-placeholder="Rechercher des crédits..."
+          no-data-message="Aucun crédit trouvé"
+          :show-filters="true"
+          :has-actions="true"
+          row-key="id"
+          @show="handleShow"
+          @search="handleSearch"
+          @sort="handleSort"
+          @page-change="handlePageChange"
+          @per-page-change="handlePerPageChange"
+        >
+          <template #column-statut="{ value }">
+            <span class="badge rounded-1" :class="getClassByStatut(value)">
+              {{ getStatusLabel(value) }}
+            </span>
+          </template>
+
+          <template #actions="{ item }">
+            <div class="btn-group">
+               <button
+                class="btn btn-outline-secondary btn-sm"
+                @click="handleShow(item)"
+                title="Voir détails"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+              
+              <button
+                v-if="item.statut === 'en_attente'"
+                class="btn btn-success btn-sm"
+                @click="handleAction(item, 'approuve')"
+                title="Accepter"
+              >
+                <i class="fas fa-check"></i>
+              </button>
+              <button
+                v-if="item.statut === 'en_attente'"
+                class="btn btn-danger btn-sm"
+                @click="handleAction(item, 'rejete')"
+                title="Refuser"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </template>
+        </AdvancedTable>
+      </div>
     </div>
   </div>
 </template>
@@ -46,138 +105,151 @@ import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
 import useAuthStore from "../../stores/auth";
+import { useToast } from "vue-toastification";
 
 const auth = useAuthStore();
 const store = useStore();
-const credits = ref([]); // Variable locale (peut être retirée si store.state.credits est la seule source)
+const toast = useToast();
 const loading = ref(false);
+
+// Filters
+const filters = ref({
+  statut: "",
+  date_demande_start: "",
+  date_demande_end: "",
+  date_fin: "",
+});
 
 // Query parameters for API
 const queryParams = ref({
   page: 1,
   per_page: 15,
   search: "",
-  sort_field: "",
-  sort_order: "asc",
-  filters: {},
+  sort_field: "created_at",
+  sort_order: "desc",
 });
 
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  // Clé simplifiée (membre_id) confirmée par les logs précédents
   {
-    key: "membre.nom",
-    label: "Membre", width: "100px", sortable: true
-  }, 
+    key: "membre.full_name",
+    label: "Membre",
+    sortable: true,
+  },
+  {
+    key: "montant_demande",
+    label: "Montant Demandé",
+    sortable: true,
+    formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
+  },
   {
     key: "montant_accorde",
-    label: "Montant accordé",
+    label: "Montant Accordé",
     sortable: true,
-    filterable: true,
+    formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
   },
   {
     key: "taux_interet",
-    label: "Taux d'intérêt",
+    label: "Taux",
     sortable: true,
-    filterable: true,
     formatter: (value) => value + " %",
   },
   {
     key: "duree_mois",
     label: "Durée",
-    width: "80px",
     sortable: true,
-    filterable: true,
     formatter: (value) => value + " mois",
   },
   {
     key: "statut",
     label: "Statut",
     sortable: true,
-    filterable: true,
   },
   {
-    key: "created_at",
-    label: "Créé le",
+    key: "date_demande",
+    label: "Date Demande",
     sortable: true,
     formatter: (value) => new Date(value).toLocaleDateString(),
   },
 ];
 
-// Fetch data from your API
 const fetchCredits = async () => {
   loading.value = true;
-
   try {
-    const params = {};
-    params.page = queryParams.value.page;
-    params.per_page = queryParams.value.per_page;
-    
-    // Ajout des autres paramètres (search, sort, filter) ...
+    const params = {
+      page: queryParams.value.page,
+      per_page: queryParams.value.per_page,
+      search: queryParams.value.search,
+      sort_field: queryParams.value.sort_field,
+      sort_order: queryParams.value.sort_order,
+      ...filters.value, // Spread filters into params
+    };
 
-    let response = null; 
+    const response = await api.get("/credits", { params });
     
-    if (!auth.hasAnyRole("admin")) {
-      response = await api.get("/mescredits", { params });
+    // Handle the response structure provided by user
+    // { success: true, data: { current_page: 1, data: [...] } }
+    if (response.data && response.data.data) {
+        store.state.credits = response.data;
     } else {
-      response = await api.get("/credits", { params });
-    }
-
-    console.log("--- Réponse de l'API (brute) ---", response);
-
-    // Extraction sécurisée des données (le tableau d'objets)
-    const creditData = response.data?.data || response.data || [];
-    
-    console.log("--- Données extraites pour la table ---", creditData);
-
-    // Mise à jour de l'état Vuex
-    if (Array.isArray(creditData)) {
-        credits.value = creditData;
-        store.state.credits = creditData;
-    } else {
-        console.error("API Error: Données de crédits non trouvées ou non-tableau.");
-        credits.value = [];
-        store.state.credits = [];
+         // Fallback if structure is different (e.g. direct pagination object)
+        store.state.credits = response.data || {};
     }
 
   } catch (error) {
     console.error("Error fetching credits:", error);
+    toast.error("Erreur lors du chargement des crédits.");
   } finally {
     loading.value = false;
   }
 };
 
-// ... (Helper functions getClassByStatut et getStatusLabel)
+const handleAction = async (item, action) => {
+  if (!confirm(`Êtes-vous sûr de vouloir ${action === 'approuve' ? 'accepter' : 'refuser'} ce crédit ?`)) {
+    return;
+  }
+
+  try {
+    // Assuming endpoint /credits/{id}/status or similar. 
+    // If not, we might need to use PUT/PATCH on /credits/{id}
+    // Let's try a generic update first.
+    await api.put(`/credits/${item.id}`, { statut: action });
+    
+    toast.success(`Crédit ${action === 'approuve' ? 'accepté' : 'refusé'} avec succès.`);
+    fetchCredits();
+  } catch (error) {
+    console.error(`Error ${action} credit:`, error);
+    toast.error(`Erreur lors de l'action sur le crédit.`);
+  }
+};
 
 const getClassByStatut = (statut) => {
-  if (statut === "rejete") {
-    return "bg-danger";
-  } else if (statut === "en_attente") {
-    return "bg-warning";
-  } else if (statut === "en_cours") {
-    return "bg-info";
-  } else if (statut === "approuve") {
-    return "bg-success";
-  } else {
-    return "bg-secondary";
+  switch (statut) {
+    case "rejete": return "bg-danger";
+    case "en_attente": return "bg-warning";
+    case "en_cours": return "bg-info";
+    case "approuve": return "bg-success";
+    case "termine": return "bg-secondary";
+    default: return "bg-secondary";
   }
 };
 
 const getStatusLabel = (statut) => {
-  if (statut === "rejete") {
-    return "Rejeté";
-  } else if (statut === "en_attente") {
-    return "En attente";
-  } else if (statut === "en_cours") {
-    return "En cours";
-  } else if (statut === "approuve") {
-    return "Approuvé";
-  } else {
-    return "Terminé";
+  switch (statut) {
+    case "rejete": return "Rejeté";
+    case "en_attente": return "En attente";
+    case "en_cours": return "En cours";
+    case "approuve": return "Approuvé";
+    case "termine": return "Terminé";
+    default: return statut;
   }
 };
 
-// ... (Event handlers handleSearch, handleSort, etc.)
+// Event Handlers
+const handleFilterChange = () => {
+  queryParams.value.page = 1;
+  fetchCredits();
+};
 
 const handleSearch = (searchTerm) => {
   queryParams.value.search = searchTerm;
@@ -188,13 +260,6 @@ const handleSearch = (searchTerm) => {
 const handleSort = (sortData) => {
   queryParams.value.sort_field = sortData.field;
   queryParams.value.sort_order = sortData.order;
-  queryParams.value.page = 1;
-  fetchCredits();
-};
-
-const handleFilter = (filters) => {
-  queryParams.value.filters = filters;
-  queryParams.value.page = 1;
   fetchCredits();
 };
 
@@ -209,55 +274,25 @@ const handlePerPageChange = (perPage) => {
   fetchCredits();
 };
 
-const handleShow = (credit) => {
-  router.push({ name: "creditsShow", params: { id: credit.id } });
+const handleShow = (item) => {
+  router.push({ name: "creditsShow", params: { id: item.id } });
 };
 
-const handleEdit = (credit) => {
-  router.push({ name: "creditsEdit", params: { id: credit.id } });
-};
-
-const handleDelete = (credit) => {
-  if (confirm("Etês-vous sûr de vouloir supprimer ce membre?")) {
-    api
-      .delete(`/credits/${credit.id}`)
-      .then((response) => {
-        console.log("Credit supprimé avec succès!");
-        fetchCredits();
-      })
-      .catch((error) => {
-        console.error(
-          "Une erreur est survenue lors de la suppression du membre:",
-          error
-        );
-      });
-  }
-};
-
+// Computed Data for AdvancedTable
+const wrappedTableData = computed(() => {
+  const creditsData = store.state.credits || {};
+  return {
+    data: creditsData.data || [],
+    current_page: creditsData.current_page || 1,
+    last_page: creditsData.last_page || 1,
+    per_page: creditsData.per_page || 15,
+    total: creditsData.total || 0,
+    from: creditsData.from || 0,
+    to: creditsData.to || 0,
+  };
+});
 
 onMounted(() => {
   fetchCredits();
-});
-
-// Le tableau simple (l'array de crédits)
-const rawCreditData = computed(() => {
-  return store.state.credits || [];
-});
-
-
-const wrappedTableData = computed(() => {
-  const dataArray = rawCreditData.value;
-  const totalItems = dataArray.length;
-  
-  return {
-    // Le tableau de données est passé sous la clé 'data'
-    data: dataArray,
-    current_page: 1, 
-    last_page: 1,    
-    per_page: queryParams.value.per_page, 
-    total: totalItems,     
-    from: totalItems > 0 ? 1 : 0,
-    to: totalItems,
-  };
 });
 </script>

@@ -36,6 +36,71 @@
           </button>
         </div>
         <div class="header-right">
+          <!-- Notification Icon -->
+          <div 
+            class="notification-container" 
+            ref="notificationRef"
+            @click.stop="toggleNotificationDropdown"
+          >
+            <button class="btn btn-icon position-relative" style="font-size: 20px; background-color: transparent; border: none;">
+              <i class="bi bi-bell fs-5"></i>
+              <span 
+                v-if="notificationCount > 0" 
+                class="position-absolute translate-middle badge rounded-pill bg-danger"
+                style="top: 10px; font-size: 14px ; padding: 2px 6px;"
+              >
+                {{ notificationCount }}
+                <span class="visually-hidden">notifications non lues</span>
+              </span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" v-if="showNotificationDropdown" @click.stop>
+              <div class="notification-header">
+                <h6 class="mb-0">Notifications</h6>
+                <button 
+                  class="btn-mark-read" 
+                  @click="markAllAsRead"
+                  v-if="notificationCount > 0"
+                >
+                  Tout marquer comme lu
+                </button>
+              </div>
+              
+              <div class="notification-list">
+                <div 
+                  v-for="notification in notifications" 
+                  :key="notification.id"
+                  class="notification-item"
+                  :class="{ unread: !notification.read }"
+                  @click="handleNotificationClick(notification)"
+                >
+                  <div class="notification-icon" :class="notification.type">
+                    <i :class="getNotificationIcon(notification.type)"></i>
+                  </div>
+                  <div class="notification-content">
+                    <p class="notification-title">{{ notification.title }}</p>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">{{ notification.time }}</span>
+                  </div>
+                  <div class="notification-badge" v-if="!notification.read"></div>
+                </div>
+
+                <div v-if="notifications.length === 0" class="notification-empty">
+                  <i class="bi bi-bell-slash fs-1 text-muted"></i>
+                  <p>Aucune notification</p>
+                </div>
+              </div>
+
+              <div class="notification-footer">
+                <router-link to="/notifications" class="btn-view-all">
+                  Voir toutes les notifications
+                </router-link>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Profile -->
           <div
             class="user-profile"
             ref="profileRef"
@@ -54,6 +119,7 @@
 
             <div class="user-dropdown" v-if="showUserDropdown" @click.stop>
               <div class="dropdown-item" @click="navigateToProfile">
+                <i class="bi bi-person"></i>
                 Mon Profil
               </div>
               <div
@@ -61,10 +127,12 @@
                 @click="navigateToUserManagement"
                 v-if="isAdmin"
               >
+                <i class="bi bi-people"></i>
                 Gestion des Utilisateurs
               </div>
               <div class="dropdown-divider"></div>
               <div class="dropdown-item logout" @click="handleLogout">
+                <i class="bi bi-box-arrow-right"></i>
                 Déconnexion
               </div>
             </div>
@@ -84,6 +152,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { useStore } from "vuex";
 import useAuthGuard from "../../utils/useAuthGuard.js";
+
 // Define component name (optional, only needed for debugging)
 defineOptions({
   name: "AppLayout",
@@ -102,7 +171,50 @@ const { isAdmin, isMember, isGuest, isAuth } = useAuthGuard();
 // Reactive data
 const isCollapsed = ref(false);
 const showUserDropdown = ref(false);
+const showNotificationDropdown = ref(false);
 const profileRef = ref(null);
+const notificationRef = ref(null);
+
+// Notifications data (à remplacer par des données réelles de votre API)
+const notifications = ref([
+  {
+    id: 1,
+    type: 'credit',
+    title: 'Demande de crédit approuvée',
+    message: 'Votre demande de crédit de 500,000 BIF a été approuvée',
+    time: 'Il y a 2 heures',
+    read: false
+  },
+  {
+    id: 2,
+    type: 'contribution',
+    title: 'Cotisation enregistrée',
+    message: 'Votre cotisation mensuelle de 50,000 BIF a été enregistrée',
+    time: 'Il y a 5 heures',
+    read: false
+  },
+  {
+    id: 3,
+    type: 'assistance',
+    title: 'Nouvelle assistance disponible',
+    message: 'Une assistance de 100,000 BIF est disponible pour vous',
+    time: 'Hier',
+    read: false
+  },
+  {
+    id: 4,
+    type: 'info',
+    title: 'Réunion mensuelle',
+    message: 'La réunion mensuelle aura lieu le 15 décembre',
+    time: 'Il y a 2 jours',
+    read: true
+  }
+]);
+
+const notificationCount = computed(() => {
+  return notifications.value.filter(n => !n.read).length;
+});
+
 const menuItems = ref([
   {
     icon: '<i class="bi bi-speedometer2"></i>',
@@ -242,9 +354,35 @@ const toggleSection = (index) => {
 };
 
 const toggleUserDropdown = () => {
-  console.log(showUserDropdown.value);
   showUserDropdown.value = !showUserDropdown.value;
-  console.log(showUserDropdown.value);
+  showNotificationDropdown.value = false;
+};
+
+const toggleNotificationDropdown = () => {
+  showNotificationDropdown.value = !showNotificationDropdown.value;
+  showUserDropdown.value = false;
+};
+
+const getNotificationIcon = (type) => {
+  const icons = {
+    credit: 'bi bi-credit-card-2-front',
+    contribution: 'bi bi-cash-coin',
+    assistance: 'bi bi-life-preserver',
+    info: 'bi bi-info-circle',
+    warning: 'bi bi-exclamation-triangle',
+    success: 'bi bi-check-circle'
+  };
+  return icons[type] || 'bi bi-bell';
+};
+
+const handleNotificationClick = (notification) => {
+  notification.read = true;
+  // Naviguer vers la page appropriée selon le type de notification
+  // router.push(`/notifications/${notification.id}`);
+};
+
+const markAllAsRead = () => {
+  notifications.value.forEach(n => n.read = true);
 };
 
 const navigateToProfile = () => {
@@ -267,11 +405,15 @@ const handleLogout = async () => {
 };
 
 const onClickOutside = (event) => {
-  // Close only if click is outside the profile/dropdown container
-  if (profileRef.value && profileRef.value.contains(event.target)) {
-    return;
+  // Close user dropdown if click is outside
+  if (profileRef.value && !profileRef.value.contains(event.target)) {
+    showUserDropdown.value = false;
   }
-  showUserDropdown.value = false;
+  
+  // Close notification dropdown if click is outside
+  if (notificationRef.value && !notificationRef.value.contains(event.target)) {
+    showNotificationDropdown.value = false;
+  }
 };
 
 // Lifecycle hooks
@@ -456,7 +598,6 @@ body {
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
-
   transition: margin var(--transition-speed) ease;
   min-height: 100vh;
   background-color: #f9fafb;
@@ -488,9 +629,211 @@ body {
 }
 
 .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Notification Styles */
+.notification-container {
   position: relative;
 }
 
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.btn-icon:hover {
+  background-color: #f5f5f5;
+}
+
+.btn-icon i {
+  color: #2c3e50;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 380px;
+  max-height: 500px;
+  overflow: hidden;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-header h6 {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.btn-mark-read {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 0.813rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.btn-mark-read:hover {
+  background-color: #e7f3ff;
+}
+
+.notification-list {
+  overflow-y: auto;
+  max-height: 380px;
+}
+
+.notification-item {
+  padding: 1rem 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f5f5f5;
+  position: relative;
+}
+
+.notification-item:hover {
+  background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+  background-color: #f0f7ff;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon.credit {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.notification-icon.contribution {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.notification-icon.assistance {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.notification-icon.info {
+  background-color: #e0f2f1;
+  color: #00897b;
+}
+
+.notification-icon.warning {
+  background-color: #fff8e1;
+  color: #f9a825;
+}
+
+.notification-icon.success {
+  background-color: #e8f5e9;
+  color: #43a047;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.notification-message {
+  color: #6c757d;
+  font-size: 0.813rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.notification-time {
+  color: #adb5bd;
+  font-size: 0.75rem;
+}
+
+.notification-badge {
+  width: 8px;
+  height: 8px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+}
+
+.notification-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #adb5bd;
+}
+
+.notification-empty i {
+  margin-bottom: 1rem;
+}
+
+.notification-empty p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.notification-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.btn-view-all {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.btn-view-all:hover {
+  background-color: #f8f9fa;
+}
+
+/* User Profile Styles */
 .user-profile {
   display: flex;
   align-items: center;
@@ -577,135 +920,6 @@ body {
   background-color: #fff5f5;
 }
 
-/* Header Styles */
-.app-header {
-  height: var(--header-height);
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 90;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.hamburger-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 24px;
-  width: 30px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 10;
-}
-
-.hamburger-icon {
-  width: 100%;
-  height: 2px;
-  background-color: #2c3e50;
-  transition: all 0.3s ease;
-  border-radius: 2px;
-}
-
-.hamburger-btn:hover .hamburger-icon {
-  background-color: var(--primary-color);
-}
-
-/* Animation when sidebar is collapsed */
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(2) {
-  opacity: 0;
-}
-
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.menu-toggle {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: var(--text-light);
-  display: none;
-}
-
-.header-left h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text-color);
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  transition: background var(--transition-speed) ease;
-}
-
-.user-profile:hover {
-  background-color: var(--hover-bg);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-color);
-  font-size: 1rem;
-}
-
-.user-name {
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-/* Page Content */
-.page-content {
-  padding: 1.5rem;
-  min-height: calc(100vh - var(--header-height));
-}
-
-/* Transitions */
-.slide-enter-active,
-.slide-leave-active {
-  transition: all var(--transition-speed) ease;
-  max-height: 500px;
-}
-
-.slide-enter,
-.slide-leave-to {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
 /* Responsive Styles */
 @media (max-width: 992px) {
   .sidebar {
@@ -730,31 +944,20 @@ body {
     width: 100%;
   }
 
-  .menu-toggle {
-    display: block;
-  }
-
-  .app-header {
-    padding-left: 1rem;
+  .notification-dropdown {
+    width: 320px;
+    right: -10px;
   }
 }
 
-/* Animation for sidebar toggle */
-@keyframes slideIn {
-  from {
-    transform: translateX(-100%);
+@media (max-width: 576px) {
+  .notification-dropdown {
+    width: 280px;
+    right: -20px;
   }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideOut {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
+  
+  .user-details {
+    display: none;
   }
 }
 </style>
