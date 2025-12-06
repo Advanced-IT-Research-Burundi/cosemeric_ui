@@ -210,10 +210,20 @@ const handleAction = async (item, action) => {
   }
 
   try {
-    // Assuming endpoint /credits/{id}/status or similar. 
+    // Assuming endpoint /credits/{id}/status or similar.
     // If not, we might need to use PUT/PATCH on /credits/{id}
     // Let's try a generic update first.
-    await api.put(`/credits/${item.id}`, { statut: action });
+
+    alert(action);
+
+    
+    //await api.put(`/credits/${item.id}`, { statut: action });
+
+    if(action === 'approuve') {
+      await api.post(`/credits/approuve/${item.id}`);
+    }else if(action === 'rejete') {
+      await api.post(`/credits/rejete/${item.id}`);
+    }
     
     toast.success(`Crédit ${action === 'approuve' ? 'accepté' : 'refusé'} avec succès.`);
     fetchCredits();
