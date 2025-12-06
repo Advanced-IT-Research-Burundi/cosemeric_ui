@@ -43,7 +43,8 @@
 
       <div class="sidebar-footer" v-if="!isCollapsed">
         <div class="version-info">
-          <span>v1.0.0</span>
+          <i class="bi bi-shield-check"></i>
+          <span>Version 1.0.0</span>
         </div>
       </div>
     </div>
@@ -58,6 +59,7 @@
           </button>
           
           <div class="current-page-title d-none d-md-block">
+            <i class="bi bi-circle-fill pulse-dot"></i>
             {{ currentRouteName }}
           </div>
         </div>
@@ -73,7 +75,7 @@
               @click.stop="toggleNotificationDropdown"
               :class="{ active: showNotificationDropdown }"
             >
-              <i class="bi bi-bell"></i>
+              <i class="bi bi-bell-fill"></i>
               <span v-if="notificationCount > 0" class="notification-badge">
                 {{ notificationCount }}
               </span>
@@ -83,13 +85,17 @@
             <transition name="fade-slide">
               <div class="dropdown-menu-custom notification-menu" v-if="showNotificationDropdown" @click.stop>
                 <div class="dropdown-header">
-                  <h3>Notifications</h3>
+                  <div class="header-title">
+                    <i class="bi bi-bell-fill"></i>
+                    <h3>Notifications</h3>
+                  </div>
                   <button 
                     v-if="notificationCount > 0"
                     class="btn-text" 
                     @click="markAllAsRead"
                   >
-                    Tout marquer comme lu
+                    <i class="bi bi-check-all"></i>
+                    Tout marquer
                   </button>
                 </div>
                 
@@ -123,7 +129,7 @@
                 </div>
 
                 <div class="dropdown-footer">
-                  <router-link to="/notifications" class="view-all-link">
+                  <router-link to="/notifications" class="view-all-link" @click="showNotificationDropdown = false">
                     Voir toutes les notifications
                     <i class="bi bi-arrow-right"></i>
                   </router-link>
@@ -151,7 +157,7 @@
                 <span class="name">{{ userName }}</span>
                 <span class="role">{{ userRole }}</span>
               </div>
-              <i class="bi bi-chevron-down ms-2 text-muted"></i>
+              <i class="bi bi-chevron-down"></i>
             </div>
 
             <transition name="fade-slide">
@@ -162,13 +168,13 @@
                   </div>
                   <div class="user-menu-info">
                     <span class="name">{{ userName }}</span>
-                    <span class="email text-muted small">utilisateur@example.com</span>
+                    <span class="email text-muted small">{{ userEmail }}</span>
                   </div>
                 </div>
                 
                 <div class="user-menu-items">
                   <div class="menu-item" @click="navigateToProfile">
-                    <i class="bi bi-person"></i>
+                    <i class="bi bi-person-circle"></i>
                     <span>Mon Profil</span>
                   </div>
                   <div
@@ -176,7 +182,7 @@
                     @click="navigateToUserManagement"
                     v-if="isAdmin"
                   >
-                    <i class="bi bi-people"></i>
+                    <i class="bi bi-people-fill"></i>
                     <span>Gestion des Utilisateurs</span>
                   </div>
                   <div class="menu-divider"></div>
@@ -193,7 +199,7 @@
 
       <!-- Page Content -->
       <main class="page-content">
-        <div class="content-container">
+        <div class="">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <component :is="Component" />
@@ -206,7 +212,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted, watch } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { useStore } from "vuex";
@@ -409,12 +415,16 @@ const userName = computed(() => {
   return authStore.user?.name ?? "Utilisateur";
 });
 
+const userEmail = computed(() => {
+  return authStore.user?.email ?? "utilisateur@example.com";
+});
+
 const userRole = computed(() => {
   const user = authStore.user || {};
   if (user.role) {
     return capitalizeFirstLetter(user.role);
   }
-  return "Rôle inconnu";
+  return "Membre";
 });
 
 // Methods
@@ -439,11 +449,11 @@ const toggleNotificationDropdown = () => {
 
 const getNotificationIcon = (type) => {
   const icons = {
-    credit: 'bi bi-credit-card',
+    credit: 'bi bi-credit-card-fill',
     contribution: 'bi bi-wallet2',
-    info: 'bi bi-info-circle',
+    info: 'bi bi-info-circle-fill',
   };
-  return icons[type] || 'bi bi-bell';
+  return icons[type] || 'bi bi-bell-fill';
 };
 
 const handleNotificationClick = (notification) => {
@@ -494,23 +504,39 @@ const onClickOutside = (event) => {
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #2563EB; /* Vibrant Blue from Image */
-  --primary-hover: #1D4ED8;
+  /* Couleurs harmonieuses basées sur CASOMIREC */
+  --primary-color: #2563EB;
+  --primary-hover: #1E40AF;
   --primary-light: #EFF6FF;
-  --sidebar-bg: #1E3A8A; /* Deep Blue for Sidebar Premium Look */
-  --sidebar-text: #E5E7EB;
-  --sidebar-text-hover: #FFFFFF;
-  --sidebar-item-active: rgba(255, 255, 255, 0.1);
-  --header-height: 70px;
-  --sidebar-width: 260px;
-  --sidebar-collapsed-width: 80px;
+  --primary-dark: #1E3A8A;
+  
+  --secondary-color: #10B981;
+  --secondary-hover: #059669;
+  
+  --accent-purple: #8B5CF6;
+  --accent-orange: #F59E0B;
+  
   --bg-color: #F3F4F6;
   --text-primary: #111827;
   --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  
+  --border-color: #E5E7EB;
+  
+  --header-height: 70px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
   --transition-speed: 0.3s;
+  
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -529,7 +555,7 @@ const onClickOutside = (event) => {
 .sidebar {
   width: var(--sidebar-width);
   background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%);
-  color: var(--sidebar-text);
+  color: white;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -538,7 +564,7 @@ const onClickOutside = (event) => {
   bottom: 0;
   z-index: 50;
   transition: all var(--transition-speed) ease;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
 }
 
 .sidebar.collapsed {
@@ -550,8 +576,9 @@ const onClickOutside = (event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .logo-wrapper {
@@ -563,7 +590,7 @@ const onClickOutside = (event) => {
 .logo-icon {
   font-size: 28px;
   color: white;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
 }
 
 .logo-text {
@@ -572,6 +599,7 @@ const onClickOutside = (event) => {
   margin: 0;
   color: white;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .nav-menu {
@@ -586,7 +614,7 @@ const onClickOutside = (event) => {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
 }
 
@@ -597,28 +625,44 @@ const onClickOutside = (event) => {
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 12px 24px;
+  padding: 12px 20px;
   margin: 4px 12px;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
+}
+
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
+  transform: translateX(4px);
+}
+
+.menu-item:hover::before {
+  width: 4px;
 }
 
 .menu-item.active {
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .menu-item.collapsed {
@@ -646,26 +690,36 @@ const onClickOutside = (event) => {
   top: 50%;
   transform: translateY(-50%);
   height: 60%;
-  width: 3px;
-  background-color: white;
+  width: 4px;
+  background: white;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .sidebar-footer {
   padding: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   text-align: center;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .version-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.version-info i {
+  font-size: 14px;
 }
 
 /* Scrollbar Customization */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -673,12 +727,12 @@ const onClickOutside = (event) => {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Main Wrapper */
@@ -708,6 +762,7 @@ const onClickOutside = (event) => {
   position: sticky;
   top: 0;
   z-index: 40;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-left {
@@ -717,40 +772,61 @@ const onClickOutside = (event) => {
 }
 
 .btn-toggle {
-  background: transparent;
+  background: var(--bg-color);
   border: none;
-  font-size: 24px;
+  font-size: 22px;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 8px;
-  transition: all 0.2s;
+  padding: 8px;
+  border-radius: 10px;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
 }
 
 .btn-toggle:hover {
-  background-color: #f3f4f6;
+  background-color: var(--primary-light);
   color: var(--primary-color);
+  transform: scale(1.05);
 }
 
 .current-page-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pulse-dot {
+  font-size: 8px;
+  color: var(--primary-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .divider-vertical {
   width: 1px;
   height: 32px;
-  background-color: #e5e7eb;
+  background-color: var(--border-color);
   margin: 0 8px;
 }
 
@@ -759,67 +835,99 @@ const onClickOutside = (event) => {
 }
 
 .btn-icon {
-  background: transparent;
+  background: var(--bg-color);
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
   color: var(--text-secondary);
   position: relative;
+  font-size: 18px;
 }
 
-.btn-icon:hover, .btn-icon.active {
-  background-color: #EFF6FF;
+.btn-icon:hover {
+  background-color: var(--primary-light);
   color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-icon.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .notification-badge {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  background-color: #EF4444;
+  top: -2px;
+  right: -2px;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
   color: white;
   font-size: 10px;
   font-weight: 700;
-  height: 16px;
-  min-width: 16px;
-  border-radius: 8px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 4px;
   border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* Dropdowns */
 .dropdown-menu-custom {
   position: absolute;
-  top: 120%;
+  top: 125%;
   right: 0;
   background: white;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
   z-index: 100;
   overflow: hidden;
   transform-origin: top right;
 }
 
 .notification-menu {
-  width: 360px;
+  width: 380px;
 }
 
 .dropdown-header {
-  padding: 16px;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, var(--bg-color) 0%, #E5E7EB 100%);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title i {
+  font-size: 20px;
+  color: var(--primary-color);
 }
 
 .dropdown-header h3 {
@@ -836,45 +944,76 @@ const onClickOutside = (event) => {
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-text:hover {
+  background: var(--primary-light);
 }
 
 .notification-list {
-  max-height: 320px;
+  max-height: 360px;
   overflow-y: auto;
 }
 
 .notification-item {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   position: relative;
 }
 
+.notification-item:last-child {
+  border-bottom: none;
+}
+
 .notification-item:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg-color);
 }
 
 .notification-item.unread {
   background-color: #F0F9FF;
 }
 
+.notification-item.unread:hover {
+  background-color: #DBEAFE;
+}
+
 .notification-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background-color: #EFF6FF;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-color: var(--primary-light);
   color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 18px;
 }
 
-.notification-icon-wrapper.credit { background-color: #ECFDF5; color: #10B981; }
-.notification-icon-wrapper.warning { background-color: #FFFBEB; color: #F59E0B; }
+.notification-icon-wrapper.credit { 
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); 
+  color: #059669; 
+}
+
+.notification-icon-wrapper.contribution { 
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); 
+  color: #2563EB; 
+}
+
+.notification-icon-wrapper.info { 
+  background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%); 
+  color: #6366F1; 
+}
 
 .notification-content {
   flex: 1;
@@ -884,6 +1023,7 @@ const onClickOutside = (event) => {
   display: flex;
   justify-content: space-between;
   margin-bottom: 4px;
+  align-items: center;
 }
 
 .notification-title {
@@ -893,68 +1033,98 @@ const onClickOutside = (event) => {
 }
 
 .notification-time {
-  font-size: 12px;
-  color: #9CA3AF;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .notification-message {
   margin: 0;
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .unread-dot {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 20px;
+  right: 20px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .dropdown-footer {
-  padding: 12px;
+  padding: 12px 16px;
   text-align: center;
-  border-top: 1px solid #f3f4f6;
-  background-color: #f9fafb;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-color);
 }
 
 .view-all-link {
   color: var(--primary-color);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.view-all-link:hover {
+  background: var(--primary-light);
 }
 
 /* User Menu */
 .user-menu {
-  width: 240px;
+  width: 260px;
 }
 
 .user-profile-trigger {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
-.user-profile-trigger:hover, .user-profile-trigger.active {
-  background-color: #f3f4f6;
+.user-profile-trigger:hover {
+  background-color: var(--bg-color);
+}
+
+.user-profile-trigger.active {
+  background-color: var(--primary-light);
 }
 
 .user-avatar {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -962,29 +1132,33 @@ const onClickOutside = (event) => {
   justify-content: center;
   font-weight: 600;
   font-size: 14px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  flex-shrink: 0;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .user-info .name {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .user-info .role {
   font-size: 12px;
   color: var(--text-secondary);
+  line-height: 1.2;
 }
 
 .user-menu-header {
-  padding: 20px;
-  background: #f9fafb;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 24px 20px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #DBEAFE 100%);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -992,10 +1166,11 @@ const onClickOutside = (event) => {
 }
 
 .user-avatar.large {
-  width: 64px;
-  height: 64px;
-  font-size: 24px;
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
   margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .user-menu-info .name {
@@ -1003,6 +1178,11 @@ const onClickOutside = (event) => {
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.user-menu-info .email {
+  font-size: 13px;
 }
 
 .user-menu-items {
@@ -1010,34 +1190,43 @@ const onClickOutside = (event) => {
 }
 
 .menu-item {
-  padding: 10px 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   color: var(--text-primary);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
-  margin: 0 !important; /* Override sidebar margin */
+  margin: 2px 0 !important;
+  font-weight: 500;
+}
+
+.menu-item i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
 }
 
 .menu-item:hover {
-  background-color: #f3f4f6;
+  background-color: var(--bg-color);
   color: var(--primary-color);
+  transform: translateX(2px);
 }
 
 .menu-item.danger {
-  color: #EF4444;
+  color: var(--error);
 }
 
 .menu-item.danger:hover {
   background-color: #FEF2F2;
+  color: #DC2626;
 }
 
 .menu-divider {
   height: 1px;
-  background-color: #f3f4f6;
+  background-color: var(--border-color);
   margin: 8px 0;
 }
 
@@ -1053,15 +1242,22 @@ const onClickOutside = (event) => {
 }
 
 /* Transitions */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.3s ease;
+.fade-slide-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-.fade-slide-enter-from,
+.fade-slide-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-5px) scale(0.98);
 }
 
 .fade-enter-active,
@@ -1072,6 +1268,26 @@ const onClickOutside = (event) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 45;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Mobile Responsive */
@@ -1085,25 +1301,6 @@ const onClickOutside = (event) => {
     transform: translateX(0);
   }
 
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 45;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-    backdrop-filter: blur(2px);
-  }
-
-  .sidebar-overlay.show {
-    opacity: 1;
-    visibility: visible;
-  }
-
   .main-wrapper, .main-wrapper.collapsed {
     margin-left: 0;
   }
@@ -1114,6 +1311,22 @@ const onClickOutside = (event) => {
 
   .page-content {
     padding: 16px;
+  }
+
+  .notification-menu {
+    width: calc(100vw - 32px);
+    right: -8px;
+  }
+
+  .user-menu {
+    width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-menu {
+    width: calc(100vw - 32px);
+    right: -8px;
   }
 }
 </style>

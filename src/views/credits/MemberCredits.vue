@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid py-1">
+  <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Mes Crédits</h2>
       <router-link to="/credits/demande" class="btn btn-primary">
