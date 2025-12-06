@@ -304,10 +304,7 @@ const wrappedTableData = computed(() => {
 
 onMounted(() => {
 
-  // if auth user is not admin redirect to mescredits
-  if (!auth.user?.role?.is_admin) {
-    router.push('/credits/mescredits');
-  }
+
   fetchCredits();
 });
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4 px-4">
+  <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Tous les utilisateurs</h2>
       <router-link to="/users/add" type="button" class="btn btn-primary">

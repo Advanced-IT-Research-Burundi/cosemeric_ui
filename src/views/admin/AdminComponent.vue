@@ -3,7 +3,7 @@
     <!-- Top Navigation -->
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="">
       <!-- Header -->
 
       <!-- Statistics Cards -->
