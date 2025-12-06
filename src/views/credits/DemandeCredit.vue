@@ -186,7 +186,7 @@ const handleSubmit = async () => {
     // Vérification de la réponse (l'API devrait retourner un objet de crédit en cas de succès)
     if (response.data) {
       toast.success('Crédit enregistré avec succès');
-      router.push('/credits');
+      router.push('/credits/mescredits');
     } else {
       // Une réponse sans 'data' peut indiquer un problème non HTTP 4xx/5xx
       throw new Error('Réponse inattendue du serveur');

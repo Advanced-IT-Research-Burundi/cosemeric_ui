@@ -6,7 +6,7 @@
       <h2 class="mb-0">Détails du Crédit</h2>
 
       <div>
-        <router-link to="/credits" class="btn btn-secondary me-2">
+        <router-link to="/credits/mescredits" class="btn btn-secondary me-2">
           <i class="fas fa-arrow-left me-2"></i>Retour
         </router-link>
 
@@ -69,6 +69,8 @@
             </span>
           </div>
         </div>
+
+        {{ credit }}
 
         <!-- Date -->
         <div class="col-md-6">
