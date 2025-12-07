@@ -139,6 +139,12 @@
           </div>
 
           <div class="divider-vertical"></div>
+          <div>
+            <button @click="refreshPage" class="header-action-item btn btn-outline-secondary">
+              <i class="bi bi-repeat"></i>
+            </button>
+          </div>
+          <div class="divider-vertical"></div>
 
           <!-- User Profile -->
           <div
@@ -221,6 +227,10 @@ import useAuthGuard from "../../utils/useAuthGuard.js";
 defineOptions({
   name: "AppLayout",
 });
+
+const refreshPage = () => {
+  window.location.reload();
+};
 
 // Router composables
 const router = useRouter();
