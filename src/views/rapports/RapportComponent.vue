@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5">
+  <div class="">
     <!-- Carte principale -->
     <div class="card shadow border-0">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">

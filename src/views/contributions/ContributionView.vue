@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4 px-4">
+  <div>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Toutes les cotisations</h2>
       <router-link

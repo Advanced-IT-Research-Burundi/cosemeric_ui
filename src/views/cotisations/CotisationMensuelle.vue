@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4">
+  <div class="">
     <div class="card shadow">
       <div
         class="card-header bg-primary text-white d-flex align-items-center justify-content-between"

@@ -1,79 +1,218 @@
 <template>
   <div class="app-layout">
+    <!-- Overlay for mobile sidebar -->
+    <div 
+      class="sidebar-overlay" 
+      :class="{ 'show': !isCollapsed && isMobile }"
+      @click="toggleSidebar"
+    ></div>
+
     <!-- Sidebar -->
-    <div class="sidebar" :class="{ collapsed: isCollapsed }">
+    <div class="sidebar" :class="{ collapsed: isCollapsed, 'mobile-open': !isCollapsed && isMobile }">
       <div class="logo-container">
-        <h2 v-if="!isCollapsed">
-          <i class="bi bi-droplet-fill me-2"></i> CASOMIREC
-        </h2>
-        <h2 v-else><i class="bi bi-droplet-fill"></i></h2>
+        <div class="logo-wrapper">
+          <i class="bi bi-droplet-fill logo-icon"></i>
+          <h2 v-show="!isCollapsed" class="logo-text">CASOMIREC</h2>
+        </div>
       </div>
-      <nav class="nav-menu">
+
+      <nav class="nav-menu custom-scrollbar">
+        <div class="menu-label" v-if="!isCollapsed">MENU PRINCIPAL</div>
+        
         <template v-for="(item, index) in menuItems" :key="index">
           <router-link
             :to="item.path"
-            class="menu-section"
+            class="menu-item-link"
             v-if="item.requireAdmin"
+            v-slot="{ isActive, navigate }"
+            custom
           >
             <div
-              class="menu-header"
-              :class="{ active: activePage === index }"
-              @click="toggleSection(index)"
+              class="menu-item"
+              :class="{ 'active': isRouteActive(item.path), 'collapsed': isCollapsed }"
+              @click="navigate"
+              :title="isCollapsed ? item.title : ''"
             >
-              <span v-html="item.icon"></span>
-              <span v-if="!isCollapsed" class="title">{{ item.title }}</span>
+              <div class="icon-wrapper" v-html="item.icon"></div>
+              <span v-show="!isCollapsed" class="menu-title">{{ item.title }}</span>
+              <div v-if="isActive && !isCollapsed" class="active-indicator"></div>
             </div>
           </router-link>
         </template>
       </nav>
-      <div class="sidebar-footer"></div>
-    </div>
-    <div class="main-content">
-      <nav class="admin-header">
-        <div class="header-left">
-          <button @click="toggleSidebar" class="btn">
-            <i class="bi bi-list"></i>
-          </button>
-        </div>
-        <div class="header-right">
-          <div
-            class="user-profile"
-            ref="profileRef"
-            @click.stop="toggleUserDropdown"
-          >
-            <div class="user-avatar">
-              {{ userInitials }}
-            </div>
-            <div class="user-details">
-              <span class="user-name">{{ userName }}</span>
-              <div class="user-role">
-                {{ userRole }}
-              </div>
-            </div>
-            <i class="bi bi-chevron-down"></i>
 
-            <div class="user-dropdown" v-if="showUserDropdown" @click.stop>
-              <div class="dropdown-item" @click="navigateToProfile">
-                Mon Profil
-              </div>
-              <div
-                class="dropdown-item"
-                @click="navigateToUserManagement"
-                v-if="isAdmin"
-              >
-                Gestion des Utilisateurs
-              </div>
-              <div class="dropdown-divider"></div>
-              <div class="dropdown-item logout" @click="handleLogout">
-                Déconnexion
-              </div>
-            </div>
+      <div class="sidebar-footer" v-if="!isCollapsed">
+        <div class="version-info">
+          <i class="bi bi-shield-check"></i>
+          <span>Version 1.0.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper" :class="{ collapsed: isCollapsed }">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button @click="toggleSidebar" class="btn-toggle">
+            <i class="bi" :class="isCollapsed ? 'bi-list' : 'bi-text-indent-right'"></i>
+          </button>
+          
+          <div class="current-page-title d-none d-md-block">
+            <i class="bi bi-circle-fill pulse-dot"></i>
+            {{ currentRouteName }}
           </div>
         </div>
-      </nav>
-      <div>
-        <router-view />
-      </div>
+
+        <div class="header-right">
+          <!-- Notification Icon -->
+          <div 
+            class="header-action-item" 
+            ref="notificationRef"
+          >
+            <button 
+              class="btn-icon notification-btn" 
+              @click.stop="toggleNotificationDropdown"
+              :class="{ active: showNotificationDropdown }"
+            >
+              <i class="bi bi-bell-fill"></i>
+              <span v-if="notificationCount > 0" class="notification-badge">
+                {{ notificationCount }}
+              </span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <transition name="fade-slide">
+              <div class="dropdown-menu-custom notification-menu" v-if="showNotificationDropdown" @click.stop>
+                <div class="dropdown-header">
+                  <div class="header-title">
+                    <i class="bi bi-bell-fill"></i>
+                    <h3>Notifications</h3>
+                  </div>
+                  <button 
+                    v-if="notificationCount > 0"
+                    class="btn-text" 
+                    @click="markAllAsRead"
+                  >
+                    <i class="bi bi-check-all"></i>
+                    Tout marquer
+                  </button>
+                </div>
+                
+                <div class="notification-list custom-scrollbar">
+                  <div 
+                    v-for="notification in notifications" 
+                    :key="notification.id"
+                    class="notification-item"
+                    :class="{ unread: !notification.read }"
+                    @click="handleNotificationClick(notification)"
+                  >
+                    <div class="notification-icon-wrapper" :class="notification.type">
+                      <i :class="getNotificationIcon(notification.type)"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-top">
+                        <span class="notification-title">{{ notification.title }}</span>
+                        <span class="notification-time">{{ notification.time }}</span>
+                      </div>
+                      <p class="notification-message">{{ notification.message }}</p>
+                    </div>
+                    <div class="unread-dot" v-if="!notification.read"></div>
+                  </div>
+
+                  <div v-if="notifications.length === 0" class="empty-state">
+                    <div class="empty-icon">
+                      <i class="bi bi-bell-slash"></i>
+                    </div>
+                    <p>Aucune notification</p>
+                  </div>
+                </div>
+
+                <div class="dropdown-footer">
+                  <router-link to="/notifications" class="view-all-link" @click="showNotificationDropdown = false">
+                    Voir toutes les notifications
+                    <i class="bi bi-arrow-right"></i>
+                  </router-link>
+                </div>
+              </div>
+            </transition>
+          </div>
+
+          <div class="divider-vertical"></div>
+          <div>
+            <button @click="refreshPage" class="header-action-item btn btn-outline-secondary">
+              <i class="bi bi-repeat"></i>
+            </button>
+          </div>
+          <div class="divider-vertical"></div>
+
+          <!-- User Profile -->
+          <div
+            class="header-action-item"
+            ref="profileRef"
+          >
+            <div 
+              class="user-profile-trigger"
+              @click.stop="toggleUserDropdown"
+              :class="{ active: showUserDropdown }"
+            >
+              <div class="user-avatar">
+                <span>{{ userInitials }}</span>
+              </div>
+              <div class="user-info d-none d-md-flex">
+                <span class="name">{{ userName }}</span>
+                <span class="role">{{ userRole }}</span>
+              </div>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+
+            <transition name="fade-slide">
+              <div class="dropdown-menu-custom user-menu" v-if="showUserDropdown" @click.stop>
+                <div class="user-menu-header">
+                  <div class="user-avatar large">
+                    <span>{{ userInitials }}</span>
+                  </div>
+                  <div class="user-menu-info">
+                    <span class="name">{{ userName }}</span>
+                    <span class="email text-muted small">{{ userEmail }}</span>
+                  </div>
+                </div>
+                
+                <div class="user-menu-items">
+                  <div class="menu-item" @click="navigateToProfile">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Mon Profil</span>
+                  </div>
+                  <div
+                    class="menu-item"
+                    @click="navigateToUserManagement"
+                    v-if="isAdmin"
+                  >
+                    <i class="bi bi-people-fill"></i>
+                    <span>Gestion des Utilisateurs</span>
+                  </div>
+                  <div class="menu-divider"></div>
+                  <div class="menu-item danger" @click="handleLogout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Déconnexion</span>
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="page-content">
+        <div class="">
+          <router-view v-slot="{ Component }">
+            <transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
+        </div>
+      </main>
     </div>
   </div>
 </template>
@@ -84,10 +223,14 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { useStore } from "vuex";
 import useAuthGuard from "../../utils/useAuthGuard.js";
-// Define component name (optional, only needed for debugging)
+
 defineOptions({
   name: "AppLayout",
 });
+
+const refreshPage = () => {
+  window.location.reload();
+};
 
 // Router composables
 const router = useRouter();
@@ -96,53 +239,127 @@ const route = useRoute();
 // Store composables
 const store = useStore();
 const authStore = useAuthStore();
-
 const { isAdmin, isMember, isGuest, isAuth } = useAuthGuard();
+
+// Responsive state
+const windowWidth = ref(window.innerWidth);
+const isMobile = computed(() => windowWidth.value <= 992);
 
 // Reactive data
 const isCollapsed = ref(false);
 const showUserDropdown = ref(false);
+const showNotificationDropdown = ref(false);
 const profileRef = ref(null);
+const notificationRef = ref(null);
+
+// Initialize collapsed state based on screen size
+const initSidebarState = () => {
+  if (window.innerWidth <= 992) {
+    isCollapsed.value = true;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  initSidebarState();
+  document.addEventListener("click", onClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  document.removeEventListener("click", onClickOutside);
+});
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+  if (windowWidth.value <= 992) {
+    isCollapsed.value = true;
+  }
+};
+
+// Route matching helper
+const isRouteActive = (path) => {
+  return route.path.startsWith(path);
+};
+
+// Notifications (Mock Data)
+const notifications = ref([
+  {
+    id: 1,
+    type: 'credit',
+    title: 'Crédit Approuvé',
+    message: 'Votre demande de 500k BIF a été validée.',
+    time: '2h',
+    read: false
+  },
+  {
+    id: 2,
+    type: 'contribution',
+    title: 'Cotisation Reçue',
+    message: 'Votre paiement de 50k BIF est confirmé.',
+    time: '5h',
+    read: false
+  },
+  {
+    id: 3,
+    type: 'info',
+    title: 'Rappel Réunion',
+    message: 'Assemblée générale le 15 Décembre.',
+    time: '1j',
+    read: true
+  }
+]);
+
+const notificationCount = computed(() => {
+  return notifications.value.filter(n => !n.read).length;
+});
+
 const menuItems = ref([
   {
-    icon: '<i class="bi bi-speedometer2"></i>',
+    icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/dashboard",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-people"></i>',
+    icon: '<i class="bi bi-people-fill"></i>',
     title: "Membres",
     path: "/members",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-cash-coin"></i>',
+    icon: '<i class="bi bi-wallet-fill"></i>',
     title: "Cotisations",
     path: "/contributions",
-    requireAdmin: isAdmin.value || isMember.value,
+    requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-calendar-range"></i>',
-    title: "Periodes",
+    icon: '<i class="bi bi-wallet-fill"></i>',
+    title: "Mes Cotisations",
+    path: "/mesCotisations",
+    requireAdmin: isMember.value,
+  },
+  {
+    icon: '<i class="bi bi-calendar-event-fill"></i>',
+    title: "Périodes",
     path: "/periodes",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-credit-card"></i>',
+    icon: '<i class="bi bi-credit-card-2-front-fill"></i>',
     title: "Crédits",
     path: "/credits",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-credit-card"></i>',
+    icon: '<i class="bi bi-credit-card-2-front"></i>',
     title: "Mes Crédits",
     path: "/credits/mescredits",
     requireAdmin: isMember.value,
   },
   {
-    icon: '<i class="bi bi-credit-card"></i>',
-    title: "Demande de Credit",
+    icon: '<i class="bi bi-plus-square-dotted"></i>',
+    title: "Demande Crédit",
     path: "/credits/demande",
     requireAdmin: isMember.value,
   },
@@ -153,37 +370,37 @@ const menuItems = ref([
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-arrow-counterclockwise"></i>',
+    icon: '<i class="bi bi-arrow-repeat"></i>',
     title: "Remboursements",
     path: "/remboursements",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-file-earmark-text"></i>',
+    icon: '<i class="bi bi-file-earmark-spreadsheet-fill"></i>',
     title: "Fiche Mensuel",
     path: "/importationMensuel",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-calendar-check"></i>',
-    title: "Cotisation Mensuelle",
+    icon: '<i class="bi bi-cash-stack"></i>',
+    title: "Cotis. Mensuelle",
     path: "/cotisationMensuelle",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-file-earmark-bar-graph"></i>',
+    icon: '<i class="bi bi-graph-up"></i>',
     title: "Rapports",
     path: "/reports",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-shield-lock"></i>',
+    icon: '<i class="bi bi-shield-check"></i>',
     title: "Administration",
     path: "/admin",
     requireAdmin: isAdmin.value,
   },
   {
-    icon: '<i class="bi bi-person-badge"></i>',
+    icon: '<i class="bi bi-person-badge-fill"></i>',
     title: "Utilisateurs",
     path: "/users",
     requireAdmin: isAdmin.value,
@@ -191,8 +408,6 @@ const menuItems = ref([
 ]);
 
 // Computed properties
-const activePage = computed(() => store.state.activePage);
-
 const currentRouteName = computed(() => {
   const name = route.meta.title || route.name || "";
   return capitalizeFirstLetter(name);
@@ -216,16 +431,21 @@ const userName = computed(() => {
   return authStore.user?.name ?? "Utilisateur";
 });
 
+const userEmail = computed(() => {
+  return authStore.user?.email ?? "utilisateur@example.com";
+});
+
 const userRole = computed(() => {
   const user = authStore.user || {};
   if (user.role) {
     return capitalizeFirstLetter(user.role);
   }
-  return "Rôle inconnu";
+  return "Membre";
 });
 
 // Methods
 const capitalizeFirstLetter = (string) => {
+  if (!string) return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -233,18 +453,31 @@ const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-const toggleSection = (index) => {
-  if (store.state.activePage === index) {
-    store.state.activePage = null;
-  } else {
-    store.state.activePage = index;
-  }
+const toggleUserDropdown = () => {
+  showUserDropdown.value = !showUserDropdown.value;
+  showNotificationDropdown.value = false;
 };
 
-const toggleUserDropdown = () => {
-  console.log(showUserDropdown.value);
-  showUserDropdown.value = !showUserDropdown.value;
-  console.log(showUserDropdown.value);
+const toggleNotificationDropdown = () => {
+  showNotificationDropdown.value = !showNotificationDropdown.value;
+  showUserDropdown.value = false;
+};
+
+const getNotificationIcon = (type) => {
+  const icons = {
+    credit: 'bi bi-credit-card-fill',
+    contribution: 'bi bi-wallet2',
+    info: 'bi bi-info-circle-fill',
+  };
+  return icons[type] || 'bi bi-bell-fill';
+};
+
+const handleNotificationClick = (notification) => {
+  notification.read = true;
+};
+
+const markAllAsRead = () => {
+  notifications.value.forEach(n => n.read = true);
 };
 
 const navigateToProfile = () => {
@@ -267,57 +500,87 @@ const handleLogout = async () => {
 };
 
 const onClickOutside = (event) => {
-  // Close only if click is outside the profile/dropdown container
-  if (profileRef.value && profileRef.value.contains(event.target)) {
-    return;
+  if (profileRef.value && !profileRef.value.contains(event.target)) {
+    showUserDropdown.value = false;
   }
-  showUserDropdown.value = false;
+  if (notificationRef.value && !notificationRef.value.contains(event.target)) {
+    showNotificationDropdown.value = false;
+  }
+  // Close sidebar on mobile when clicking outside
+  const sidebar = document.querySelector('.sidebar');
+  const toggleBtn = document.querySelector('.btn-toggle');
+  if (isMobile.value && !isCollapsed.value && sidebar && !sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+    isCollapsed.value = true;
+  }
 };
-
-// Lifecycle hooks
-onMounted(() => {
-  document.addEventListener("click", onClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", onClickOutside);
-});
 </script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Importing Inter font for a modern feel */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Couleurs harmonieuses basées sur CASOMIREC */
+  --primary-color: #2563EB;
+  --primary-hover: #1E40AF;
+  --primary-light: #EFF6FF;
+  --primary-dark: #1E3A8A;
+  
+  --secondary-color: #10B981;
+  --secondary-hover: #059669;
+  
+  --accent-purple: #8B5CF6;
+  --accent-orange: #F59E0B;
+  
+  --bg-color: #F3F4F6;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  
+  --border-color: #E5E7EB;
+  
+  --header-height: 70px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --transition-speed: 0.3s;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-body {
-  font-family: "Inter", sans-serif;
-  color: var(--text-color);
-  background-color: #f9fafb;
+* {
+  box-sizing: border-box;
 }
 
 .app-layout {
   display: flex;
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
 }
 
-/* Sidebar Styles */
+/* Sidebar Styling */
 .sidebar {
-  width: 250px;
-  background: white;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%);
+  color: white;
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
-  transition: width var(--transition-speed) ease;
-  position: relative;
-  z-index: 100;
-  height: 100vh;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
+  z-index: 50;
+  transition: all var(--transition-speed) ease;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
 }
 
 .sidebar.collapsed {
@@ -325,436 +588,761 @@ body {
 }
 
 .logo-container {
-  padding: 1.5rem 1rem;
-  border-bottom: 1px solid var(--border-color);
-  text-align: center;
   height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
 }
 
-.logo-container h2 {
-  color: var(--primary-color);
-  font-size: 1.25rem;
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 28px;
+  color: white;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+
+.logo-text {
+  font-size: 20px;
   font-weight: 700;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
+  color: white;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .nav-menu {
   flex: 1;
+  padding: 20px 0;
   overflow-y: auto;
-  padding: 1rem 0;
 }
 
-.menu-section {
-  margin-bottom: 0.5rem;
-  text-decoration: none !important;
-}
-
-.menu-header {
-  padding: 0.75rem 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center !important;
-  gap: 10px;
-  color: var(--text-light);
-  font-weight: 500;
-  transition: all var(--transition-speed) ease;
-  border-left: 3px solid transparent;
-}
-
-.menu-header:hover {
-  background-color: var(--hover-bg);
-  color: var(--primary-color);
-  text-decoration: none;
-}
-
-.menu-header.active {
-  color: white !important;
-  background-color: var(--primary-light);
-  border-left-color: var(--primary-color);
-}
-
-.menu-header .icon {
-  margin-right: 0.75rem;
-  font-size: 1.1rem;
-}
-
-.menu-header .title {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-.menu-header .arrow {
-  font-size: 0.75rem;
-  transition: transform var(--transition-speed) ease;
-}
-
-.menu-header.active .arrow {
-  transform: rotate(0);
-}
-
-.submenu {
-  overflow: hidden;
-  transition: max-height var(--transition-speed) ease;
-}
-
-.submenu-item {
-  display: block;
-  padding: 0.5rem 1.5rem 0.5rem 3.5rem;
-  color: var(--text-light);
-  text-decoration: none;
-  font-size: 0.875rem;
-  transition: all var(--transition-speed) ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.submenu-item:hover {
-  background-color: var(--hover-bg);
-  color: var(--primary-color);
-}
-
-.submenu-item.active {
-  color: white !important;
-  font-weight: 500;
-  background-color: var(--primary-color);
-}
-
-.sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.toggle-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-light);
-  font-size: 1.25rem;
-  padding: 0;
-  border-radius: 4px;
-  transition: all var(--transition-speed) ease;
-}
-
-.toggle-btn:hover {
-  background-color: var(--hover-bg);
-  color: var(--primary-color);
-}
-
-/* Main Content Styles */
-.main-content {
-  flex: 1;
-  margin-left: var(--sidebar-width);
-
-  transition: margin var(--transition-speed) ease;
-  min-height: 100vh;
-  background-color: #f9fafb;
-}
-
-.sidebar.collapsed + .main-content {
-  margin-left: var(--sidebar-collapsed-width);
-}
-
-/* Admin Header Styles */
-.admin-header {
-  background: white;
-  padding: 0 2rem;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.admin-header h1 {
-  font-size: 1.25rem;
+.menu-label {
+  padding: 0 24px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
-  color: #2c3e50;
-  margin: 0;
 }
 
-.header-right {
-  position: relative;
+.menu-item-link {
+  text-decoration: none;
 }
 
-.user-profile {
+.menu-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem !important;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 12px 20px;
+  margin: 4px 12px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
   position: relative;
+  overflow: hidden;
 }
 
-.user-profile:hover {
-  background-color: #f5f5f5;
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
 }
 
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateX(4px);
+}
+
+.menu-item:hover::before {
+  width: 4px;
+}
+
+.menu-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.menu-item.collapsed {
+  padding: 12px;
+  justify-content: center;
+  margin: 4px 10px;
+}
+
+.menu-item .icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2c3e50;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 18px;
+  min-width: 24px;
 }
 
-.user-name {
-  font-weight: 600;
-  font-size: 1.2em;
-  color: #2c3e50;
+.menu-title {
+  margin-left: 12px;
+  white-space: nowrap;
 }
 
-.user-role {
-  font-weight: 400;
-  font-size: 0.9em;
-  color: #6c757d;
-}
-
-.user-dropdown {
+.active-indicator {
   position: absolute;
-  top: 100%;
-  right: 0;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  width: 4px;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  min-width: 200px;
-  overflow: hidden;
-  z-index: 1000;
-  margin-top: 8px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-.dropdown-item {
-  padding: 0.75rem 1rem;
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.version-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #2c3e50;
-  transition: background-color 0.2s;
-  cursor: pointer;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.dropdown-item:hover {
-  background-color: #f8f9fa;
+.version-info i {
+  font-size: 14px;
 }
 
-.dropdown-item i {
-  width: 20px;
-  text-align: center;
+/* Scrollbar Customization */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
 }
 
-.dropdown-divider {
-  height: 1px;
-  background-color: #e9ecef;
-  margin: 0.25rem 0;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.logout {
-  color: #dc3545;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
-.logout:hover {
-  background-color: #fff5f5;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
-/* Header Styles */
+/* Main Wrapper */
+.main-wrapper {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  transition: margin var(--transition-speed) ease;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+.main-wrapper.collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Header Styling */
 .app-header {
   height: var(--header-height);
   background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 30px;
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
-  z-index: 90;
+  z-index: 40;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
-.hamburger-btn {
-  background: none;
+.btn-toggle {
+  background: var(--bg-color);
   border: none;
+  font-size: 22px;
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 24px;
-  width: 30px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 10;
-}
-
-.hamburger-icon {
-  width: 100%;
-  height: 2px;
-  background-color: #2c3e50;
-  transition: all 0.3s ease;
-  border-radius: 2px;
-}
-
-.hamburger-btn:hover .hamburger-icon {
-  background-color: var(--primary-color);
-}
-
-/* Animation when sidebar is collapsed */
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(2) {
-  opacity: 0;
-}
-
-.sidebar.collapsed + .main-content .hamburger-icon:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.menu-toggle {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: var(--text-light);
-  display: none;
-}
-
-.header-left h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text-color);
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  transition: background var(--transition-speed) ease;
-}
-
-.user-profile:hover {
-  background-color: var(--hover-bg);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--primary-light);
+  padding: 8px;
+  border-radius: 10px;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-color);
-  font-size: 1rem;
+  width: 40px;
+  height: 40px;
 }
 
-.user-name {
+.btn-toggle:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.current-page-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pulse-dot {
+  font-size: 8px;
+  color: var(--primary-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.divider-vertical {
+  width: 1px;
+  height: 32px;
+  background-color: var(--border-color);
+  margin: 0 8px;
+}
+
+.header-action-item {
+  position: relative;
+}
+
+.btn-icon {
+  background: var(--bg-color);
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text-secondary);
+  position: relative;
+  font-size: 18px;
+}
+
+.btn-icon:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-icon.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Dropdowns */
+.dropdown-menu-custom {
+  position: absolute;
+  top: 125%;
+  right: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+  z-index: 100;
+  overflow: hidden;
+  transform-origin: top right;
+}
+
+.notification-menu {
+  width: 380px;
+}
+
+.dropdown-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--bg-color) 0%, #E5E7EB 100%);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title i {
+  font-size: 20px;
+  color: var(--primary-color);
+}
+
+.dropdown-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 12px;
   font-weight: 500;
-  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-text:hover {
+  background: var(--primary-light);
+}
+
+.notification-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background-color: var(--bg-color);
+}
+
+.notification-item.unread {
+  background-color: #F0F9FF;
+}
+
+.notification-item.unread:hover {
+  background-color: #DBEAFE;
+}
+
+.notification-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.notification-icon-wrapper.credit { 
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); 
+  color: #059669; 
+}
+
+.notification-icon-wrapper.contribution { 
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); 
+  color: #2563EB; 
+}
+
+.notification-icon-wrapper.info { 
+  background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%); 
+  color: #6366F1; 
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+.notification-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notification-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.notification-message {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.unread-dot {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.dropdown-footer {
+  padding: 12px 16px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+}
+
+.view-all-link {
+  color: var(--primary-color);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.view-all-link:hover {
+  background: var(--primary-light);
+}
+
+/* User Menu */
+.user-menu {
+  width: 260px;
+}
+
+.user-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.user-profile-trigger:hover {
+  background-color: var(--bg-color);
+}
+
+.user-profile-trigger.active {
+  background-color: var(--primary-light);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-info .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.user-info .role {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.user-menu-header {
+  padding: 24px 20px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #DBEAFE 100%);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.user-avatar.large {
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.user-menu-info .name {
+  display: block;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.user-menu-info .email {
+  font-size: 13px;
+}
+
+.user-menu-items {
+  padding: 8px;
+}
+
+.menu-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  margin: 2px 0 !important;
+  font-weight: 500;
+}
+
+.menu-item i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.menu-item:hover {
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  transform: translateX(2px);
+}
+
+.menu-item.danger {
+  color: var(--error);
+}
+
+.menu-item.danger:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 8px 0;
 }
 
 /* Page Content */
 .page-content {
-  padding: 1.5rem;
-  min-height: calc(100vh - var(--header-height));
+  padding: 30px;
+  flex: 1;
+}
+
+.content-container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* Transitions */
-.slide-enter-active,
-.slide-leave-active {
-  transition: all var(--transition-speed) ease;
-  max-height: 500px;
+.fade-slide-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-.slide-enter,
-.slide-leave-to {
-  max-height: 0;
+.fade-slide-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.fade-slide-enter-from {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-10px) scale(0.95);
 }
 
-/* Responsive Styles */
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-5px) scale(0.98);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 45;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Responsive */
 @media (max-width: 992px) {
   .sidebar {
     transform: translateX(-100%);
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    z-index: 1000;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    width: 280px;
   }
 
-  .sidebar.collapsed {
-    transform: translateX(-100%);
-  }
-
-  .sidebar.show-mobile {
+  .sidebar.mobile-open {
     transform: translateX(0);
   }
 
-  .main-content {
+  .main-wrapper, .main-wrapper.collapsed {
     margin-left: 0;
-    width: 100%;
-  }
-
-  .menu-toggle {
-    display: block;
   }
 
   .app-header {
-    padding-left: 1rem;
+    padding: 0 16px;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+
+  .notification-menu {
+    width: calc(100vw - 32px);
+    right: -8px;
+  }
+
+  .user-menu {
+    width: 240px;
   }
 }
 
-/* Animation for sidebar toggle */
-@keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideOut {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
+@media (max-width: 480px) {
+  .user-menu {
+    width: calc(100vw - 32px);
+    right: -8px;
   }
 }
 </style>

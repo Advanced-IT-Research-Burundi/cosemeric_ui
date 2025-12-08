@@ -173,13 +173,16 @@ async function login() {
   error.value = "";
 
   try {
-    const success = await authStore.login(email.value, password.value);
-    if (!success) throw new Error("Email ou mot de passe incorrect");
-    if (authStore.hasRole("admin")) {
-      await router.push("/dashboard");
+    const success = await authStore.login(email.value, password.value)
+    if (!success) throw new Error('Email ou mot de passe incorrect')
+
+    // check if the user is Admin 
+    if (authStore.user.role === 'admin') {
+      window.location.href = '/dashboard'
     } else {
-      await router.push("/contributions");
+      window.location.href = '/credits/mescredits'
     }
+    // await router.push('/dashboard')
   } catch (err) {
     error.value = err.message || "Erreur de connexion";
     toast.error(error.value);
