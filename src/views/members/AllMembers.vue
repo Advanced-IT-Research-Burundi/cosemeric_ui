@@ -322,8 +322,6 @@ onMounted(async () => {
    }
 });
 
-const membersData = computed(() => store.state.membres?.data || []);
-const pagination = computed(() => store.state.membres || {});
 
 const fetchMembers = async (page = 1) => {
     loading.value = true;
@@ -334,7 +332,7 @@ const fetchMembers = async (page = 1) => {
         }
         
         const response = await api.get("/membres", params);
-        store.state.membres = response.data || response;
+        store.state.data.membres = response.data || response;
     } catch (error) {
         console.error("Error fetching members:", error);
         toast.error("Erreur lors du chargement des membres.");
@@ -347,6 +345,10 @@ const fetchMembers = async (page = 1) => {
 const handleSearch = _.debounce(() => {
     fetchMembers(1);
 }, 500);
+
+const membersData = computed(() => store.state.data?.membres?.data || []);
+const pagination = computed(() => store.state.data?.membres || {});
+
 
 
 // Actions
