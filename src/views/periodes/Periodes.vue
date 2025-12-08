@@ -28,6 +28,7 @@
         @filter="handleFilter"
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
+        
       >
         </AdvancedTable>
     </div>

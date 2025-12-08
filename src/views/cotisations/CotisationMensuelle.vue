@@ -30,7 +30,7 @@
             <label class="form-label fw-semibold">Matricule</label>
             <input
               v-model="filters.matricule"
-              @input="getCotisationsMensuelles"
+              @input="seachOnMatricule"
               type="text"
               class="form-control"
               placeholder="Rechercher par matricule"
@@ -40,7 +40,7 @@
             <label class="form-label fw-semibold">Nom</label>
             <input
               v-model="filters.name"
-              @input="getCotisationsMensuelles"
+              @change="getCotisationsMensuelles"
               type="text"
               class="form-control"
               placeholder="Rechercher par nom"
@@ -235,6 +235,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
+const loadingData = ref(false);
 const store = useStore();
 
 const filters = ref({
@@ -260,6 +261,8 @@ onMounted(() => {
 });
 
 async function getCotisationsMensuelles(url = "/cotisation-mensuelles") {
+  loadingData.value = true;
+
   try {
     const params = {
       matricule: filters.value.matricule || undefined,
@@ -270,9 +273,15 @@ async function getCotisationsMensuelles(url = "/cotisation-mensuelles") {
     const response = await api.get(url, { params });
     // keep compatibility with axios-style response
     store.state.cotisationsMensuelles = response.data || response;
+    loadingData.value = false;
   } catch (error) {
     console.error("Erreur lors du chargement des cotisations :", error);
+    loadingData.value = false;
   }
+}
+
+function seachOnMatricule() {
+  getCotisationsMensuelles();
 }
 
 function changePage(url) {

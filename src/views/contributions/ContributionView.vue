@@ -69,7 +69,13 @@ const columns = [
     label: "Montant",
     sortable: true,
     filterable: true,
-    formatter: (value) => formatMontant(value),
+    // formatter: (value) => formatMontant(value),
+  },
+  {
+    key: "devise",
+    label: "Devise",
+    sortable: true,
+    filterable: true,
   },
   {
     key: "mode_paiement",
@@ -92,10 +98,10 @@ const columns = [
   },
 ];
 
-const formatMontant = (montant) => {
+const formatMontant = (montant, devise) => {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
-    currency: "FBU",
+    currency: devise || "XAF",
   }).format(montant);
 };
 
@@ -115,8 +121,8 @@ const ucFirst = (str) => {
 
 const fetchCotisations = async () => {
   loading.value = true;
-  
-  let response = null; 
+
+  let response = null;
 
   try {
     const params = {};
@@ -141,9 +147,9 @@ const fetchCotisations = async () => {
 
     let response = null;
     if (!auth.hasAnyRole("admin")) {
-      response = await api.get("/mescotisations", { params }); 
+      response = await api.get("/mescotisations", { params });
     } else {
-      response = await api.get("/cotisations", { params }); 
+      response = await api.get("/cotisations", { params });
     }
 
     if (response && response.data) {
