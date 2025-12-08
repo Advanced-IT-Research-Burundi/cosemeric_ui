@@ -18,7 +18,7 @@
             <div class="user-meta">
               <span class="badge" :class="getBadgeClass">
                 <i class="bi bi-circle-fill"></i>
-                {{ userData.statut || 'Actif' }}
+                {{ userData.statut || "Actif" }}
               </span>
               <span class="role-badge">
                 <i class="bi bi-shield"></i>
@@ -55,7 +55,9 @@
               </div>
               <div class="stat-info">
                 <span class="stat-label">Matricule</span>
-                <span class="stat-value">{{ userData.membre?.matricule || 'N/A' }}</span>
+                <span class="stat-value">{{
+                  userData.membre?.matricule || "N/A"
+                }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -97,21 +99,21 @@
       <div class="profile-content">
         <!-- Tabs Navigation -->
         <div class="modern-tabs">
-          <button 
+          <button
             :class="['modern-tab', { active: activeTab === 'view' }]"
             @click="activeTab = 'view'"
           >
             <i class="bi bi-eye"></i>
             <span>Aperçu</span>
           </button>
-          <button 
+          <button
             :class="['modern-tab', { active: activeTab === 'info' }]"
             @click="activeTab = 'info'"
           >
             <i class="bi bi-pencil-square"></i>
             <span>Modifier</span>
           </button>
-          <button 
+          <button
             :class="['modern-tab', { active: activeTab === 'password' }]"
             @click="activeTab = 'password'"
           >
@@ -152,7 +154,7 @@
                       <i class="bi bi-telephone"></i>
                       Téléphone
                     </label>
-                    <p>{{ userData.telephone || 'Non renseigné' }}</p>
+                    <p>{{ userData.telephone || "Non renseigné" }}</p>
                   </div>
                   <div class="info-item">
                     <label>
@@ -180,28 +182,28 @@
                       <i class="bi bi-house"></i>
                       Adresse complète
                     </label>
-                    <p>{{ userData.adresse || 'Non renseignée' }}</p>
+                    <p>{{ userData.adresse || "Non renseignée" }}</p>
                   </div>
                   <div class="info-item">
                     <label>
                       <i class="bi bi-building"></i>
                       Ville
                     </label>
-                    <p>{{ userData.ville || 'Non renseignée' }}</p>
+                    <p>{{ userData.ville || "Non renseignée" }}</p>
                   </div>
                   <div class="info-item">
                     <label>
                       <i class="bi bi-flag"></i>
                       Pays
                     </label>
-                    <p>{{ userData.pays || 'Non renseigné' }}</p>
+                    <p>{{ userData.pays || "Non renseigné" }}</p>
                   </div>
                   <div class="info-item">
                     <label>
                       <i class="bi bi-mailbox"></i>
                       Code postal
                     </label>
-                    <p>{{ userData.code_postal || 'Non renseigné' }}</p>
+                    <p>{{ userData.code_postal || "Non renseigné" }}</p>
                   </div>
                 </div>
               </div>
@@ -244,7 +246,10 @@
                       Statut membre
                     </label>
                     <p>
-                      <span class="status-badge" :class="userData.membre.statut">
+                      <span
+                        class="status-badge"
+                        :class="userData.membre.statut"
+                      >
                         {{ userData.membre.statut }}
                       </span>
                     </p>
@@ -272,8 +277,8 @@
                       <i class="bi bi-person"></i>
                       Nom <span class="required">*</span>
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.nom"
                       class="modern-input"
                       placeholder="Votre nom"
@@ -286,8 +291,8 @@
                       <i class="bi bi-person"></i>
                       Prénom <span class="required">*</span>
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.prenom"
                       class="modern-input"
                       placeholder="Votre prénom"
@@ -300,8 +305,8 @@
                       <i class="bi bi-envelope"></i>
                       Email <span class="required">*</span>
                     </label>
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       v-model="profileForm.email"
                       class="modern-input"
                       placeholder="votre.email@exemple.com"
@@ -314,8 +319,8 @@
                       <i class="bi bi-telephone"></i>
                       Téléphone <span class="required">*</span>
                     </label>
-                    <input 
-                      type="tel" 
+                    <input
+                      type="tel"
                       v-model="profileForm.telephone"
                       class="modern-input"
                       placeholder="+257 79 XX XX XX"
@@ -340,8 +345,8 @@
                       <i class="bi bi-house"></i>
                       Adresse
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.adresse"
                       class="modern-input"
                       placeholder="Rue, numéro, quartier..."
@@ -353,8 +358,8 @@
                       <i class="bi bi-building"></i>
                       Ville
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.ville"
                       class="modern-input"
                       placeholder="Votre ville"
@@ -366,8 +371,8 @@
                       <i class="bi bi-flag"></i>
                       Pays
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.pays"
                       class="modern-input"
                       placeholder="Votre pays"
@@ -379,8 +384,8 @@
                       <i class="bi bi-mailbox"></i>
                       Code postal
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       v-model="profileForm.code_postal"
                       class="modern-input"
                       placeholder="Code postal"
@@ -389,13 +394,21 @@
                 </div>
               </div>
               <div class="card-footer">
-                <button type="button" class="btn btn-secondary" @click="activeTab = 'view'">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="activeTab = 'view'"
+                >
                   <i class="bi bi-x-circle"></i>
                   Annuler
                 </button>
-                <button type="submit" class="btn btn-primary" :disabled="isLoading">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="isLoading"
+                >
                   <i class="bi bi-check-circle"></i>
-                  {{ isLoading ? 'Enregistrement...' : 'Enregistrer' }}
+                  {{ isLoading ? "Enregistrement..." : "Enregistrer" }}
                 </button>
               </div>
             </div>
@@ -417,7 +430,10 @@
                   <i class="bi bi-info-circle-fill"></i>
                   <div>
                     <strong>Conseil de sécurité :</strong>
-                    <p>Utilisez un mot de passe fort avec au moins 8 caractères, incluant des majuscules, minuscules et chiffres.</p>
+                    <p>
+                      Utilisez un mot de passe fort avec au moins 8 caractères,
+                      incluant des majuscules, minuscules et chiffres.
+                    </p>
                   </div>
                 </div>
 
@@ -428,19 +444,24 @@
                       Mot de passe actuel <span class="required">*</span>
                     </label>
                     <div class="password-field">
-                      <input 
+                      <input
                         :type="showCurrentPassword ? 'text' : 'password'"
                         v-model="passwordForm.current_password"
                         class="modern-input"
                         placeholder="Entrez votre mot de passe actuel"
                         required
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         class="password-toggle"
                         @click="showCurrentPassword = !showCurrentPassword"
                       >
-                        <i class="bi" :class="showCurrentPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        <i
+                          class="bi"
+                          :class="
+                            showCurrentPassword ? 'bi-eye-slash' : 'bi-eye'
+                          "
+                        ></i>
                       </button>
                     </div>
                   </div>
@@ -451,7 +472,7 @@
                       Nouveau mot de passe <span class="required">*</span>
                     </label>
                     <div class="password-field">
-                      <input 
+                      <input
                         :type="showNewPassword ? 'text' : 'password'"
                         v-model="passwordForm.new_password"
                         class="modern-input"
@@ -459,23 +480,32 @@
                         minlength="8"
                         required
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         class="password-toggle"
                         @click="showNewPassword = !showNewPassword"
                       >
-                        <i class="bi" :class="showNewPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        <i
+                          class="bi"
+                          :class="showNewPassword ? 'bi-eye-slash' : 'bi-eye'"
+                        ></i>
                       </button>
                     </div>
-                    <div class="password-strength" v-if="passwordForm.new_password">
+                    <div
+                      class="password-strength"
+                      v-if="passwordForm.new_password"
+                    >
                       <div class="strength-bar">
-                        <div 
-                          class="strength-fill" 
+                        <div
+                          class="strength-fill"
                           :class="passwordStrength.class"
                           :style="{ width: passwordStrength.width }"
                         ></div>
                       </div>
-                      <span class="strength-text" :class="passwordStrength.class">
+                      <span
+                        class="strength-text"
+                        :class="passwordStrength.class"
+                      >
                         {{ passwordStrength.text }}
                       </span>
                     </div>
@@ -487,7 +517,7 @@
                       Confirmer le mot de passe <span class="required">*</span>
                     </label>
                     <div class="password-field">
-                      <input 
+                      <input
                         :type="showConfirmPassword ? 'text' : 'password'"
                         v-model="passwordForm.confirm_password"
                         class="modern-input"
@@ -495,19 +525,30 @@
                         minlength="8"
                         required
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         class="password-toggle"
                         @click="showConfirmPassword = !showConfirmPassword"
                       >
-                        <i class="bi" :class="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        <i
+                          class="bi"
+                          :class="
+                            showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'
+                          "
+                        ></i>
                       </button>
                     </div>
-                    <span v-if="passwordForm.confirm_password && !passwordsMatch" class="error-message">
+                    <span
+                      v-if="passwordForm.confirm_password && !passwordsMatch"
+                      class="error-message"
+                    >
                       <i class="bi bi-x-circle"></i>
                       Les mots de passe ne correspondent pas
                     </span>
-                    <span v-if="passwordForm.confirm_password && passwordsMatch" class="success-message">
+                    <span
+                      v-if="passwordForm.confirm_password && passwordsMatch"
+                      class="success-message"
+                    >
                       <i class="bi bi-check-circle"></i>
                       Les mots de passe correspondent
                     </span>
@@ -515,17 +556,23 @@
                 </div>
               </div>
               <div class="card-footer">
-                <button type="button" class="btn btn-secondary" @click="resetPasswordForm">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="resetPasswordForm"
+                >
                   <i class="bi bi-arrow-clockwise"></i>
                   Réinitialiser
                 </button>
-                <button 
-                  type="submit" 
-                  class="btn btn-primary" 
+                <button
+                  type="submit"
+                  class="btn btn-primary"
                   :disabled="isLoading || !passwordsMatch"
                 >
                   <i class="bi bi-shield-check"></i>
-                  {{ isLoading ? 'Modification...' : 'Changer le mot de passe' }}
+                  {{
+                    isLoading ? "Modification..." : "Changer le mot de passe"
+                  }}
                 </button>
               </div>
             </div>
@@ -536,12 +583,24 @@
 
     <!-- Toast Notification -->
     <Transition name="toast">
-      <div v-if="notification.show" :class="['toast-notification', notification.type]">
+      <div
+        v-if="notification.show"
+        :class="['toast-notification', notification.type]"
+      >
         <div class="toast-icon">
-          <i class="bi" :class="notification.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+          <i
+            class="bi"
+            :class="
+              notification.type === 'success'
+                ? 'bi-check-circle-fill'
+                : 'bi-exclamation-triangle-fill'
+            "
+          ></i>
         </div>
         <div class="toast-content">
-          <strong>{{ notification.type === 'success' ? 'Succès' : 'Erreur' }}</strong>
+          <strong>{{
+            notification.type === "success" ? "Succès" : "Erreur"
+          }}</strong>
           <p>{{ notification.message }}</p>
         </div>
         <button class="toast-close" @click="notification.show = false">
@@ -553,12 +612,12 @@
 </template>
 
 <script setup>
-import { useStore } from 'vuex';
-import api from '../../services/api';
-import { computed, onMounted, ref } from 'vue';
+import { useStore } from "vuex";
+import api from "../../services/api";
+import { computed, onMounted, ref } from "vue";
 
 const store = useStore();
-const activeTab = ref('view');
+const activeTab = ref("view");
 const isLoading = ref(false);
 
 // Password visibility
@@ -569,27 +628,27 @@ const showConfirmPassword = ref(false);
 // Notification
 const notification = ref({
   show: false,
-  type: 'success',
-  message: ''
+  type: "success",
+  message: "",
 });
 
 // Forms
 const profileForm = ref({
-  nom: '',
-  prenom: '',
-  email: '',
-  telephone: '',
-  sexe: '',
-  adresse: '',
-  ville: '',
-  pays: '',
-  code_postal: ''
+  nom: "",
+  prenom: "",
+  email: "",
+  telephone: "",
+  sexe: "",
+  adresse: "",
+  ville: "",
+  pays: "",
+  code_postal: "",
 });
 
 const passwordForm = ref({
-  current_password: '',
-  new_password: '',
-  confirm_password: ''
+  current_password: "",
+  new_password: "",
+  confirm_password: "",
 });
 
 // Computed
@@ -603,52 +662,60 @@ const userData = computed(() => {
 });
 
 const fullName = computed(() => {
-  return `${userData.value.prenom || ''} ${userData.value.nom || ''}`.trim() || 'Utilisateur';
+  return (
+    `${userData.value.prenom || ""} ${userData.value.nom || ""}`.trim() ||
+    "Utilisateur"
+  );
 });
 
 const getInitials = computed(() => {
-  const nom = userData.value.nom || '';
-  const prenom = userData.value.prenom || '';
-  return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase() || 'U';
+  const nom = userData.value.nom || "";
+  const prenom = userData.value.prenom || "";
+  return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase() || "U";
 });
 
 const getBadgeClass = computed(() => {
   const statut = userData.value.statut?.toLowerCase();
-  if (statut === 'actif' || userData.value.is_active) return 'badge-success';
-  if (statut === 'inactif') return 'badge-warning';
-  return 'badge-secondary';
+  if (statut === "actif" || userData.value.is_active) return "badge-success";
+  if (statut === "inactif") return "badge-warning";
+  return "badge-secondary";
 });
 
 const getSexeLabel = computed(() => {
-  if (userData.value.sexe === 'M') return 'Masculin';
-  if (userData.value.sexe === 'F') return 'Féminin';
-  return 'Non renseigné';
+  if (userData.value.sexe === "M") return "Masculin";
+  if (userData.value.sexe === "F") return "Féminin";
+  return "Non renseigné";
 });
 
 const memberSince = computed(() => {
   if (userData.value.membre?.date_adhesion) {
     return formatDate(userData.value.membre.date_adhesion);
   }
-  return 'N/A';
+  return "N/A";
 });
 
 const lastLogin = computed(() => {
   if (userData.value.last_login_at) {
     return formatDateTime(userData.value.last_login_at);
   }
-  return 'Jamais';
+  return "Jamais";
 });
 
 const passwordsMatch = computed(() => {
-  if (!passwordForm.value.new_password || !passwordForm.value.confirm_password) {
+  if (
+    !passwordForm.value.new_password ||
+    !passwordForm.value.confirm_password
+  ) {
     return true;
   }
-  return passwordForm.value.new_password === passwordForm.value.confirm_password;
+  return (
+    passwordForm.value.new_password === passwordForm.value.confirm_password
+  );
 });
 
 const passwordStrength = computed(() => {
   const password = passwordForm.value.new_password;
-  if (!password) return { class: '', width: '0%', text: '' };
+  if (!password) return { class: "", width: "0%", text: "" };
 
   let strength = 0;
   if (password.length >= 8) strength++;
@@ -657,19 +724,19 @@ const passwordStrength = computed(() => {
   if (/\d/.test(password)) strength++;
   if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-  if (strength <= 2) return { class: 'weak', width: '33%', text: 'Faible' };
-  if (strength <= 3) return { class: 'medium', width: '66%', text: 'Moyen' };
-  return { class: 'strong', width: '100%', text: 'Fort' };
+  if (strength <= 2) return { class: "weak", width: "33%", text: "Faible" };
+  if (strength <= 3) return { class: "medium", width: "66%", text: "Moyen" };
+  return { class: "strong", width: "100%", text: "Fort" };
 });
 
 // Methods
 const fetchProfile = async () => {
   try {
-    const response = await api.get('/profiles');
+    const response = await api.get("/profiles");
     store.state.user = response.data;
     populateForm();
   } catch (error) {
-    showNotification('error', 'Erreur lors du chargement du profil');
+    showNotification("error", "Erreur lors du chargement du profil");
     console.error(error);
   }
 };
@@ -677,15 +744,15 @@ const fetchProfile = async () => {
 const populateForm = () => {
   if (userData.value) {
     profileForm.value = {
-      nom: userData.value.nom || '',
-      prenom: userData.value.prenom || '',
-      email: userData.value.email || '',
-      telephone: userData.value.telephone || '',
-      sexe: userData.value.sexe || '',
-      adresse: userData.value.adresse || '',
-      ville: userData.value.ville || '',
-      pays: userData.value.pays || '',
-      code_postal: userData.value.code_postal || ''
+      nom: userData.value.nom || "",
+      prenom: userData.value.prenom || "",
+      email: userData.value.email || "",
+      telephone: userData.value.telephone || "",
+      sexe: userData.value.sexe || "",
+      adresse: userData.value.adresse || "",
+      ville: userData.value.ville || "",
+      pays: userData.value.pays || "",
+      code_postal: userData.value.code_postal || "",
     };
   }
 };
@@ -693,13 +760,14 @@ const populateForm = () => {
 const updateProfile = async () => {
   isLoading.value = true;
   try {
-    const response = await api.put('/profiles', profileForm.value);
+    const response = await api.put("/profiles", profileForm.value);
     store.state.user = [response.data];
-    activeTab.value = 'view';
-    showNotification('success', 'Profil mis à jour avec succès !');
+    activeTab.value = "view";
+    showNotification("success", "Profil mis à jour avec succès !");
   } catch (error) {
-    const message = error.response?.data?.message || 'Erreur lors de la mise à jour';
-    showNotification('error', message);
+    const message =
+      error.response?.data?.message || "Erreur lors de la mise à jour";
+    showNotification("error", message);
     console.error(error);
   } finally {
     isLoading.value = false;
@@ -708,23 +776,25 @@ const updateProfile = async () => {
 
 const changePassword = async () => {
   if (!passwordsMatch.value) {
-    showNotification('error', 'Les mots de passe ne correspondent pas');
+    showNotification("error", "Les mots de passe ne correspondent pas");
     return;
   }
 
   isLoading.value = true;
   try {
-    await api.post('/change-password', {
+    await api.post("/change-password", {
       current_password: passwordForm.value.current_password,
       new_password: passwordForm.value.new_password,
-      new_password_confirmation: passwordForm.value.confirm_password
+      new_password_confirmation: passwordForm.value.confirm_password,
     });
-    
+
     resetPasswordForm();
-    showNotification('success', 'Mot de passe modifié avec succès !');
+    showNotification("success", "Mot de passe modifié avec succès !");
   } catch (error) {
-    const message = error.response?.data?.message || 'Erreur lors du changement de mot de passe';
-    showNotification('error', message);
+    const message =
+      error.response?.data?.message ||
+      "Erreur lors du changement de mot de passe";
+    showNotification("error", message);
     console.error(error);
   } finally {
     isLoading.value = false;
@@ -733,9 +803,9 @@ const changePassword = async () => {
 
 const resetPasswordForm = () => {
   passwordForm.value = {
-    current_password: '',
-    new_password: '',
-    confirm_password: ''
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
   };
   showCurrentPassword.value = false;
   showNewPassword.value = false;
@@ -743,16 +813,16 @@ const resetPasswordForm = () => {
 };
 
 const openAvatarUpload = () => {
-  showNotification('info', 'Fonctionnalité de téléchargement d\'avatar à venir');
+  showNotification("info", "Fonctionnalité de téléchargement d'avatar à venir");
 };
 
 const downloadProfile = () => {
   const data = JSON.stringify(userData.value, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
+  const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
-  a.download = `profile-${userData.value.matricule || 'data'}.json`;
+  a.download = `profile-${userData.value.matricule || "data"}.json`;
   a.click();
   URL.revokeObjectURL(url);
 };
@@ -765,22 +835,22 @@ const showNotification = (type, message) => {
 };
 
 const formatDate = (date) => {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
 };
 
 const formatDateTime = (date) => {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -791,32 +861,32 @@ onMounted(() => {
 
 <style scoped>
 /* Importing Inter font for a modern feel */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
   /* Couleurs basées sur votre design CASOMIREC */
-  --primary-color: #2563EB; /* Bleu principal de votre application */
-  --primary-hover: #1E40AF;
-  --primary-light: #EFF6FF;
-  --primary-dark: #1E3A8A;
-  
-  --secondary-color: #10B981; /* Vert accent */
+  --primary-color: #2563eb; /* Bleu principal de votre application */
+  --primary-hover: #1e40af;
+  --primary-light: #eff6ff;
+  --primary-dark: #1e3a8a;
+
+  --secondary-color: #10b981; /* Vert accent */
   --secondary-hover: #059669;
-  
-  --accent-purple: #8B5CF6;
-  --accent-orange: #F59E0B;
-  
-  --bg-color: #F3F4F6;
+
+  --accent-purple: #8b5cf6;
+  --accent-orange: #f59e0b;
+
+  --bg-color: #f3f4f6;
   --text-primary: #111827;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  
-  --success: #10B981;
-  --error: #EF4444;
-  --warning: #F59E0B;
-  --info: #3B82F6;
-  
-  --border-color: #E5E7EB;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  --border-color: #e5e7eb;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -831,7 +901,7 @@ onMounted(() => {
   min-height: 100vh;
   background-color: var(--bg-color);
   padding-bottom: 3rem;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 /* Hero Section */
@@ -847,17 +917,17 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 100%;
-  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
 .hero-background::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 120px;
-  background: linear-gradient(to top, rgba(255,255,255,0.15), transparent);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.15), transparent);
 }
 
 .hero-content {
@@ -884,7 +954,7 @@ onMounted(() => {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
   border: 6px solid white;
   display: flex;
   align-items: center;
@@ -895,7 +965,7 @@ onMounted(() => {
 .avatar-text {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -935,7 +1005,7 @@ onMounted(() => {
   font-weight: 700;
   color: white;
   margin: 0 0 0.75rem 0;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .user-meta {
@@ -957,13 +1027,13 @@ onMounted(() => {
 
 .badge-success {
   background: rgba(16, 185, 129, 0.25);
-  color: #D1FAE5;
+  color: #d1fae5;
   border: 2px solid rgba(16, 185, 129, 0.4);
 }
 
 .badge-warning {
   background: rgba(245, 158, 11, 0.25);
-  color: #FEF3C7;
+  color: #fef3c7;
   border: 2px solid rgba(245, 158, 11, 0.4);
 }
 
@@ -988,7 +1058,7 @@ onMounted(() => {
 /* Main Content */
 .profile-main {
   max-width: 1400px;
-  margin: -80px auto 0;
+  margin: 40px auto 0;
   padding: 0 2rem;
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -1062,15 +1132,15 @@ onMounted(() => {
 }
 
 .stat-icon.blue {
-  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
 .stat-icon.green {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .stat-icon.purple {
-  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
 .stat-info {
@@ -1171,13 +1241,17 @@ onMounted(() => {
 }
 
 .modern-tab.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -3px;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--primary-hover)
+  );
 }
 
 /* Tab Panel */
@@ -1206,7 +1280,7 @@ onMounted(() => {
 }
 
 .card-header {
-  background: linear-gradient(135deg, var(--bg-color) 0%, #E5E7EB 100%);
+  background: linear-gradient(135deg, var(--bg-color) 0%, #e5e7eb 100%);
   padding: 1.25rem 1.5rem;
   border-bottom: 2px solid var(--border-color);
 }
@@ -1285,13 +1359,13 @@ onMounted(() => {
 }
 
 .status-badge.actif {
-  background: #D1FAE5;
-  color: #065F46;
+  background: #d1fae5;
+  color: #065f46;
 }
 
 .status-badge.inactif {
-  background: #FEF3C7;
-  color: #92400E;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 /* Modern Form */
@@ -1463,7 +1537,7 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   padding: 1.25rem;
-  background: #EFF6FF;
+  background: #eff6ff;
   border-left: 4px solid var(--primary-color);
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -1514,7 +1588,11 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-hover) 100%
+  );
   color: white;
   border: 2px solid transparent;
 }
@@ -1569,12 +1647,12 @@ onMounted(() => {
 }
 
 .toast-notification.success .toast-icon {
-  background: #D1FAE5;
+  background: #d1fae5;
   color: var(--success);
 }
 
 .toast-notification.error .toast-icon {
-  background: #FEE2E2;
+  background: #fee2e2;
   color: var(--error);
 }
 
