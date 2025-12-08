@@ -91,6 +91,13 @@ const routes = [
     meta: { requiresAuth: true },
   },
 
+  {
+path: "/config",
+name : "Confinguration",
+component: () => import("../views/conf/Configuration.vue"),
+meta: { requiresAuth: true},
+  },
+
   // Credits
   {
     path: "/credits",

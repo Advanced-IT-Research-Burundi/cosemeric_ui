@@ -1,14 +1,20 @@
 <template>
   <div class="app-layout">
     <!-- Overlay for mobile sidebar -->
-    <div 
-      class="sidebar-overlay" 
-      :class="{ 'show': !isCollapsed && isMobile }"
+    <div
+      class="sidebar-overlay"
+      :class="{ show: !isCollapsed && isMobile }"
       @click="toggleSidebar"
     ></div>
 
     <!-- Sidebar -->
-    <div class="sidebar" :class="{ collapsed: isCollapsed, 'mobile-open': !isCollapsed && isMobile }">
+    <div
+      class="sidebar"
+      :class="{
+        collapsed: isCollapsed,
+        'mobile-open': !isCollapsed && isMobile,
+      }"
+    >
       <div class="logo-container">
         <div class="logo-wrapper">
           <i class="bi bi-droplet-fill logo-icon"></i>
@@ -18,7 +24,7 @@
 
       <nav class="nav-menu custom-scrollbar">
         <div class="menu-label" v-if="!isCollapsed">MENU PRINCIPAL</div>
-        
+
         <template v-for="(item, index) in menuItems" :key="index">
           <router-link
             :to="item.path"
@@ -29,13 +35,21 @@
           >
             <div
               class="menu-item"
-              :class="{ 'active': isRouteActive(item.path), 'collapsed': isCollapsed }"
+              :class="{
+                active: isRouteActive(item.path),
+                collapsed: isCollapsed,
+              }"
               @click="navigate"
               :title="isCollapsed ? item.title : ''"
             >
               <div class="icon-wrapper" v-html="item.icon"></div>
-              <span v-show="!isCollapsed" class="menu-title">{{ item.title }}</span>
-              <div v-if="isActive && !isCollapsed" class="active-indicator"></div>
+              <span v-show="!isCollapsed" class="menu-title">{{
+                item.title
+              }}</span>
+              <div
+                v-if="isActive && !isCollapsed"
+                class="active-indicator"
+              ></div>
             </div>
           </router-link>
         </template>
@@ -55,9 +69,12 @@
       <header class="app-header">
         <div class="header-left">
           <button @click="toggleSidebar" class="btn-toggle">
-            <i class="bi" :class="isCollapsed ? 'bi-list' : 'bi-text-indent-right'"></i>
+            <i
+              class="bi"
+              :class="isCollapsed ? 'bi-list' : 'bi-text-indent-right'"
+            ></i>
           </button>
-          
+
           <div class="current-page-title d-none d-md-block">
             <i class="bi bi-circle-fill pulse-dot"></i>
             {{ currentRouteName }}
@@ -66,12 +83,9 @@
 
         <div class="header-right">
           <!-- Notification Icon -->
-          <div 
-            class="header-action-item" 
-            ref="notificationRef"
-          >
-            <button 
-              class="btn-icon notification-btn" 
+          <div class="header-action-item" ref="notificationRef">
+            <button
+              class="btn-icon notification-btn"
               @click.stop="toggleNotificationDropdown"
               :class="{ active: showNotificationDropdown }"
             >
@@ -83,39 +97,52 @@
 
             <!-- Notification Dropdown -->
             <transition name="fade-slide">
-              <div class="dropdown-menu-custom notification-menu" v-if="showNotificationDropdown" @click.stop>
+              <div
+                class="dropdown-menu-custom notification-menu"
+                v-if="showNotificationDropdown"
+                @click.stop
+              >
                 <div class="dropdown-header">
                   <div class="header-title">
                     <i class="bi bi-bell-fill"></i>
                     <h3>Notifications</h3>
                   </div>
-                  <button 
+                  <button
                     v-if="notificationCount > 0"
-                    class="btn-text" 
+                    class="btn-text"
                     @click="markAllAsRead"
                   >
                     <i class="bi bi-check-all"></i>
                     Tout marquer
                   </button>
                 </div>
-                
+
                 <div class="notification-list custom-scrollbar">
-                  <div 
-                    v-for="notification in notifications" 
+                  <div
+                    v-for="notification in notifications"
                     :key="notification.id"
                     class="notification-item"
                     :class="{ unread: !notification.read }"
                     @click="handleNotificationClick(notification)"
                   >
-                    <div class="notification-icon-wrapper" :class="notification.type">
+                    <div
+                      class="notification-icon-wrapper"
+                      :class="notification.type"
+                    >
                       <i :class="getNotificationIcon(notification.type)"></i>
                     </div>
                     <div class="notification-content">
                       <div class="notification-top">
-                        <span class="notification-title">{{ notification.title }}</span>
-                        <span class="notification-time">{{ notification.time }}</span>
+                        <span class="notification-title">{{
+                          notification.title
+                        }}</span>
+                        <span class="notification-time">{{
+                          notification.time
+                        }}</span>
                       </div>
-                      <p class="notification-message">{{ notification.message }}</p>
+                      <p class="notification-message">
+                        {{ notification.message }}
+                      </p>
                     </div>
                     <div class="unread-dot" v-if="!notification.read"></div>
                   </div>
@@ -129,7 +156,11 @@
                 </div>
 
                 <div class="dropdown-footer">
-                  <router-link to="/notifications" class="view-all-link" @click="showNotificationDropdown = false">
+                  <router-link
+                    to="/notifications"
+                    class="view-all-link"
+                    @click="showNotificationDropdown = false"
+                  >
                     Voir toutes les notifications
                     <i class="bi bi-arrow-right"></i>
                   </router-link>
@@ -140,18 +171,18 @@
 
           <div class="divider-vertical"></div>
           <div>
-            <button @click="refreshPage" class="header-action-item btn btn-outline-secondary">
+            <button
+              @click="refreshPage"
+              class="header-action-item btn btn-outline-secondary"
+            >
               <i class="bi bi-repeat"></i>
             </button>
           </div>
           <div class="divider-vertical"></div>
 
           <!-- User Profile -->
-          <div
-            class="header-action-item"
-            ref="profileRef"
-          >
-            <div 
+          <div class="header-action-item" ref="profileRef">
+            <div
               class="user-profile-trigger"
               @click.stop="toggleUserDropdown"
               :class="{ active: showUserDropdown }"
@@ -167,7 +198,11 @@
             </div>
 
             <transition name="fade-slide">
-              <div class="dropdown-menu-custom user-menu" v-if="showUserDropdown" @click.stop>
+              <div
+                class="dropdown-menu-custom user-menu"
+                v-if="showUserDropdown"
+                @click.stop
+              >
                 <div class="user-menu-header">
                   <div class="user-avatar large">
                     <span>{{ userInitials }}</span>
@@ -177,12 +212,13 @@
                     <span class="email text-muted small">{{ userEmail }}</span>
                   </div>
                 </div>
-                
+
                 <div class="user-menu-items">
                   <div class="menu-item" @click="navigateToProfile">
                     <i class="bi bi-person-circle"></i>
                     <span>Mon Profil</span>
                   </div>
+
                   <div
                     class="menu-item"
                     @click="navigateToUserManagement"
@@ -190,6 +226,10 @@
                   >
                     <i class="bi bi-people-fill"></i>
                     <span>Gestion des Utilisateurs</span>
+                  </div>
+                  <div class="menu-item" @click="navigateToConfig">
+                    <i class="bi bi-gear"></i>
+                    <span>Configuration</span>
                   </div>
                   <div class="menu-divider"></div>
                   <div class="menu-item danger" @click="handleLogout">
@@ -260,13 +300,13 @@ const initSidebarState = () => {
 };
 
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
   initSidebarState();
   document.addEventListener("click", onClickOutside);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener("resize", handleResize);
   document.removeEventListener("click", onClickOutside);
 });
 
@@ -286,32 +326,32 @@ const isRouteActive = (path) => {
 const notifications = ref([
   {
     id: 1,
-    type: 'credit',
-    title: 'Crédit Approuvé',
-    message: 'Votre demande de 500k BIF a été validée.',
-    time: '2h',
-    read: false
+    type: "credit",
+    title: "Crédit Approuvé",
+    message: "Votre demande de 500k BIF a été validée.",
+    time: "2h",
+    read: false,
   },
   {
     id: 2,
-    type: 'contribution',
-    title: 'Cotisation Reçue',
-    message: 'Votre paiement de 50k BIF est confirmé.',
-    time: '5h',
-    read: false
+    type: "contribution",
+    title: "Cotisation Reçue",
+    message: "Votre paiement de 50k BIF est confirmé.",
+    time: "5h",
+    read: false,
   },
   {
     id: 3,
-    type: 'info',
-    title: 'Rappel Réunion',
-    message: 'Assemblée générale le 15 Décembre.',
-    time: '1j',
-    read: true
-  }
+    type: "info",
+    title: "Rappel Réunion",
+    message: "Assemblée générale le 15 Décembre.",
+    time: "1j",
+    read: true,
+  },
 ]);
 
 const notificationCount = computed(() => {
-  return notifications.value.filter(n => !n.read).length;
+  return notifications.value.filter((n) => !n.read).length;
 });
 
 const menuItems = ref([
@@ -445,7 +485,7 @@ const userRole = computed(() => {
 
 // Methods
 const capitalizeFirstLetter = (string) => {
-  if (!string) return '';
+  if (!string) return "";
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -465,11 +505,11 @@ const toggleNotificationDropdown = () => {
 
 const getNotificationIcon = (type) => {
   const icons = {
-    credit: 'bi bi-credit-card-fill',
-    contribution: 'bi bi-wallet2',
-    info: 'bi bi-info-circle-fill',
+    credit: "bi bi-credit-card-fill",
+    contribution: "bi bi-wallet2",
+    info: "bi bi-info-circle-fill",
   };
-  return icons[type] || 'bi bi-bell-fill';
+  return icons[type] || "bi bi-bell-fill";
 };
 
 const handleNotificationClick = (notification) => {
@@ -477,7 +517,7 @@ const handleNotificationClick = (notification) => {
 };
 
 const markAllAsRead = () => {
-  notifications.value.forEach(n => n.read = true);
+  notifications.value.forEach((n) => (n.read = true));
 };
 
 const navigateToProfile = () => {
@@ -487,6 +527,11 @@ const navigateToProfile = () => {
 
 const navigateToUserManagement = () => {
   router.push("/users");
+  showUserDropdown.value = false;
+};
+
+const navigateToConfig = () => {
+  router.push("/config");
   showUserDropdown.value = false;
 };
 
@@ -507,9 +552,15 @@ const onClickOutside = (event) => {
     showNotificationDropdown.value = false;
   }
   // Close sidebar on mobile when clicking outside
-  const sidebar = document.querySelector('.sidebar');
-  const toggleBtn = document.querySelector('.btn-toggle');
-  if (isMobile.value && !isCollapsed.value && sidebar && !sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+  const sidebar = document.querySelector(".sidebar");
+  const toggleBtn = document.querySelector(".btn-toggle");
+  if (
+    isMobile.value &&
+    !isCollapsed.value &&
+    sidebar &&
+    !sidebar.contains(event.target) &&
+    !toggleBtn.contains(event.target)
+  ) {
     isCollapsed.value = true;
   }
 };
@@ -517,38 +568,38 @@ const onClickOutside = (event) => {
 
 <style scoped>
 /* Importing Inter font for a modern feel */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
   /* Couleurs harmonieuses basées sur CASOMIREC */
-  --primary-color: #2563EB;
-  --primary-hover: #1E40AF;
-  --primary-light: #EFF6FF;
-  --primary-dark: #1E3A8A;
-  
-  --secondary-color: #10B981;
+  --primary-color: #2563eb;
+  --primary-hover: #1e40af;
+  --primary-light: #eff6ff;
+  --primary-dark: #1e3a8a;
+
+  --secondary-color: #10b981;
   --secondary-hover: #059669;
-  
-  --accent-purple: #8B5CF6;
-  --accent-orange: #F59E0B;
-  
-  --bg-color: #F3F4F6;
+
+  --accent-purple: #8b5cf6;
+  --accent-orange: #f59e0b;
+
+  --bg-color: #f3f4f6;
   --text-primary: #111827;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  
-  --success: #10B981;
-  --error: #EF4444;
-  --warning: #F59E0B;
-  --info: #3B82F6;
-  
-  --border-color: #E5E7EB;
-  
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  --border-color: #e5e7eb;
+
   --header-height: 70px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 80px;
   --transition-speed: 0.3s;
-  
+
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -562,7 +613,7 @@ const onClickOutside = (event) => {
 .app-layout {
   display: flex;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
 }
@@ -570,7 +621,7 @@ const onClickOutside = (event) => {
 /* Sidebar Styling */
 .sidebar {
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%);
+  background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
   color: white;
   display: flex;
   flex-direction: column;
@@ -606,7 +657,7 @@ const onClickOutside = (event) => {
 .logo-icon {
   font-size: 28px;
   color: white;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 
 .logo-text {
@@ -615,7 +666,7 @@ const onClickOutside = (event) => {
   margin: 0;
   color: white;
   letter-spacing: 0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .nav-menu {
@@ -654,7 +705,7 @@ const onClickOutside = (event) => {
 }
 
 .menu-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -825,7 +876,8 @@ const onClickOutside = (event) => {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -883,7 +935,7 @@ const onClickOutside = (event) => {
   position: absolute;
   top: -2px;
   right: -2px;
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
   font-size: 10px;
   font-weight: 700;
@@ -900,7 +952,8 @@ const onClickOutside = (event) => {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -915,7 +968,8 @@ const onClickOutside = (event) => {
   right: 0;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-color);
   z-index: 100;
   overflow: hidden;
@@ -932,7 +986,7 @@ const onClickOutside = (event) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--bg-color) 0%, #E5E7EB 100%);
+  background: linear-gradient(135deg, var(--bg-color) 0%, #e5e7eb 100%);
 }
 
 .header-title {
@@ -996,11 +1050,11 @@ const onClickOutside = (event) => {
 }
 
 .notification-item.unread {
-  background-color: #F0F9FF;
+  background-color: #f0f9ff;
 }
 
 .notification-item.unread:hover {
-  background-color: #DBEAFE;
+  background-color: #dbeafe;
 }
 
 .notification-icon-wrapper {
@@ -1016,19 +1070,19 @@ const onClickOutside = (event) => {
   font-size: 18px;
 }
 
-.notification-icon-wrapper.credit { 
-  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); 
-  color: #059669; 
+.notification-icon-wrapper.credit {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #059669;
 }
 
-.notification-icon-wrapper.contribution { 
-  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); 
-  color: #2563EB; 
+.notification-icon-wrapper.contribution {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #2563eb;
 }
 
-.notification-icon-wrapper.info { 
-  background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%); 
-  color: #6366F1; 
+.notification-icon-wrapper.info {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #6366f1;
 }
 
 .notification-content {
@@ -1140,7 +1194,7 @@ const onClickOutside = (event) => {
 .user-avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1173,7 +1227,7 @@ const onClickOutside = (event) => {
 
 .user-menu-header {
   padding: 24px 20px;
-  background: linear-gradient(135deg, var(--primary-light) 0%, #DBEAFE 100%);
+  background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -1236,8 +1290,8 @@ const onClickOutside = (event) => {
 }
 
 .menu-item.danger:hover {
-  background-color: #FEF2F2;
-  color: #DC2626;
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
 .menu-divider {
@@ -1317,7 +1371,8 @@ const onClickOutside = (event) => {
     transform: translateX(0);
   }
 
-  .main-wrapper, .main-wrapper.collapsed {
+  .main-wrapper,
+  .main-wrapper.collapsed {
     margin-left: 0;
   }
 

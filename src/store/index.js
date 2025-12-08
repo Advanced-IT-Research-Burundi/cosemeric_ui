@@ -16,6 +16,7 @@ const vuexStore = createStore({
         remboursements: [],
         periodes: [],
         dashboard: [],
+        configurations: [],
       },
       isLoading: false,
       error: null,

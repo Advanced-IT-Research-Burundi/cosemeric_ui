@@ -12,7 +12,9 @@
         <!-- Date Search Filter -->
         <div class="row mb-3">
           <div class="col-md-4">
-            <label for="dateSearch" class="form-label">Rechercher par date</label>
+            <label for="dateSearch" class="form-label"
+              >Rechercher par date</label
+            >
             <input
               type="date"
               id="dateSearch"
@@ -43,15 +45,15 @@
               {{ getStatusLabel(value) }}
             </span>
           </template>
-          
+
           <template #actions="{ item }">
-             <button
-                class="btn btn-outline-secondary btn-sm"
-                @click="handleShow(item)"
-                title="Voir détails"
-              >
-                <i class="fas fa-eye"></i>
-              </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              @click="handleShow(item)"
+              title="Voir détails"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
           </template>
         </AdvancedTable>
       </div>
@@ -138,7 +140,7 @@ const fetchCredits = async () => {
       date: queryParams.value.date,
     };
 
-    const response = await api.get("/mescredits", { params });
+    const response = await api.get("/mescredits");
     store.state.mescredits = response.data;
   } catch (error) {
     console.error("Error fetching credits:", error);
@@ -149,23 +151,35 @@ const fetchCredits = async () => {
 
 const getClassByStatut = (statut) => {
   switch (statut) {
-    case "rejete": return "bg-danger";
-    case "en_attente": return "bg-warning";
-    case "en_cours": return "bg-info";
-    case "approuve": return "bg-success";
-    case "termine": return "bg-secondary";
-    default: return "bg-secondary";
+    case "rejete":
+      return "bg-danger";
+    case "en_attente":
+      return "bg-warning";
+    case "en_cours":
+      return "bg-info";
+    case "approuve":
+      return "bg-success";
+    case "termine":
+      return "bg-secondary";
+    default:
+      return "bg-secondary";
   }
 };
 
 const getStatusLabel = (statut) => {
   switch (statut) {
-    case "rejete": return "Rejeté";
-    case "en_attente": return "En attente";
-    case "en_cours": return "En cours";
-    case "approuve": return "Approuvé";
-    case "termine": return "Terminé";
-    default: return statut;
+    case "rejete":
+      return "Rejeté";
+    case "en_attente":
+      return "En attente";
+    case "en_cours":
+      return "En cours";
+    case "approuve":
+      return "Approuvé";
+    case "termine":
+      return "Terminé";
+    default:
+      return statut;
   }
 };
 
@@ -200,8 +214,8 @@ const handlePerPageChange = (perPage) => {
 };
 
 const handleShow = (item) => {
-  // Assuming there is a generic view or we can reuse ViewCredit if applicable, 
-  // or just show a modal. For now, let's navigate to a detail page if it exists, 
+  // Assuming there is a generic view or we can reuse ViewCredit if applicable,
+  // or just show a modal. For now, let's navigate to a detail page if it exists,
   // or just log it. The user didn't specify a detail view for member credits specifically,
   // but we can reuse the admin one if accessible or create a new one.
   // For now, let's assume we can use the same route or a similar one.
