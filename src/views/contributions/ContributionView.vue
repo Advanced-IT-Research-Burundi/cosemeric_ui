@@ -63,7 +63,7 @@ const queryParams = ref({
 
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
+  { key: "membre.nom", label: "Membre" },
   {
     key: "montant",
     label: "Montant",
@@ -208,6 +208,7 @@ const handlePerPageChange = (perPage) => {
 };
 
 const handleEdit = (cotisation) => {
+  console.log("Cotisation : ", cotisation);
   router.push({ name: "contributionsEdit", params: { id: cotisation.id } });
 };
 

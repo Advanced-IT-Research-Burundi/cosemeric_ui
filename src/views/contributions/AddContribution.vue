@@ -44,9 +44,10 @@
                 @click="selectMember(member)"
               >
                 <span>
-                  Nom : **{{ member.full_name }}** | Matricule :
-                  {{ member.matricule }} | Téléphone : {{ member.telephone }} |
-                  Catégorie : {{ member.categorie }}
+                  Nom :<strong>{{ member.full_name }}</strong> | Matricule :
+                  <strong>{{ member.matricule }}</strong> | Téléphone :
+                  <strong>{{ member.telephone }}</strong> | Catégorie :
+                  <strong> {{ member.categorie.nom }}</strong>
                 </span>
                 <i
                   v-if="formData.membre_id === member.id"
@@ -142,16 +143,18 @@
                   type="number"
                   class="form-control"
                   id="montant"
-                  v-model.number="formData.montant"
                   min="0"
                   step="0.01"
                   required
+                  v-model="formData.montant"
+                  disabled
                 />
                 <select
                   class="form-select"
                   style="max-width: 100px"
                   v-model="formData.devise"
                   required
+                  disabled
                 >
                   <option value="FBU">FBU</option>
                   <option value="USD">USD</option>
@@ -300,11 +303,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
+import { useStore } from "vuex";
 
+const store = useStore();
 const router = useRouter();
 const toast = useToast();
 
@@ -314,10 +319,12 @@ const loadingPeriodes = ref(true);
 
 const allMembers = ref([]);
 const filteredMembers = ref([]);
+
 const periodes = ref([]);
 
 const searchTimeout = ref(null);
 const searchMember = ref("");
+const searchedMemberData = computed(() => store.state.searchedMember);
 
 const formData = ref({
   membre: null,
@@ -330,6 +337,7 @@ const formData = ref({
   reference_paiement: "",
   statut: "en_attente",
   notes: "",
+  categorie: [],
 });
 
 const currentStep = ref(1);
@@ -429,15 +437,44 @@ const selectMember = (member) => {
   formData.value.membre = member;
   formData.value.membre_id = member.id;
 
+  // Save in Vuex store
+  store.commit("SET_SEARCHED_MEMBER", member);
+
+  // Automatically fill montant + devise
+  formData.value.montant = member.categorie?.montant_cotisation || 0;
+  formData.value.devise = member.categorie?.devise || "FBU";
+
+  // Clear list and move forward
   filteredMembers.value = [];
   searchMember.value = member.full_name;
 
   currentStep.value = 2;
+
+  // Fetch the periodes immediately after selecting a member
+  fetchPeriodes();
 };
 
 const fetchPeriodes = async () => {
+  loadingPeriodes.value = true;
+
   try {
-    const response = await api.get("/periodes");
+    let params = {};
+
+    const member = searchedMemberData.value; // <--- THE CORRECT ONE
+
+    if (member?.categorie?.nom) {
+      const cat = member.categorie.nom;
+
+      console.log(cat);
+
+      if (cat === "service_externe_5" || cat === "service_externe_10") {
+        params.type_membre = "semestriel";
+      } else {
+        params.type_membre = "mensuel";
+      }
+    }
+
+    const response = await api.get("/periodes", { params });
     periodes.value = response.data.data || response.data || [];
   } catch (err) {
     console.error("Error fetching periods:", err);

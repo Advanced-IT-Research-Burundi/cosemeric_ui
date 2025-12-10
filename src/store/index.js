@@ -17,6 +17,7 @@ const vuexStore = createStore({
         periodes: [],
         dashboard: [],
         configurations: [],
+        searchedMember:[],
       },
       isLoading: false,
       error: null,
@@ -27,7 +28,10 @@ const vuexStore = createStore({
   mutations: {
     SET_LOADING(state, value) {
       state.isLoading = value;
-    }
+    },SET_SEARCHED_MEMBER(state, member) {
+    state.searchedMember = member;
+  }
+
   },
   actions: {
     setLoading({ commit }, value) {

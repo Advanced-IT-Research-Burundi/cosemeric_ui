@@ -18,7 +18,7 @@
         :loading="loading"
         search-placeholder="Rechercher des périodes..."
         no-data-message="Aucune période trouvée"
-        :show-filters="true"
+        :show-filters="false"
         :has-actions="true"
         row-key="id"
         @edit="openEdit"
@@ -200,27 +200,6 @@ const queryParams = ref({
   filters: {},
 });
 
-const columns = [
-  { key: "id", label: "id" },
-  { key: "type", label: "Type", sortable: true, filterable: true },
-  { key: "mois", label: "Mois", sortable: true },
-  { key: "semestre", label: "Semestre", sortable: true },
-  { key: "annee", label: "Année", sortable: true, filterable: true },
-  { key: "statut", label: "Statut", sortable: true, filterable: true },
-  {
-    key: "date_debut",
-    label: "Début",
-    sortable: true,
-    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
-  },
-  {
-    key: "date_fin",
-    label: "Fin",
-    sortable: true,
-    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
-  },
-];
-
 const months = [
   "Janvier",
   "Février",
@@ -235,6 +214,38 @@ const months = [
   "Novembre",
   "Décembre",
 ];
+
+const columns = [
+  { key: "id", label: "id" },
+  {
+    key: "mois",
+    label: "Mois",
+    sortable: true,
+    formatter: (v) => {
+      if (typeof v !== "number") return "";
+      return months[v - 1] ?? "don't know"; // <-- fixed
+    },
+  },
+
+  { key: "semestre", label: "Semestre", sortable: true },
+  { key: "annee", label: "Année", sortable: true, filterable: true },
+  { key: "statut", label: "Statut", sortable: true, filterable: true },
+  { key: "type", label: "Type", sortable: true, filterable: true },
+
+  {
+    key: "date_debut",
+    label: "Début",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
+  {
+    key: "date_fin",
+    label: "Fin",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
+];
+
 const monthLabel = (n) => (n && n >= 1 && n <= 12 ? months[n - 1] : "");
 const semesterLabel = (s) =>
   s === 1 ? "1er semestre" : s === 2 ? "2ème semestre" : "";

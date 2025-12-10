@@ -118,12 +118,7 @@ meta: { requiresAuth: true},
         name: "creditsDemande",
         component: () => import("../views/credits/DemandeCredit.vue"),
       },
-      
-      {
-        path: "Admin-demande",
-        name: "creditsDemandeAdmin",
-        component: () => import("../views/credits/AdminDemandeCredit.vue"),
-      },
+    
       {
         path: "add",
         name: "creditsAdd",
@@ -233,7 +228,7 @@ meta: { requiresAuth: true},
         component: () => import("../views/contributions/AddContribution.vue"),
       },
       {
-        path: "/contributions/:id",
+        path: ":id",
         name: "viewContribution",
         component: () => import("../views/contributions/ViewContribution.vue"),
       },
