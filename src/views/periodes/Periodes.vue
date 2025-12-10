@@ -28,9 +28,8 @@
         @filter="handleFilter"
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
-        
       >
-        </AdvancedTable>
+      </AdvancedTable>
     </div>
 
     <div
@@ -202,6 +201,7 @@ const queryParams = ref({
 });
 
 const columns = [
+  { key: "id", label: "id" },
   { key: "type", label: "Type", sortable: true, filterable: true },
   { key: "mois", label: "Mois", sortable: true },
   { key: "semestre", label: "Semestre", sortable: true },
@@ -242,12 +242,12 @@ const semesterLabel = (s) =>
 const form = ref({
   id: null,
   type: "mensuel",
-  mois: 1, 
-  semestre: 1, 
-  annee: new Date().getFullYear(), 
-  statut: "ouvert", 
-  date_debut: "", 
-  date_fin: "", 
+  mois: 1,
+  semestre: 1,
+  annee: new Date().getFullYear(),
+  statut: "ouvert",
+  date_debut: "",
+  date_fin: "",
 });
 const showModal = ref(false);
 const isEdit = ref(false);
@@ -332,7 +332,8 @@ const save = async () => {
     console.log(form.value);
     const payload = { ...form.value };
 
-    
+    alert(payload.value);
+
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }
@@ -351,10 +352,9 @@ const save = async () => {
     showModal.value = false;
   } catch (e) {
     console.error("Error saving periode:", e);
-    
+
     const apiErrors = e?.response?.data?.errors;
     if (apiErrors) {
-      
       let errorMessages = e.response.data.message + "<br>";
       for (const key in apiErrors) {
         errorMessages += `**${key}**: ${apiErrors[key].join(", ")}<br>`;

@@ -374,7 +374,6 @@
                     class="form-select"
                     v-model="formData.categorie_id"
                     required
-                    :disabled="!isAdmin"
                   >
                     <option value="" disabled>Sélectionner...</option>
                     <option

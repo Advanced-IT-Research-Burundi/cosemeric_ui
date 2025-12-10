@@ -26,7 +26,7 @@
             <thead class="table-light">
               <tr>
                 <th>#</th>
-                <th>Description</th>
+                <th>nom</th>
                 <th>Valeur</th>
                 <!-- <th>Label</th> -->
                 <!-- <th>Extra1</th>
@@ -37,8 +37,8 @@
             <tbody>
               <tr v-for="(c, i) in configs" :key="c.id || c.key || i">
                 <td>{{ i + 1 }}</td>
-                <td>{{ c.description }}</td>
-                <td>{{ c.valeur }}</td>
+                <td>{{ c.nom }}</td>
+                <td>{{ c.montant_standard }}</td>
                 <!-- <td>{{ c.label }}</td> -->
                 <!-- <td>{{ c.extra1 ?? "" }}</td>
                 <td>{{ c.extra2 ?? "" }}</td> -->
@@ -110,18 +110,14 @@
               </div> -->
 
               <div class="mb-3">
-                <label class="form-label">Description</label>
-                <input
-                  v-model="editing.description"
-                  type="text"
-                  class="form-control"
-                />
+                <label class="form-label">nom</label>
+                <input v-model="editing.nom" type="text" class="form-control" />
               </div>
 
               <div class="mb-3">
                 <label class="form-label">Valeur</label>
                 <input
-                  v-model="editing.valeur"
+                  v-model="editing.montant_standard"
                   type="number"
                   class="form-control"
                 />
@@ -200,9 +196,9 @@ onMounted(() => {
 async function fetchConfigs() {
   error.value = "";
   try {
-    const res = await api.get("/configurations");
+    const res = await api.get("/type-assistances");
     // normalize possible shapes: res.data.data (paginated) or res.data
-    store.state.configurations = res.data.data ?? null;
+    store.state.configurations = res.data ?? null;
     configs.value = store.state.configurations;
     console.log("Fetched configs", configs.value);
   } catch (err) {
@@ -244,18 +240,19 @@ async function saveConfig() {
   modalError.value = "";
   try {
     const payload = {
-      valeur: editing.value.valeur === "" ? null : editing.value.valeur,
-      description: editing.value.description || null,
+      montant_standard: editing.value.montant_standard || null,
+      nom: editing.value.nom || null,
       //   extra1: editing.value.extra1 || null,
       //   extra2: editing.value.extra2 || null,
     };
 
     if (editing.value.id) {
       // update
-      await api.put(`/configurations/${editing.value.id}`, payload);
+      await api.put(`/type-assistances/${editing.value.id}`, payload);
     } else {
       // create
-      await api.post("/configurations", payload);
+      console.log(payload);
+      await api.post("/type-assistances", payload);
     }
 
     await fetchConfigs();
@@ -270,7 +267,7 @@ async function saveConfig() {
 async function removeConfig(cfg) {
   if (!confirm(`Confirmer la suppression de "${cfg.key}" ?`)) return;
   try {
-    if (cfg.id) await api.delete(`/configurations/${cfg.id}`);
+    if (cfg.id) await api.delete(`/type-assistances/${cfg.id}`);
     // optimistic remove locally
     configs.value = configs.value.filter(
       (c) => c.id !== cfg.id && c.key !== cfg.key

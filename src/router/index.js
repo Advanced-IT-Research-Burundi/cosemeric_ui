@@ -118,6 +118,12 @@ meta: { requiresAuth: true},
         name: "creditsDemande",
         component: () => import("../views/credits/DemandeCredit.vue"),
       },
+      
+      {
+        path: "Admin-demande",
+        name: "creditsDemandeAdmin",
+        component: () => import("../views/credits/AdminDemandeCredit.vue"),
+      },
       {
         path: "add",
         name: "creditsAdd",

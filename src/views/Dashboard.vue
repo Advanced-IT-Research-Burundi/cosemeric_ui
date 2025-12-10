@@ -35,7 +35,7 @@
               <div class="stat-value text-info">
                 {{ formatMontant(stats.cotisationsCumulatif) }}
               </div>
-              <div class="stat-label">Cotisations cumulées</div>
+              <div class="stat-label">Caisse principale</div>
               <div class="stat-change text-muted">Total depuis début</div>
             </div>
           </div>
@@ -452,12 +452,12 @@ const initChartsWithData = (chartsData) => {
 onMounted(async () => {
   try {
     const response = await api.get("/dashboard");
-    
+
     // Modification: Utilisation directe de response.data si c'est déjà l'objet, ou response tout court selon l'intercepteur axios
     // En supposant que l'API renvoie l'objet JSON tel quel
     const data = response.data || response;
 
-    store.commit('SET_DASHBOARD_DATA', data);
+    store.commit("SET_DASHBOARD_DATA", data);
 
     // Vérifier que la réponse est valide
     if (data.success && data.stats && data.charts) {
