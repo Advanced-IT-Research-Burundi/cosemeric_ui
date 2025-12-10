@@ -75,10 +75,10 @@
             ></i>
           </button>
 
-          <div class="current-page-title d-none d-md-block">
+          <!-- <div class="current-page-title d-none d-md-block">
             <i class="bi bi-circle-fill pulse-dot"></i>
             {{ currentRouteName }}
-          </div>
+          </div> -->
         </div>
 
         <div class="header-right">
