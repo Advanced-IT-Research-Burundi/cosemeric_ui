@@ -317,7 +317,7 @@
                     class="form-control"
                     v-model="formData.nom"
                     required
-                    :disabled="!isAdmin"
+                    :disabled="isEditing && !isAdmin"
                   />
                 </div>
                 <div class="col-md-6">
@@ -327,7 +327,7 @@
                     class="form-control"
                     v-model="formData.prenom"
                     required
-                    :disabled="!isAdmin"
+                    :disabled="isEditing && !isAdmin"
                   />
                 </div>
                 <div class="col-md-6">
@@ -337,7 +337,7 @@
                     class="form-control"
                     v-model="formData.email"
                     required
-                    :disabled="!isAdmin"
+                    :disabled="isEditing && !isAdmin"
                   />
                 </div>
                 <div class="col-md-6">
@@ -347,7 +347,7 @@
                     class="form-control"
                     v-model="formData.telephone"
                     required
-                    :disabled="!isAdmin"
+                    :disabled="isEditing && !isAdmin"
                   />
                 </div>
                 <div class="col-md-6">
@@ -365,7 +365,7 @@
                     type="date"
                     class="form-control"
                     v-model="formData.date_adhesion"
-                    :disabled="!isAdmin"
+                    :disabled="isEditing && !isAdmin"
                   />
                 </div>
                 <div class="col-md-6">
