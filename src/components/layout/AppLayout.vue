@@ -6,7 +6,6 @@
       :class="{ show: !isCollapsed && isMobile }"
       @click="toggleSidebar"
     ></div>
-
     <!-- Sidebar -->
     <div
       class="sidebar"
@@ -263,6 +262,8 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { useStore } from "vuex";
 import useAuthGuard from "../../utils/useAuthGuard.js";
+import api from "../../services/api.js";
+import { timeAgo } from "../../utils/useTimeFomat.js";
 
 defineOptions({
   name: "AppLayout",
@@ -303,6 +304,8 @@ onMounted(() => {
   window.addEventListener("resize", handleResize);
   initSidebarState();
   document.addEventListener("click", onClickOutside);
+
+  getNotifications();
 });
 
 onUnmounted(() => {
@@ -322,37 +325,23 @@ const isRouteActive = (path) => {
   return route.path.startsWith(path);
 };
 
-// Notifications (Mock Data)
-const notifications = ref([
-  {
-    id: 1,
-    type: "credit",
-    title: "Crédit Approuvé",
-    message: "Votre demande de 500k BIF a été validée.",
-    time: "2h",
-    read: false,
-  },
-  {
-    id: 2,
-    type: "contribution",
-    title: "Cotisation Reçue",
-    message: "Votre paiement de 50k BIF est confirmé.",
-    time: "5h",
-    read: false,
-  },
-  {
-    id: 3,
-    type: "info",
-    title: "Rappel Réunion",
-    message: "Assemblée générale le 15 Décembre.",
-    time: "1j",
-    read: true,
-  },
-]);
+const getNotifications = async () => {
+  const response = await api.get("notifications");
+  store.state.data.notifications = response.data;
+};
 
-const notificationCount = computed(() => {
-  return notifications.value.filter((n) => !n.read).length;
-});
+
+// Notifications (Mock Data)
+const notifications = computed(() => store.state.data.notifications.map((notification) => ({
+   id: notification.id,
+    type: notification.type,
+    title: notification.title,
+    message: notification.message,
+    time: timeAgo(notification.created_at),
+    read: notification.read,
+})));
+
+const notificationCount = computed(() => notifications.value.length);
 
 const menuItems = ref([
   {
@@ -512,7 +501,10 @@ const getNotificationIcon = (type) => {
   return icons[type] || "bi bi-bell-fill";
 };
 
-const handleNotificationClick = (notification) => {
+const handleNotificationClick = async (notification) => {
+  // send request to chage to read true 
+  const response = await api.put(`notifications/${notification.id}/mark-read`);
+ 
   notification.read = true;
 };
 

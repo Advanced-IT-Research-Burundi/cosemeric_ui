@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
     <app-layout v-if="authStore.isAuthenticated"/>
     <router-view v-else />
     <LoadingComponent v-if="isLoading"/>

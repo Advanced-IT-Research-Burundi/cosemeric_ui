@@ -16,6 +16,7 @@ const vuexStore = createStore({
         remboursements: [],
         periodes: [],
         dashboard: [],
+        notifications: [],
         configurations: [],
         searchedMember:[],
       },
