@@ -98,8 +98,8 @@ const buildFinancialCards = (data) => {
       color: "text-info",
     },
     {
-      title: "Anomalies ou retards éventuels ",
-      value: `${data.assistances_recues ?? 0} `, // Default to 0 if value is missing
+      title: "Retards de cotisation ",
+      value: `${data.retard ?? 0} `, // Default to 0 if value is missing
       icon: "fas fa-hands-helping",
       color: "text-primary",
     },
