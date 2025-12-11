@@ -21,7 +21,7 @@
       <MemberFinancialSummary :cards="financialCards" />
       <MemberInfoCard :member="member" />
       <div class="row">
-        <div class="col-md-6 mb-4">
+        <!-- <div class="col-md-6 mb-4">
           <ActivityList
             title="Dernières cotisations"
             :items="contributions"
@@ -34,6 +34,17 @@
             :items="assistances"
             empty-message="Aucune assistance récente"
             status-field="status"
+          />
+        </div>-->
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <ActivityList
+            title="Activités récentes"
+            :items="activityItems"
+            emptyMessage="Aucune activité récente"
+            statusField="status"
           />
         </div>
       </div>
@@ -67,6 +78,74 @@ const member = ref({
 });
 
 const financialCards = ref([]);
+
+const activityItems = ref([]);
+
+const mapMemberActivities = (memberData) => {
+  const activities = [];
+
+  // Cotisations
+  if (memberData.cotisation) {
+    memberData.cotisation.forEach((c) => {
+      activities.push({
+        title: `Cotisation ${c.montant} ${c.devise}`,
+        date: c.date_paiement,
+        amount: Number(c.montant).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        status:
+          c.statut === "paye"
+            ? "Payé"
+            : c.statut === "en_retard"
+            ? "En retard"
+            : c.statut,
+      });
+    });
+  }
+
+  // Credits
+  if (memberData.credits) {
+    memberData.credits.forEach((cr) => {
+      activities.push({
+        title: `Crédit demandé: ${cr.montant_demande} ${memberData.devise}`,
+        date: cr.date_demande,
+        amount: Number(cr.montant_demande).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        status:
+          cr.statut === "en_attente"
+            ? "En attente"
+            : cr.statut === "accorde"
+            ? "Approuvée"
+            : cr.statut === "refuse"
+            ? "Refusée"
+            : cr.statut,
+      });
+    });
+  }
+
+  // Assistances
+  if (memberData.assistances) {
+    memberData.assistances.forEach((a) => {
+      activities.push({
+        title: `Assistance reçue: ${a.montant} ${memberData.devise}`,
+        date: a.date_demande,
+        amount: Number(a.montant).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        status: a.statut === "en_attente" ? "En attente" : "Approuvée",
+      });
+    });
+  }
+
+  // Sort activities by date descending
+  activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  activityItems.value = activities;
+};
 
 const buildFinancialCards = (data) => {
   financialCards.value = [
@@ -142,9 +221,13 @@ const fetchMemberDetails = async () => {
     contributions.value = memberData.cotisations || [];
 
     assistances.value = memberData.assistances || [];
+    credits.value = memberData.credits || [];
 
     // Mettre à jour les cartes avec les vraies données
     buildFinancialCards(memberData);
+
+    // Map activities for the list
+    mapMemberActivities(memberData);
   } catch (err) {
     console.error("Error fetching member details:", err);
     error.value =
