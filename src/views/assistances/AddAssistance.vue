@@ -54,6 +54,7 @@
                 v-model="formData.type_assistance_id"
                 required
                 :disabled="loadingTypes"
+                @change="handleSelectAssistance"
               >
                 <option value="" disabled>Sélectionnez un type</option>
                 <option
@@ -76,30 +77,12 @@
                 >Montant <span class="text-danger">*</span></label
               >
               <div class="input-group">
-                <select
-                  id="montant"
-                  class="form-select"
-                  v-model.number="formData.montant"
-                  required
-                  :disabled="loadingConfigurations"
-                >
-                  <option value="" disabled>
-                    Sélectionnez une configuration
-                  </option>
-                  <option
-                    v-for="cfg in configurations"
-                    :key="cfg.id || cfg.key"
-                    :value="Number(cfg.value ?? cfg.valeur ?? 0)"
-                  >
-                    {{ cfg.label ?? cfg.description ?? cfg.key }}:
-                    {{ cfg.value ?? cfg.valeur ?? "" }} FBU
-                  </option>
-                </select>
-                <span class="input-group-text">FBU</span>
-              </div>
-              <div v-if="loadingConfigurations" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
-                configurations...
+                <input
+                  type="text"
+                  v-model="formData.montant"
+                  class="form-control"
+                  disabled
+                />
               </div>
             </div>
 
@@ -126,12 +109,11 @@
               <label for="date_demande" class="form-label"
                 >Date de Demande <span class="text-danger">*</span></label
               >
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="date_demande"
+              <Datepicker
                 v-model="formData.date_demande"
-                required
+                :enable-time-picker="true"
+                :minute-increment="1"
+                placeholder="Choisir une date et l'heure"
               />
             </div>
 
@@ -140,11 +122,9 @@
               <label for="date_approbation" class="form-label"
                 >Date d'Approbation</label
               >
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="date_approbation"
+              <Datepicker
                 v-model="formData.date_approbation"
+                :enable-time-picker="true"
               />
             </div>
 
@@ -153,11 +133,9 @@
               <label for="date_versement" class="form-label"
                 >Date de Versement</label
               >
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="date_versement"
+              <Datepicker
                 v-model="formData.date_versement"
+                :enable-time-picker="true"
               />
             </div>
 
@@ -219,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
@@ -229,12 +207,10 @@ const toast = useToast();
 
 const loading = ref(false);
 const loadingMembers = ref(true);
-const loadingConfigurations = ref(true);
 const loadingTypes = ref(true);
 const error = ref("");
 
 const members = ref([]);
-const configurations = ref([]);
 const assistanceTypes = ref([]);
 
 const formData = ref({
@@ -251,17 +227,27 @@ const formData = ref({
 
 const isMotifRequired = computed(() => formData.value.statut === "rejete");
 
+const handleSelectAssistance = () => {
+  const selectedId = formData.value.type_assistance_id;
+
+  const selectedType = assistanceTypes.value.find(
+    (item) => item.id === selectedId
+  );
+
+  if (selectedType) {
+    formData.value.montant = selectedType.montant_standard; // AUTO-FILL
+  } else {
+    formData.value.montant = 0;
+  }
+};
+
 const fetchData = async () => {
-  loadingMembers.value =
-    loadingTypes.value =
-    loadingConfigurations.value =
-      true;
+  loadingMembers.value = loadingTypes.value = true;
   try {
     // request all three and handle different shapes safely
-    const [membersRes, typesRes, configsRes] = await Promise.all([
+    const [membersRes, typesRes] = await Promise.all([
       api.get("/membres"),
       api.get("/type-assistances"),
-      api.get("/configurations"),
     ]);
 
     // members: may be paginated
@@ -270,18 +256,13 @@ const fetchData = async () => {
     // types: try data or direct
     assistanceTypes.value =
       typesRes?.data?.data ?? typesRes?.data ?? typesRes ?? [];
-
-    // configurations: try multiple shapes
-    const cfgBody = configsRes?.data ?? configsRes;
-    configurations.value = cfgBody?.data ?? cfgBody ?? [];
   } catch (err) {
     console.error("Error fetching data:", err);
     toast.error("Erreur lors du chargement des données");
-    members.value = assistanceTypes.value = configurations.value = [];
+    members.value = assistanceTypes.value = [];
   } finally {
     loadingMembers.value = false;
     loadingTypes.value = false;
-    loadingConfigurations.value = false;
   }
 };
 
@@ -311,6 +292,15 @@ const handleSubmit = async () => {
     loading.value = false;
   }
 };
+
+watch(
+  () => formData.value.statut,
+  (newVal) => {
+    if (newVal === "approuve" && !formData.value.date_approbation) {
+      formData.value.date_approbation = new Date().toISOString().slice(0, 16);
+    }
+  }
+);
 
 onMounted(() => {
   fetchData();

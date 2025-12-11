@@ -16,95 +16,105 @@
 
           <div class="row g-3">
             <div class="col-md-6">
-              <label for="membre_id" class="form-label">Membre <span class="text-danger">*</span></label>
-              <select 
-                id="membre_id" 
-                class="form-select" 
-                v-model="formData.membre_id" 
+              <label for="membre_id" class="form-label"
+                >Membre <span class="text-danger">*</span></label
+              >
+              <select
+                id="membre_id"
+                class="form-select"
+                v-model="formData.membre_id"
                 required
                 :disabled="loadingMembers"
               >
                 <option value="" disabled>Sélectionnez un membre</option>
-                <option 
-                  v-for="membre in members" 
-                  :key="membre.id" 
+                <option
+                  v-for="membre in members"
+                  :key="membre.id"
                   :value="membre.id"
                 >
-                {{ membre.id }} |
-                  {{ membre.full_name }} | {{ membre.telephone }} | {{ membre.categorie }}
+                  {{ membre.id }} | {{ membre.full_name }} |
+                  {{ membre.telephone }} | {{ membre.categorie }}
                 </option>
               </select>
               <div v-if="loadingMembers" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des membres...
+                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
+                membres...
               </div>
             </div>
 
             <div class="col-md-6">
-              <label for="montant_demande" class="form-label">Montant Demandé <span class="text-danger">*</span></label>
+              <label for="montant_demande" class="form-label"
+                >Montant Demandé <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="montant_demande" 
-                  v-model.number="formData.montant_demande" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  id="montant_demande"
+                  v-model.number="formData.montant_demande"
+                  min="0"
                   step="1"
                   required
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">FBU</span>
               </div>
             </div>
 
             <!-- Montant Accordé -->
             <div class="col-md-6">
-              <label for="montant_accorde" class="form-label">Montant Accordé <span class="text-danger">*</span></label>
+              <label for="montant_accorde" class="form-label"
+                >Montant Accordé <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="montant_accorde" 
-                  v-model.number="formData.montant_accorde" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  id="montant_accorde"
+                  v-model.number="formData.montant_accorde"
+                  min="0"
                   step="1"
                   required
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">FBU</span>
               </div>
             </div>
 
             <!-- Taux d'Intérêt -->
             <div class="col-md-6">
-              <label for="taux_interet" class="form-label">Taux d'Intérêt (%) <span class="text-danger">*</span></label>
+              <label for="taux_interet" class="form-label"
+                >Taux d'Intérêt (%) <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="taux_interet" 
-                  v-model.number="formData.taux_interet" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  id="taux_interet"
+                  v-model.number="formData.taux_interet"
+                  min="0"
                   max="100"
                   step="1"
                   disabled
-
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">%</span>
               </div>
             </div>
 
             <div class="col-md-6">
-              <label for="duree_mois" class="form-label">Durée (mois) <span class="text-danger">*</span></label>
-              <input 
-                type="number" 
-                class="form-control" 
-                id="duree_mois" 
-                v-model.number="formData.duree_mois" 
-                min="1" 
+              <label for="duree_mois" class="form-label"
+                >Durée (mois) <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="duree_mois"
+                v-model.number="formData.duree_mois"
+                min="1"
                 required
                 disabled
-              >
+              />
             </div>
 
             <div class="col-md-6">
@@ -123,34 +133,40 @@
 
             <!-- Date de Demande -->
             <div class="col-md-6">
-              <label for="date_demande" class="form-label">Date de Demande <span class="text-danger">*</span></label>
-              <input 
-                type="date" 
-                class="form-control" 
-                id="date_demande" 
-                v-model="formData.date_demande" 
-                required
+              <label for="date_demande" class="form-label"
+                >Date de Demande <span class="text-danger">*</span></label
               >
+              <input
+                type="date"
+                class="form-control"
+                id="date_demande"
+                v-model="formData.date_demande"
+                required
+              />
             </div>
 
             <!-- Date d'Approbation -->
             <div class="col-md-6">
-              <label for="date_approbation" class="form-label">Date d'Approbation</label>
-              <input 
-                type="date" 
-                class="form-control" 
-                id="date_approbation" 
-                v-model="formData.date_approbation"
+              <label for="date_approbation" class="form-label"
+                >Date d'Approbation</label
               >
+              <input
+                type="date"
+                class="form-control"
+                id="date_approbation"
+                v-model="formData.date_approbation"
+              />
             </div>
 
             <!-- Statut -->
             <div class="col-md-6">
-              <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
-              <select 
-                id="statut" 
-                class="form-select" 
-                v-model="formData.statut" 
+              <label for="statut" class="form-label"
+                >Statut <span class="text-danger">*</span></label
+              >
+              <select
+                id="statut"
+                class="form-select"
+                v-model="formData.statut"
                 required
               >
                 <option value="en_attente">En attente</option>
@@ -162,10 +178,12 @@
             </div>
 
             <div class="col-12">
-              <label for="motif" class="form-label">Motif du Crédit <span class="text-danger">*</span></label>
-              <textarea 
-                class="form-control" 
-                id="motif" 
+              <label for="motif" class="form-label"
+                >Motif du Crédit <span class="text-danger">*</span></label
+              >
+              <textarea
+                class="form-control"
+                id="motif"
                 v-model="formData.motif"
                 rows="3"
                 required
@@ -175,21 +193,25 @@
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
-            <button 
-              type="button" 
-              class="btn btn-outline-secondary" 
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
               @click="$router.push('/credits')"
               :disabled="loading"
             >
               Annuler
             </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary" 
+            <button
+              type="submit"
+              class="btn btn-primary"
               :disabled="loading || loadingMembers"
             >
-              <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-              {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              {{ loading ? "Enregistrement..." : "Enregistrer" }}
             </button>
           </div>
         </form>
@@ -199,17 +221,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useToast } from 'vue-toastification';
-import api from '../../services/api';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+import api from "../../services/api";
 
 const router = useRouter();
 const toast = useToast();
 
 const loading = ref(false);
 const loadingMembers = ref(true);
-const error = ref('');
+const error = ref("");
 
 const members = ref([]);
 
@@ -219,21 +241,21 @@ const formData = ref({
   duree_mois: 12,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
-  date_demande: new Date().toISOString().split('T')[0],
-  date_approbation: new Date().toISOString().split('T')[0],
-  statut: 'en_attente',
-  motif: ''
+  date_demande: new Date().toISOString().split("T")[0],
+  date_approbation: new Date().toISOString().split("T")[0],
+  statut: "en_attente",
+  motif: "",
 });
 
 // Fetch members
 const fetchMembers = async () => {
   try {
-    const response = await api.get('/membres');
+    const response = await api.get("/membres");
     // Assurez-vous que members.value est bien un tableau
     members.value = response.data?.data || [];
   } catch (err) {
-    console.error('Error fetching members:', err);
-    toast.error('Erreur lors du chargement des membres');
+    console.error("Error fetching members:", err);
+    toast.error("Erreur lors du chargement des membres");
   } finally {
     loadingMembers.value = false;
   }
@@ -244,14 +266,14 @@ const calculatePayments = () => {
   const montant = parseFloat(formData.value.montant_accorde) || 0;
   const taux = parseFloat(formData.value.taux_interet) || 0;
   const duree = parseInt(formData.value.duree_mois) || 1;
-  
+
   // Calculate total amount with interest
   const interet = (montant * taux * duree) / (12 * 100);
   const total = montant + interet;
-  
+
   // Calculate monthly payment
   const mensualite = duree > 0 ? total / duree : 0;
-  
+
   formData.value.montant_total_rembourser = total.toFixed(0);
   formData.value.montant_mensualite = mensualite.toFixed(0);
 };
@@ -259,32 +281,33 @@ const calculatePayments = () => {
 // Handle form submission
 const handleSubmit = async () => {
   loading.value = true;
-  error.value = '';
-  
+  error.value = "";
+
   try {
     // Prepare the data for API (Les nombres sont déjà gérés par v-model.number)
     const payload = {
-      ...formData.value
+      ...formData.value,
     };
 
     console.log("Payload envoyé :", payload);
-    
-    const response = await api.post('/credits', payload);
-    
+
+    const response = await api.post("/credits", payload);
+
     // Vérification de la réponse (l'API devrait retourner un objet de crédit en cas de succès)
     if (response.data) {
-      toast.success('Crédit enregistré avec succès');
-      router.push('/credits');
+      toast.success("Crédit enregistré avec succès");
+      router.push("/credits");
     } else {
       // Une réponse sans 'data' peut indiquer un problème non HTTP 4xx/5xx
-      throw new Error('Réponse inattendue du serveur');
+      throw new Error("Réponse inattendue du serveur");
     }
   } catch (err) {
-    console.error('Error saving credit:', err);
+    console.error("Error saving credit:", err);
     // Gérer les erreurs spécifiques de l'API (ex: Laravel validation errors)
-    const apiErrorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Erreur lors de l\'enregistrement du crédit';
+    const apiErrorMessage =
+      err.response?.data?.message ||
+      err.message ||
+      "Erreur lors de l'enregistrement du crédit";
     error.value = apiErrorMessage;
     toast.error(apiErrorMessage);
   } finally {

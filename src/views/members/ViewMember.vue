@@ -79,13 +79,13 @@ const buildFinancialCards = (data) => {
       color: "text-success",
     },
     {
-      title: "Cotisations manquantes",
+      title: "État de remboursement des crédits ",
       value: `${data.cotisations_manquantes ?? 0} mois`, // Handle missing value with ?? for default value
       icon: "fas fa-exclamation-triangle",
       color: "text-warning",
     },
     {
-      title: "Crédit en cours",
+      title: "Montants reçus en assistance ",
       value: `${(data.credit_encours || 0).toLocaleString()} ${
         data.devise || "FBU"
       }`, // Use devise if available
@@ -98,7 +98,7 @@ const buildFinancialCards = (data) => {
       color: "text-info",
     },
     {
-      title: "Assistances",
+      title: "Anomalies ou retards éventuels ",
       value: `${data.assistances_recues ?? 0} reçues`, // Default to 0 if value is missing
       icon: "fas fa-hands-helping",
       color: "text-primary",

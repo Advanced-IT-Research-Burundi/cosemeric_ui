@@ -15,11 +15,15 @@ import select2 from './directives/select2'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+
+
 
 
 // Create app
 const app = createApp(App)
-
+app.component('Datepicker', VueDatePicker)
 // Add plugins
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -45,6 +49,8 @@ const toastOptions = {
 }
 
 app.use(Toast, toastOptions)
+
+
 
 // Mount the app
 app.mount('#app')
