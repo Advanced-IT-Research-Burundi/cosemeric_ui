@@ -129,20 +129,17 @@
               <label class="form-label"
                 >Date d'échéance <span class="text-danger">*</span></label
               >
-              <input
-                type="date"
-                class="form-control"
+              <Datepicker
                 v-model="form.date_echeance"
-                required
+                :enable-time-picker="true"
               />
             </div>
 
             <div class="col-md-6">
               <label class="form-label">Date de paiement</label>
-              <input
-                type="date"
-                class="form-control"
+              <Datepicker
                 v-model="form.date_paiement"
+                :enable-time-picker="true"
               />
             </div>
 

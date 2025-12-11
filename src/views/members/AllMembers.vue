@@ -361,11 +361,9 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Date d'adhésion</label>
-                  <input
-                    type="date"
-                    class="form-control"
+                  <Datepicker
                     v-model="formData.date_adhesion"
-                    :disabled="isEditing && !isAdmin"
+                    :enable-time-picker="true"
                   />
                 </div>
                 <div class="col-md-6">

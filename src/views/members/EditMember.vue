@@ -76,7 +76,10 @@
 
         <div class="col-md-6">
           <label for="date_adhesion" class="form-label">Date d'adhésion <span class="text-danger">*</span></label>
-          <input type="date" class="form-control" id="date_adhesion" v-model="formData.date_adhesion" required>
+          <Datepicker
+                v-model="formData.date_adhesion"
+                :enable-time-picker="true"
+              />
         </div>
 
         <div class="col-12 mt-4">

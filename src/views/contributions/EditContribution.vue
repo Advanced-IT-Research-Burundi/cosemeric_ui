@@ -102,12 +102,10 @@
               <label for="date_paiement" class="form-label"
                 >Date de Paiement <span class="text-danger">*</span></label
               >
-              <input
-                type="date"
-                class="form-control"
-                id="date_paiement"
+
+                         <Datepicker
                 v-model="formData.date_paiement"
-                required
+                :enable-time-picker="true"
               />
             </div>
 
