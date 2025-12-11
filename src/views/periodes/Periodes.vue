@@ -125,11 +125,9 @@
                   <label class="form-label"
                     >Date de début <span class="text-danger">*</span></label
                   >
-                  <input
-                    type="date"
-                    class="form-control"
+                  <Datepicker
                     v-model="form.date_debut"
-                    required
+                    :enable-time-picker="true"
                   />
                 </div>
 
@@ -137,11 +135,9 @@
                   <label class="form-label"
                     >Date de fin <span class="text-danger">*</span></label
                   >
-                  <input
-                    type="date"
-                    class="form-control"
+                  <Datepicker
                     v-model="form.date_fin"
-                    required
+                    :enable-time-picker="true"
                   />
                 </div>
               </div>

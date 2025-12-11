@@ -129,20 +129,17 @@
               <label class="form-label"
                 >Date d'échéance <span class="text-danger">*</span></label
               >
-              <input
-                type="date"
-                class="form-control"
+              <Datepicker
                 v-model="form.date_echeance"
-                required
+                :enable-time-picker="true"
               />
             </div>
 
             <div class="col-md-6">
               <label class="form-label">Date de paiement</label>
-              <input
-                type="date"
-                class="form-control"
+              <Datepicker
                 v-model="form.date_paiement"
+                :enable-time-picker="true"
               />
             </div>
 
@@ -241,12 +238,8 @@ const fetchAllCredits = async () => {
 
   loadingCredits.value = true;
   try {
-    const res = await api.get("/credits?per_page=100");
+    const res = await api.get("/credits");
 
-    // normalize different possible response shapes:
-    // - axios res.data = { success, data: { data: [...] } }
-    // - or res.data = { data: [...] }
-    // - or res.data = [...]
     const body = res?.data ?? {};
     if (Array.isArray(body)) {
       allCredits.value = body;
