@@ -241,12 +241,8 @@ const fetchAllCredits = async () => {
 
   loadingCredits.value = true;
   try {
-    const res = await api.get("/credits?per_page=100");
+    const res = await api.get("/credits");
 
-    // normalize different possible response shapes:
-    // - axios res.data = { success, data: { data: [...] } }
-    // - or res.data = { data: [...] }
-    // - or res.data = [...]
     const body = res?.data ?? {};
     if (Array.isArray(body)) {
       allCredits.value = body;
