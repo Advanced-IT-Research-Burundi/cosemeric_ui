@@ -3,9 +3,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
       <router-link
-        to="/credits/demande"
+        :to="isAdmin ? '/credits/add' : '/credits/demande'"
         class="btn btn-primary"
-        v-if="auth.hasAnyRole('admin') || true" 
       >
         <i class="fas fa-plus me-2"></i>Ajouter un crédit
       </router-link>
@@ -17,7 +16,11 @@
         <div class="row g-3 mb-4">
           <div class="col-md-3">
             <label class="form-label">Statut</label>
-            <select v-model="filters.statut" class="form-select" @change="handleFilterChange">
+            <select
+              v-model="filters.statut"
+              class="form-select"
+              @change="handleFilterChange"
+            >
               <option value="">Tous les statuts</option>
               <option value="en_attente">En attente</option>
               <option value="approuve">Approuvé</option>
@@ -28,21 +31,35 @@
           </div>
           <div class="col-md-3">
             <label class="form-label">Date Demande (Du)</label>
-            <input type="date" v-model="filters.date_demande_start" class="form-control" @change="handleFilterChange">
+            <input
+              type="date"
+              v-model="filters.date_demande_start"
+              class="form-control"
+              @change="handleFilterChange"
+            />
           </div>
           <div class="col-md-3">
             <label class="form-label">Date Demande (Au)</label>
-            <input type="date" v-model="filters.date_demande_end" class="form-control" @change="handleFilterChange">
+            <input
+              type="date"
+              v-model="filters.date_demande_end"
+              class="form-control"
+              @change="handleFilterChange"
+            />
           </div>
-           <!-- Date Fin Filter (if applicable, though usually date_demande is more relevant for requests) -->
-           <!-- Adding it as requested -->
-           <div class="col-md-3">
+          <!-- Date Fin Filter (if applicable, though usually date_demande is more relevant for requests) -->
+          <!-- Adding it as requested -->
+          <div class="col-md-3">
             <label class="form-label">Date Fin (Après)</label>
-            <input type="date" v-model="filters.date_fin" class="form-control" @change="handleFilterChange">
+            <input
+              type="date"
+              v-model="filters.date_fin"
+              class="form-control"
+              @change="handleFilterChange"
+            />
           </div>
         </div>
 
-  
         <AdvancedTable
           :data="wrappedTableData"
           :columns="columns"
@@ -66,14 +83,14 @@
 
           <template #actions="{ item }">
             <div class="btn-group">
-               <button
+              <button
                 class="btn btn-outline-secondary btn-sm"
                 @click="handleShow(item)"
                 title="Voir détails"
               >
                 <i class="fas fa-eye"></i>
               </button>
-              
+
               <button
                 v-if="item.statut === 'en_attente'"
                 class="btn btn-success btn-sm"
@@ -108,6 +125,7 @@ import useAuthStore from "../../stores/auth";
 import { useToast } from "vue-toastification";
 
 const auth = useAuthStore();
+const isAdmin = auth.hasAnyRole("admin");
 const store = useStore();
 const toast = useToast();
 const loading = ref(false);
@@ -186,16 +204,15 @@ const fetchCredits = async () => {
     };
 
     const response = await api.get("/credits", { params });
-    
+
     // Handle the response structure provided by user
     // { success: true, data: { current_page: 1, data: [...] } }
     if (response.data && response.data.data) {
-        store.state.credits = response.data;
+      store.state.credits = response.data;
     } else {
-         // Fallback if structure is different (e.g. direct pagination object)
-        store.state.credits = response.data || {};
+      // Fallback if structure is different (e.g. direct pagination object)
+      store.state.credits = response.data || {};
     }
-
   } catch (error) {
     console.error("Error fetching credits:", error);
     toast.error("Erreur lors du chargement des crédits.");
@@ -205,7 +222,13 @@ const fetchCredits = async () => {
 };
 
 const handleAction = async (item, action) => {
-  if (!confirm(`Êtes-vous sûr de vouloir ${action === 'approuve' ? 'accepter' : 'refuser'} ce crédit ?`)) {
+  if (
+    !confirm(
+      `Êtes-vous sûr de vouloir ${
+        action === "approuve" ? "accepter" : "refuser"
+      } ce crédit ?`
+    )
+  ) {
     return;
   }
 
@@ -216,16 +239,17 @@ const handleAction = async (item, action) => {
 
     alert(action);
 
-    
     //await api.put(`/credits/${item.id}`, { statut: action });
 
-    if(action === 'approuve') {
+    if (action === "approuve") {
       await api.post(`/credits/approuve/${item.id}`);
-    }else if(action === 'rejete') {
+    } else if (action === "rejete") {
       await api.post(`/credits/rejete/${item.id}`);
     }
-    
-    toast.success(`Crédit ${action === 'approuve' ? 'accepté' : 'refusé'} avec succès.`);
+
+    toast.success(
+      `Crédit ${action === "approuve" ? "accepté" : "refusé"} avec succès.`
+    );
     fetchCredits();
   } catch (error) {
     console.error(`Error ${action} credit:`, error);
@@ -235,23 +259,35 @@ const handleAction = async (item, action) => {
 
 const getClassByStatut = (statut) => {
   switch (statut) {
-    case "rejete": return "bg-danger";
-    case "en_attente": return "bg-warning";
-    case "en_cours": return "bg-info";
-    case "approuve": return "bg-success";
-    case "termine": return "bg-secondary";
-    default: return "bg-secondary";
+    case "rejete":
+      return "bg-danger";
+    case "en_attente":
+      return "bg-warning";
+    case "en_cours":
+      return "bg-info";
+    case "approuve":
+      return "bg-success";
+    case "termine":
+      return "bg-secondary";
+    default:
+      return "bg-secondary";
   }
 };
 
 const getStatusLabel = (statut) => {
   switch (statut) {
-    case "rejete": return "Rejeté";
-    case "en_attente": return "En attente";
-    case "en_cours": return "En cours";
-    case "approuve": return "Approuvé";
-    case "termine": return "Terminé";
-    default: return statut;
+    case "rejete":
+      return "Rejeté";
+    case "en_attente":
+      return "En attente";
+    case "en_cours":
+      return "En cours";
+    case "approuve":
+      return "Approuvé";
+    case "termine":
+      return "Terminé";
+    default:
+      return statut;
   }
 };
 
@@ -303,8 +339,6 @@ const wrappedTableData = computed(() => {
 });
 
 onMounted(() => {
-
-
   fetchCredits();
 });
 </script>

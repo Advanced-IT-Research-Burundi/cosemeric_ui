@@ -33,7 +33,7 @@
                   :value="membre.id"
                 >
                   {{ membre.id }} | {{ membre.full_name }} |
-                  {{ membre.telephone }} | {{ membre.categorie }}
+                  {{ membre.telephone }} | {{ membre.categorie.nom }}
                 </option>
               </select>
               <div v-if="loadingMembers" class="form-text">
@@ -136,12 +136,10 @@
               <label for="date_demande" class="form-label"
                 >Date de Demande <span class="text-danger">*</span></label
               >
-              <input
-                type="date"
-                class="form-control"
-                id="date_demande"
+
+              <Datepicker
                 v-model="formData.date_demande"
-                required
+                :enable-time-picker="true"
               />
             </div>
 
@@ -150,11 +148,10 @@
               <label for="date_approbation" class="form-label"
                 >Date d'Approbation</label
               >
-              <input
-                type="date"
-                class="form-control"
-                id="date_approbation"
+
+              <Datepicker
                 v-model="formData.date_approbation"
+                :enable-time-picker="true"
               />
             </div>
 
