@@ -79,7 +79,7 @@ const routes = [
       {
         path: "add",
         name: "assistancesAdd",
-        component: () => import("../views/assistances/AddAssistance.vue"),
+        component: () => import("../views/assistances/AddAssistanceView.vue"),
       },
       {
         path: ":id/edit",

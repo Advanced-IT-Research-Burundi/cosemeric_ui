@@ -17,13 +17,15 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-
-
-
+import PrimeVue from 'primevue/config';
+import AutoComplete from 'primevue/autocomplete';
+import Aura from '@primeuix/themes/aura';
 
 // Create app
 const app = createApp(App)
 app.component('Datepicker', VueDatePicker)
+app.component('AutoComplete', AutoComplete);
+
 // Add plugins
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -31,6 +33,12 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(vuexStore)
 app.use(router)
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    }
+});
+
 
 // Configure toast notifications
 const toastOptions = {
