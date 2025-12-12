@@ -169,7 +169,8 @@
 
               <Datepicker
                 v-model="formData.date_paiement"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 

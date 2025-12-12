@@ -111,9 +111,9 @@
               >
               <Datepicker
                 v-model="formData.date_demande"
-                :enable-time-picker="true"
-                :minute-increment="1"
-                placeholder="Choisir une date et l'heure"
+                :enable-time-picker="false"
+                :auto-apply="true"
+                placeholder="Choisir une date"
               />
             </div>
 
@@ -124,7 +124,8 @@
               >
               <Datepicker
                 v-model="formData.date_approbation"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -135,7 +136,8 @@
               >
               <Datepicker
                 v-model="formData.date_versement"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -217,7 +219,7 @@ const formData = ref({
   membre_id: "",
   type_assistance_id: "",
   montant: 0,
-  date_demande: new Date().toISOString().slice(0, 16),
+  date_demande: new Date().toISOString().split("T")[0],
   date_approbation: null,
   date_versement: null,
   statut: "en_attente",
@@ -297,7 +299,7 @@ watch(
   () => formData.value.statut,
   (newVal) => {
     if (newVal === "approuve" && !formData.value.date_approbation) {
-      formData.value.date_approbation = new Date().toISOString().slice(0, 16);
+      formData.value.date_approbation = new Date().toISOString().split("T")[0];
     }
   }
 );

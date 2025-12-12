@@ -363,7 +363,8 @@
                   <label class="form-label">Date d'adhésion</label>
                   <Datepicker
                     v-model="formData.date_adhesion"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
                 <div class="col-md-6">

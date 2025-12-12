@@ -280,7 +280,7 @@ const route = useRoute();
 // Store composables
 const store = useStore();
 const authStore = useAuthStore();
-const { isAdmin, isMember, isGuest, isAuth } = useAuthGuard();
+const { isAdmin, isMember, isManager, isGuest, isAuth } = useAuthGuard();
 
 // Responsive state
 const windowWidth = ref(window.innerWidth);
@@ -330,16 +330,17 @@ const getNotifications = async () => {
   store.state.data.notifications = response.data;
 };
 
-
 // Notifications (Mock Data)
-const notifications = computed(() => store.state.data.notifications.map((notification) => ({
-   id: notification.id,
+const notifications = computed(() =>
+  store.state.data.notifications.map((notification) => ({
+    id: notification.id,
     type: notification.type,
     title: notification.title,
     message: notification.message,
     time: timeAgo(notification.created_at),
     read: notification.read,
-})));
+  }))
+);
 
 const notificationCount = computed(() => notifications.value.length);
 
@@ -348,19 +349,19 @@ const menuItems = ref([
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/dashboard",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-people-fill"></i>',
     title: "Membres",
     path: "/members",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-wallet-fill"></i>',
     title: "Cotisations",
     path: "/contributions",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-wallet-fill"></i>',
@@ -378,7 +379,7 @@ const menuItems = ref([
     icon: '<i class="bi bi-credit-card-2-front-fill"></i>',
     title: "Crédits",
     path: "/credits",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-credit-card-2-front"></i>',
@@ -390,19 +391,19 @@ const menuItems = ref([
     icon: '<i class="bi bi-plus-square-dotted"></i>',
     title: "Demande Crédit",
     path: "/credits/demande",
-    requireAdmin: isMember.value,
+    requireAdmin: isMember.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-life-preserver"></i>',
     title: "Assistances",
     path: "/assistances",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-arrow-repeat"></i>',
     title: "Remboursements",
     path: "/remboursements",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-file-earmark-spreadsheet-fill"></i>',
@@ -502,9 +503,9 @@ const getNotificationIcon = (type) => {
 };
 
 const handleNotificationClick = async (notification) => {
-  // send request to chage to read true 
+  // send request to chage to read true
   const response = await api.put(`notifications/${notification.id}/mark-read`);
- 
+
   notification.read = true;
 };
 

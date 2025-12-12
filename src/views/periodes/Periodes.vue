@@ -127,7 +127,8 @@
                   >
                   <Datepicker
                     v-model="form.date_debut"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
 
@@ -137,7 +138,8 @@
                   >
                   <Datepicker
                     v-model="form.date_fin"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
               </div>

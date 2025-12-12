@@ -142,7 +142,8 @@ import api from "../../services/api";
 import useAuthStore from "../../stores/auth";
 
 const authStore = useAuthStore();
-const isAdmin = ref(authStore.hasAnyRole["Admin"])
+const isAdmin = ref(authStore.hasAnyRole["Admin"]);
+const isManager = ref(authStore.hasAnyRole["Manager"]);
 const router = useRouter();
 const toast = useToast();
 

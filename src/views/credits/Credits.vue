@@ -33,21 +33,27 @@
             <label class="form-label">Date Demande (Du)</label>
             <Datepicker
               v-model="filters.date_demande_start"
-              :enable-time-picker="true"
+              :enable-time-picker="false"
+              :auto-apply="true"
             />
           </div>
           <div class="col-md-3">
             <label class="form-label">Date Demande (Au)</label>
             <Datepicker
               v-model="filters.date_demande_end"
-              :enable-time-picker="true"
+              :enable-time-picker="false"
+              :auto-apply="true"
             />
           </div>
           <!-- Date Fin Filter (if applicable, though usually date_demande is more relevant for requests) -->
           <!-- Adding it as requested -->
           <div class="col-md-3">
             <label class="form-label">Date Fin (Après)</label>
-            <Datepicker v-model="filters.date_fin" :enable-time-picker="true" />
+            <Datepicker
+              v-model="filters.date_fin"
+              :enable-time-picker="false"
+              :auto-apply="true"
+            />
           </div>
         </div>
 
