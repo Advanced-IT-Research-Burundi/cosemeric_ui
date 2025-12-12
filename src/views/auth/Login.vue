@@ -128,10 +128,12 @@ import { useAuthStore } from "../../stores/auth";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
+// --- Composables ---
 const authStore = useAuthStore();
 const router = useRouter();
 const toast = useToast();
 
+// --- Configuration & Constants ---
 const APP_CONFIG = {
   name: "CASOMIREC",
   description: "Système de gestion des cotisations et adhérents",
@@ -161,31 +163,39 @@ const FEATURES = [
   },
 ];
 
+// --- Reactive State ---
 const email = ref("");
 const password = ref("");
 const isLoading = ref(false);
 const error = ref("");
 const showPassword = ref(false);
 
+// --- Login Function ---
 async function login() {
   if (isLoading.value) return;
   isLoading.value = true;
   error.value = "";
 
   try {
+    // Attempt login via AuthStore
     const success = await authStore.login(email.value, password.value);
     if (!success) throw new Error("Email ou mot de passe incorrect");
 
-    // check if the user is Admin
+    // Redirect based on User Role
+    // 1. Admin -> Main Dashboard
     if (authStore.user.role === "admin") {
       window.location.href = "/dashboard";
-    } else if (authStore.user.role === "gestionnaire") {
+    }
+    // 2. Manager (Gestionnaire) -> Manager Dashboard
+    else if (authStore.user.role === "gestionnaire") {
       window.location.href = "/manager/dashboard";
-    } else {
+    }
+    // 3. Regular Member or others -> Credits/Member Area
+    else {
       window.location.href = "/credits/mescredits";
     }
-    // await router.push('/dashboard')
   } catch (err) {
+    console.error("Login error:", err);
     error.value = err.message || "Erreur de connexion";
     toast.error(error.value);
   } finally {
