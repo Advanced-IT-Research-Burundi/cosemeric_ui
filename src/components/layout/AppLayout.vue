@@ -349,7 +349,13 @@ const menuItems = ref([
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/dashboard",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value,
+  },
+    {
+    icon: '<i class="bi bi-grid-fill"></i>',
+    title: "Tableau de bord",
+    path: "/manager/dashboard",
+    requireAdmin: isManager.value,
   },
   {
     icon: '<i class="bi bi-people-fill"></i>',
@@ -385,7 +391,7 @@ const menuItems = ref([
     icon: '<i class="bi bi-credit-card-2-front"></i>',
     title: "Mes Crédits",
     path: "/credits/mescredits",
-    requireAdmin: isMember.value,
+    requireAdmin: isMember.value || isManager.value,
   },
   {
     icon: '<i class="bi bi-plus-square-dotted"></i>',

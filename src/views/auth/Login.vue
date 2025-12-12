@@ -173,14 +173,16 @@ async function login() {
   error.value = "";
 
   try {
-    const success = await authStore.login(email.value, password.value)
-    if (!success) throw new Error('Email ou mot de passe incorrect')
+    const success = await authStore.login(email.value, password.value);
+    if (!success) throw new Error("Email ou mot de passe incorrect");
 
-    // check if the user is Admin 
-    if (authStore.user.role === 'admin') {
-      window.location.href = '/dashboard'
+    // check if the user is Admin
+    if (authStore.user.role === "admin") {
+      window.location.href = "/dashboard";
+    } else if (authStore.user.role === "manager") {
+      window.location.href = "/manager/dashboard";
     } else {
-      window.location.href = '/credits/mescredits'
+      window.location.href = "/credits/mescredits";
     }
     // await router.push('/dashboard')
   } catch (err) {

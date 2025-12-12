@@ -5,7 +5,6 @@ import { useAuthStore } from "../stores/auth";
 import Login from "../views/auth/Login.vue";
 import Register from "../views/auth/Register.vue";
 import PageNotFound from "../views/errors/PageNotFound.vue";
-import AdminComponent from "../views/admin/AdminComponent.vue";
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -18,12 +17,7 @@ const requireAuth = (to, from, next) => {
 };
 
 const routes = [
-  {
-    path: "/admin",
-    name: "admin",
-    component: AdminComponent,
-    meta: { requiresAuth: true },
-  },
+
   {
     path: "/reports",
     name: "reports",
@@ -51,6 +45,12 @@ const routes = [
     name: "dashboard",
     component: () => import("../views/Dashboard.vue"),
     alias: "/",
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/manager/dashboard",
+    name: "managerDashboard",
+    component: () => import("../views/manager/ManagerDashboard.vue"),
     meta: { requiresAuth: true },
   },
   // Test AdvancedTable
