@@ -26,7 +26,7 @@
         </div>
 
         <!-- Total Cotisations Cumulatif -->
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <!-- <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
           <div class="card stat-card">
             <div class="card-body">
               <div class="stat-icon bg-info-gradient">
@@ -37,6 +37,25 @@
               </div>
               <div class="stat-label">Caisse principale</div>
               <div class="stat-change text-muted">Total depuis début</div>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- Membres Actifs -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-success-gradient">
+                <i class="bi bi-people-fill"></i>
+              </div>
+              <div class="stat-value text-success">
+                {{ stats.membresActifs }}
+              </div>
+              <div class="stat-label">Membres Actifs</div>
+              <div class="stat-change text-danger">
+                <i class="bi bi-person-x"></i>
+                {{ stats.membresInactifs }} inactifs
+              </div>
             </div>
           </div>
         </div>
@@ -61,7 +80,7 @@
         </div>
 
         <!-- Dettes en Attente -->
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <!-- <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
           <div class="card stat-card">
             <div class="card-body">
               <div class="stat-icon bg-danger-gradient">
@@ -76,7 +95,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Demandes d'Assistance -->
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
@@ -98,7 +117,7 @@
         </div>
 
         <!-- Taux de Recouvrement -->
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <!-- <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
           <div class="card stat-card">
             <div class="card-body">
               <div class="stat-icon bg-teal-gradient">
@@ -113,7 +132,25 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
+
+        <!-- Solde Disponible -->
+        <!-- <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="stat-icon bg-dark-gradient">
+                <i class="bi bi-bank2"></i>
+              </div>
+              <div class="stat-value text-dark">
+                {{ formatMontant(stats.soldeDisponible) }}
+              </div>
+              <div class="stat-label">Solde Disponible</div>
+              <div class="stat-change text-info">
+                <i class="bi bi-shield-check"></i> Sécurisé
+              </div>
+            </div>
+          </div>
+        </div> -->
       </div>
 
       <!-- Section Graphiques -->
@@ -124,7 +161,7 @@
 
       <div class="row g-4 mb-4">
         <!-- Graphique Cotisations Mensuelles -->
-        <div class="col-12 col-lg-12">
+        <div class="col-12 col-lg-8">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-graph-up me-2"></i>
@@ -136,8 +173,23 @@
           </div>
         </div>
 
+        <!-- Graphique Répartition Membres -->
+        <div class="col-12 col-lg-4">
+          <div class="card chart-card">
+            <div class="card-header">
+              <i class="bi bi-pie-chart-fill me-2"></i>
+              Répartition des Membres
+            </div>
+            <div
+              class="card-body d-flex align-items-center justify-content-center"
+            >
+              <canvas ref="membresChart"></canvas>
+            </div>
+          </div>
+        </div>
+
         <!-- Graphique Crédits vs Remboursements -->
-        <div class="col-12 col-lg-6">
+        <!-- <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-cash-stack me-2"></i>
@@ -147,10 +199,10 @@
               <canvas ref="creditsChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Assistances par Type -->
-        <div class="col-12 col-lg-6">
+        <!-- <div class="col-12 col-lg-6">
           <div class="card chart-card">
             <div class="card-header">
               <i class="bi bi-heart-pulse-fill me-2"></i>
@@ -160,7 +212,7 @@
               <canvas ref="assistancesChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Graphique Tendance Mensuelle -->
         <div class="col-12">
@@ -195,14 +247,18 @@ const stats = ref({
   cotisationsMois: 0,
   cotisationsCumulatif: 0,
   evolutionCotisations: 0,
+  membresActifs: 0,
+  membresInactifs: 0,
   creditsTotal: 0,
   creditsEnCours: 0,
   dettesAttente: 0,
   demandesAssistance: 0,
   aidesAccordees: 0,
   tauxRecouvrement: 0,
+  soldeDisponible: 0,
   anomalies: 0,
   creditsTotalPaye: 0,
+  montantsAssistancesRecus: 0,
 });
 
 // =============================
@@ -220,7 +276,7 @@ const formatMontant = (montant) => {
 // RÉFÉRENCES DES GRAPHIQUES
 // =============================
 const cotisationsChart = ref(null);
-
+const membresChart = ref(null);
 const creditsChart = ref(null);
 const assistancesChart = ref(null);
 const tendanceChart = ref(null);
@@ -231,7 +287,7 @@ const tendanceChart = ref(null);
 const initChartsWithData = (chartsData) => {
   const commonOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         labels: {
@@ -262,6 +318,28 @@ const initChartsWithData = (chartsData) => {
         ],
       },
       options: commonOptions,
+    });
+  }
+
+  // Répartition Membres
+  if (membresChart.value) {
+    new Chart(membresChart.value, {
+      type: "doughnut",
+      data: {
+        labels: ["Actifs", "Inactifs"],
+        datasets: [
+          {
+            data: [chartsData.membres.actifs, chartsData.membres.inactifs],
+            backgroundColor: ["#27ae60", "#e74c3c"],
+            borderWidth: 3,
+            borderColor: "#fff",
+          },
+        ],
+      },
+      options: {
+        ...commonOptions,
+        plugins: { legend: { position: "bottom" } },
+      },
     });
   }
 
@@ -388,14 +466,18 @@ onMounted(async () => {
         cotisationsMois: data.stats.cotisationsMois || 0,
         cotisationsCumulatif: data.stats.cotisationsCumulatif || 0,
         evolutionCotisations: data.stats.evolutionCotisations || 0,
+        membresActifs: data.stats.membresActifs || 0,
+        membresInactifs: data.stats.membresInactifs || 0,
         creditsTotal: data.stats.creditsTotal || 0,
         creditsEnCours: data.stats.creditsEnCours || 0,
         dettesAttente: data.stats.dettesAttente || 0,
         demandesAssistance: data.stats.demandesAssistance || 0,
         aidesAccordees: data.stats.aidesAccordees || 0,
         tauxRecouvrement: data.stats.tauxRecouvrement || 0,
+        soldeDisponible: data.stats.soldeDisponible || 0,
         anomalies: data.stats.anomalies || 0,
         creditsTotalPaye: data.stats.creditsTotalPaye || 0,
+        montantsAssistancesRecus: data.stats.montantsAssistancesRecus || 0,
       };
 
       console.log("Données du dashboard reçues:", data);
@@ -579,8 +661,10 @@ onMounted(async () => {
 }
 
 .chart-card .card-body {
-  padding: 1.5rem;
+  padding: 1rem;
   background-color: white;
+  height: 300px;
+  position: relative;
 }
 
 /* ============================================

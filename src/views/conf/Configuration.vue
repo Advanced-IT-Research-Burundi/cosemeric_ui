@@ -49,12 +49,12 @@
                   >
                     Modifier
                   </button>
-                  <!-- <button
+                  <button
                     class="btn btn-sm btn-outline-danger"
                     @click="removeConfig(c)"
                   >
                     Supprimer
-                  </button> -->
+                  </button>
                 </td>
               </tr>
             </tbody>
