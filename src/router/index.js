@@ -206,6 +206,12 @@ meta: { requiresAuth: true},
     meta: { requiresAuth: true },
   },
   {
+    path: "/notifications",
+    name: "notifications",
+    component: () => import("../views/notifications/Notifications.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/cotisationMensuelle",
     name: "cotisationMensuelle",
     component: () => import("../views/cotisations/CotisationMensuelle.vue"),

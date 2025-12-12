@@ -325,8 +325,12 @@ const isRouteActive = (path) => {
   return route.path.startsWith(path);
 };
 
-const getNotifications = async () => {
-  const response = await api.get("notifications");
+const getNotifications = async (memberId) => {
+  const response = await api.get("/notifications", {
+    params: {
+      memberId: memberId,
+    },
+  });
   store.state.data.notifications = response.data;
 };
 
@@ -351,7 +355,7 @@ const menuItems = ref([
     path: "/dashboard",
     requireAdmin: isAdmin.value,
   },
-    {
+  {
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/manager/dashboard",

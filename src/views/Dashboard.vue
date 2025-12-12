@@ -287,7 +287,7 @@ const tendanceChart = ref(null);
 const initChartsWithData = (chartsData) => {
   const commonOptions = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
     plugins: {
       legend: {
         labels: {
@@ -661,10 +661,8 @@ onMounted(async () => {
 }
 
 .chart-card .card-body {
-  padding: 1rem;
+  padding: 1.5rem;
   background-color: white;
-  height: 300px;
-  position: relative;
 }
 
 /* ============================================
