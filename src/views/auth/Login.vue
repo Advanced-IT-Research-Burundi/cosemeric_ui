@@ -179,7 +179,7 @@ async function login() {
     // check if the user is Admin
     if (authStore.user.role === "admin") {
       window.location.href = "/dashboard";
-    } else if (authStore.user.role === "manager") {
+    } else if (authStore.user.role === "gestionnaire") {
       window.location.href = "/manager/dashboard";
     } else {
       window.location.href = "/credits/mescredits";

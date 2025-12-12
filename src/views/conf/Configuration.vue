@@ -272,6 +272,7 @@ async function removeConfig(cfg) {
     configs.value = configs.value.filter(
       (c) => c.id !== cfg.id && c.key !== cfg.key
     );
+    await fetchConfigs();
   } catch (err) {
     console.error("removeConfig error", err);
     alert("Erreur lors de la suppression.");
