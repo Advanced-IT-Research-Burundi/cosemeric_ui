@@ -379,6 +379,13 @@ const menuItems = ref([
     path: "/mesCotisations",
     requireAdmin: isMember.value,
   },
+
+  {
+    icon: '<i class="bi bi-wallet-fill"></i>',
+    title: "Mes assistances",
+    path: "/mesAssistances",
+    requireAdmin: isMember.value,
+  },
   {
     icon: '<i class="bi bi-calendar-event-fill"></i>',
     title: "Périodes",
@@ -401,6 +408,13 @@ const menuItems = ref([
     icon: '<i class="bi bi-plus-square-dotted"></i>',
     title: "Demande Crédit",
     path: "/credits/demande",
+    requireAdmin: isMember.value || isManager.value,
+  },
+
+  {
+    icon: '<i class="bi bi-plus-square-dotted"></i>',
+    title: "Demande Assistance",
+    path: "/assistance/demande",
     requireAdmin: isMember.value || isManager.value,
   },
   {

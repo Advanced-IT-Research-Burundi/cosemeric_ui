@@ -66,6 +66,19 @@ const routes = [
     component: () => import("../views/cotisations/MesCotisations.vue"),
     meta: { requiresAuth: true },
   },
+
+  {
+    path: "/assistance/demande",
+    name: "assistanceDemande",
+    component: () => import("../views/assistances/DemandeAssistance.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/mesAssistances",
+    name: "mesAssistances",
+    component: () => import("../views/assistances/MesAssistances.vue"),
+    meta: { requiresAuth: true },
+  },
   // Assistances
   {
     path: "/assistances",
