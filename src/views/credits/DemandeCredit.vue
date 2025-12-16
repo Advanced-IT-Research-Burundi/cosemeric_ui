@@ -86,11 +86,10 @@
               <label for="date_demande" class="form-label"
                 >Date de Demande <span class="text-danger">*</span></label
               >
-              <input
-                type="date"
-                class="form-control"
-                id="date_demande"
+              <Datepicker
                 v-model="formData.date_demande"
+                :enable-time-picker="false"
+                :auto-apply="true"
                 required
               />
             </div>

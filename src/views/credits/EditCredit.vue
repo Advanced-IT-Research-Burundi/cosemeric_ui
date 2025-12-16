@@ -17,12 +17,16 @@
     <div v-else class="card">
       <div class="card-body">
         <form @submit.prevent="handleSubmit">
-          <div v-if="submitError" class="alert alert-danger mb-4">{{ submitError }}</div>
+          <div v-if="submitError" class="alert alert-danger mb-4">
+            {{ submitError }}
+          </div>
 
           <div class="row g-3">
             <!-- Membre -->
             <div class="col-md-6">
-              <label class="form-label">Membre <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >Membre <span class="text-danger">*</span></label
+              >
               <select class="form-select" v-model="formData.membre_id" required>
                 <option v-for="m in members" :key="m.id" :value="m.id">
                   {{ m.prenom }} {{ m.nom }}
@@ -32,67 +36,75 @@
 
             <!-- Montant Demandé -->
             <div class="col-md-6">
-              <label class="form-label">Montant Demandé <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >Montant Demandé <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  v-model.number="formData.montant_demande" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model.number="formData.montant_demande"
+                  min="0"
                   step="1"
                   required
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">FBU</span>
               </div>
             </div>
 
             <!-- Montant Accordé -->
             <div class="col-md-6">
-              <label class="form-label">Montant Accordé <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >Montant Accordé <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  v-model.number="formData.montant_accorde" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model.number="formData.montant_accorde"
+                  min="0"
                   step="1"
                   required
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">FBU</span>
               </div>
             </div>
 
             <!-- Taux d'Intérêt -->
             <div class="col-md-6">
-              <label class="form-label">Taux d'Intérêt (%) <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >Taux d'Intérêt (%) <span class="text-danger">*</span></label
+              >
               <div class="input-group">
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  v-model.number="formData.taux_interet" 
-                  min="0" 
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model.number="formData.taux_interet"
+                  min="0"
                   max="100"
                   step="1"
                   required
                   @input="calculatePayments"
-                >
+                />
                 <span class="input-group-text">%</span>
               </div>
             </div>
 
             <!-- Durée en Mois -->
             <div class="col-md-6">
-              <label class="form-label">Durée (mois) <span class="text-danger">*</span></label>
-              <input 
-                type="number" 
-                class="form-control" 
-                v-model.number="formData.duree_mois" 
-                min="1" 
+              <label class="form-label"
+                >Durée (mois) <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control"
+                v-model.number="formData.duree_mois"
+                min="1"
                 required
                 @input="calculatePayments"
-              >
+              />
             </div>
 
             <!-- Montant Total à Rembourser -->
@@ -113,28 +125,32 @@
 
             <!-- Date de Demande -->
             <div class="col-md-6">
-              <label class="form-label">Date de Demande <span class="text-danger">*</span></label>
-              <input 
-                type="date" 
-                class="form-control" 
-                v-model="formData.date_demande" 
-                required
+              <label class="form-label"
+                >Date de Demande <span class="text-danger">*</span></label
               >
+              <Datepicker
+                v-model="formData.date_demande"
+                :enable-time-picker="false"
+                :auto-apply="true"
+                required
+              />
             </div>
 
             <!-- Date d'Approbation -->
             <div class="col-md-6">
               <label class="form-label">Date d'Approbation</label>
-              <input 
-                type="date" 
-                class="form-control" 
+              <Datepicker
                 v-model="formData.date_approbation"
-              >
+                :enable-time-picker="false"
+                :auto-apply="true"
+              />
             </div>
 
             <!-- Statut -->
             <div class="col-md-6">
-              <label class="form-label">Statut <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >Statut <span class="text-danger">*</span></label
+              >
               <select class="form-select" v-model="formData.statut" required>
                 <option value="en_attente">En attente</option>
                 <option value="approuve">Approuvé</option>
@@ -145,9 +161,11 @@
 
             <!-- Motif -->
             <div class="col-12">
-              <label class="form-label">Motif du Crédit <span class="text-danger">*</span></label>
-              <textarea 
-                class="form-control" 
+              <label class="form-label"
+                >Motif du Crédit <span class="text-danger">*</span></label
+              >
+              <textarea
+                class="form-control"
                 v-model="formData.motif"
                 rows="3"
                 required
@@ -157,21 +175,20 @@
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
-            <button 
-              type="button" 
-              class="btn btn-outline-secondary" 
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
               @click="$router.push('/credits')"
               :disabled="saving"
             >
               Annuler
             </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary" 
-              :disabled="saving"
-            >
-              <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
-              {{ saving ? 'Enregistrement...' : 'Mettre à jour' }}
+            <button type="submit" class="btn btn-primary" :disabled="saving">
+              <span
+                v-if="saving"
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
+              {{ saving ? "Enregistrement..." : "Mettre à jour" }}
             </button>
           </div>
         </form>
@@ -181,10 +198,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useToast } from 'vue-toastification';
-import api from '../../services/api';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+import api from "../../services/api";
 
 const route = useRoute();
 const router = useRouter();
@@ -193,49 +210,52 @@ const toast = useToast();
 const creditId = route.params.id;
 const loading = ref(true);
 const saving = ref(false);
-const error = ref('');
-const submitError = ref('');
+const error = ref("");
+const submitError = ref("");
 const members = ref([]);
 
 const formData = ref({
-  membre_id: '',
+  membre_id: "",
   montant_demande: 0,
   montant_accorde: 0,
   taux_interet: 0,
   duree_mois: 1,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
-  date_demande: new Date().toISOString().split('T')[0],
-  date_approbation: '',
-  statut: 'en_attente',
-  motif: ''
+  date_demande: new Date().toISOString().split("T")[0],
+  date_approbation: "",
+  statut: "en_attente",
+  motif: "",
 });
 
 // Fetch data
 const fetchData = async () => {
   try {
     const [membersRes, creditRes] = await Promise.all([
-      api.get('/membres'),
-      api.get(`/credits/${creditId}`)
+      api.get("/membres"),
+      api.get(`/credits/${creditId}`),
     ]);
-    
+
     members.value = membersRes.data.data || [];
-    
+
     const credit = creditRes.data;
     formData.value = {
       ...credit,
-      date_demande: credit.date_demande ? credit.date_demande.split('T')[0] : '',
-      date_approbation: credit.date_approbation ? credit.date_approbation.split('T')[0] : ''
+      date_demande: credit.date_demande
+        ? credit.date_demande.split("T")[0]
+        : "",
+      date_approbation: credit.date_approbation
+        ? credit.date_approbation.split("T")[0]
+        : "",
     };
 
     console.log(formData.value);
-    
+
     // Calculate initial payments
     calculatePayments();
-    
   } catch (err) {
-    console.error('Error fetching data:', err);
-    error.value = 'Erreur lors du chargement des données';
+    console.error("Error fetching data:", err);
+    error.value = "Erreur lors du chargement des données";
     toast.error(error.value);
   } finally {
     loading.value = false;
@@ -247,14 +267,14 @@ const calculatePayments = () => {
   const montant = parseFloat(formData.value.montant_accorde) || 0;
   const taux = parseFloat(formData.value.taux_interet) || 0;
   const duree = parseInt(formData.value.duree_mois) || 1;
-  
+
   // Calculate total amount with interest
   const interet = (montant * taux * duree) / (12 * 100);
   const total = montant + interet;
-  
+
   // Calculate monthly payment
   const mensualite = duree > 0 ? total / duree : 0;
-  
+
   formData.value.montant_total_rembourser = total.toFixed(2);
   formData.value.montant_mensualite = mensualite.toFixed(2);
 };
@@ -262,16 +282,17 @@ const calculatePayments = () => {
 // Handle form submission
 const handleSubmit = async () => {
   saving.value = true;
-  submitError.value = '';
-  
+  submitError.value = "";
+
   try {
     const payload = { ...formData.value };
     await api.put(`/credits/${creditId}`, payload);
-    toast.success('Crédit mis à jour avec succès');
-    router.push('/credits');
+    toast.success("Crédit mis à jour avec succès");
+    router.push("/credits");
   } catch (err) {
-    console.error('Error updating credit:', err);
-    submitError.value = err.response?.data?.message || 'Erreur lors de la mise à jour';
+    console.error("Error updating credit:", err);
+    submitError.value =
+      err.response?.data?.message || "Erreur lors de la mise à jour";
     toast.error(submitError.value);
   } finally {
     saving.value = false;

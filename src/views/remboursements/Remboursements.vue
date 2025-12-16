@@ -50,7 +50,7 @@ const queryParams = ref({
   sort_order: "asc",
   filters: {},
 });
-3
+3;
 const columns = [
   { key: "id", label: "ID", sortable: true },
   { key: "credit_id", label: "Crédit", sortable: true, filterable: true },
