@@ -58,7 +58,12 @@
                   <label class="form-label"
                     >Type <span class="text-danger">*</span></label
                   >
-                  <select class="form-select" v-model="form.type" required>
+                  <select
+                    class="form-select"
+                    v-model="form.type"
+                    required
+                    :disabled="isEdit"
+                  >
                     <option value="mensuel">Mensuel</option>
                     <option value="semestriel">Semestriel</option>
                   </select>
@@ -374,8 +379,6 @@ const save = async () => {
     console.log(form.value);
     const payload = { ...form.value };
 
-    alert(payload.value);
-
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }
@@ -385,13 +388,16 @@ const save = async () => {
 
     if (isEdit.value && payload.id) {
       await api.put(`/periodes/${payload.id}`, payload);
+      showModal.value = false;
+
       toast.success("Période modifiée avec succès");
     } else {
       await api.post("/periodes", payload);
+      showModal.value = false;
+
       toast.success("Période enregistrée avec succès");
     }
     await fetchPeriodes();
-    showModal.value = false;
   } catch (e) {
     console.error("Error saving periode:", e);
 
