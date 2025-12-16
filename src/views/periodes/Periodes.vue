@@ -21,6 +21,8 @@
         :show-filters="false"
         :has-actions="true"
         row-key="id"
+        details-endpoint="periodes"
+        details-title="Détails de la période"
         @edit="openEdit"
         @delete="handleDelete"
         @search="handleSearch"

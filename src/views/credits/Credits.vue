@@ -66,7 +66,8 @@
           :show-filters="true"
           :has-actions="true"
           row-key="id"
-          @show="handleShow"
+          details-endpoint="credits"
+          details-title="Détails du Crédit"
           @search="handleSearch"
           @sort="handleSort"
           @page-change="handlePageChange"
@@ -78,11 +79,11 @@
             </span>
           </template>
 
-          <template #actions="{ item }">
+          <template #actions="{ item, openDetails }">
             <div class="btn-group">
               <button
                 class="btn btn-outline-secondary btn-sm"
-                @click="handleShow(item)"
+                @click="openDetails(item)"
                 title="Voir détails"
               >
                 <i class="fas fa-eye"></i>
