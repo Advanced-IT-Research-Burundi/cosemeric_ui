@@ -13,11 +13,11 @@
 
 <script>
 export default {
-  name: 'PageNotFound',
+  name: "PageNotFound",
   mounted() {
-    document.title = 'Page non trouvée | COSEMERIC'
-  }
-}
+    document.title = "Page non trouvée | CASOMIREC";
+  },
+};
 </script>
 
 <style scoped>

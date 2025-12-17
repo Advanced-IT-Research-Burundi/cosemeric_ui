@@ -231,7 +231,7 @@ const handleAction = async (item, action) => {
     // If not, we might need to use PUT/PATCH on /credits/{id}
     // Let's try a generic update first.
 
-    alert(action);
+    //alert(action);
 
     //await api.put(`/credits/${item.id}`, { statut: action });
 

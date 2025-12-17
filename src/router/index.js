@@ -323,7 +323,7 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
   // Set page title
-  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : "COSEMERIC";
+  document.title = to.meta.title ? `${to.meta.title} | CASOMIREC` : "CASOMIREC";
 
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
