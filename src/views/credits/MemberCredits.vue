@@ -15,12 +15,12 @@
             <label for="dateSearch" class="form-label"
               >Rechercher par date</label
             >
-            <input
-              type="date"
+            <Datepicker
               id="dateSearch"
-              class="form-control"
               v-model="dateSearch"
-              @change="handleDateSearch"
+              :enable-time-picker="false"
+              :auto-apply="true"
+              @update:model-value="handleDateSearch"
             />
           </div>
         </div>

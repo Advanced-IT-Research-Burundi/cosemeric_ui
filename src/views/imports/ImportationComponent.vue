@@ -38,7 +38,11 @@
         <div class="row g-3 mb-4 align-items-end">
           <div class="col-md-4">
             <label class="form-label fw-semibold">Date de cotisation</label>
-            <input type="date" v-model="date_cotisation" class="form-control" />
+            <Datepicker
+              v-model="date_cotisation"
+              :enable-time-picker="false"
+              :auto-apply="true"
+            />
           </div>
 
           <div class="col-md-8">

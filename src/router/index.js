@@ -5,7 +5,6 @@ import { useAuthStore } from "../stores/auth";
 import Login from "../views/auth/Login.vue";
 import Register from "../views/auth/Register.vue";
 import PageNotFound from "../views/errors/PageNotFound.vue";
-import AdminComponent from "../views/admin/AdminComponent.vue";
 
 // Auth guard
 const requireAuth = (to, from, next) => {
@@ -18,12 +17,7 @@ const requireAuth = (to, from, next) => {
 };
 
 const routes = [
-  {
-    path: "/admin",
-    name: "admin",
-    component: AdminComponent,
-    meta: { requiresAuth: true },
-  },
+
   {
     path: "/reports",
     name: "reports",
@@ -53,6 +47,12 @@ const routes = [
     alias: "/",
     meta: { requiresAuth: true },
   },
+  {
+    path: "/manager/dashboard",
+    name: "managerDashboard",
+    component: () => import("../views/manager/ManagerDashboard.vue"),
+    meta: { requiresAuth: true },
+  },
   // Test AdvancedTable
   {
     path: "/test",
@@ -64,6 +64,19 @@ const routes = [
     path: "/mesCotisations",
     name: "mesCotisations",
     component: () => import("../views/cotisations/MesCotisations.vue"),
+    meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/assistance/demande",
+    name: "assistanceDemande",
+    component: () => import("../views/assistances/DemandeAssistance.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/mesAssistances",
+    name: "mesAssistances",
+    component: () => import("../views/assistances/MesAssistances.vue"),
     meta: { requiresAuth: true },
   },
   // Assistances
@@ -79,7 +92,7 @@ const routes = [
       {
         path: "add",
         name: "assistancesAdd",
-        component: () => import("../views/assistances/AddAssistance.vue"),
+        component: () => import("../views/assistances/AddAssistanceView.vue"),
       },
       {
         path: ":id/edit",
@@ -206,6 +219,12 @@ meta: { requiresAuth: true},
     meta: { requiresAuth: true },
   },
   {
+    path: "/notifications",
+    name: "notifications",
+    component: () => import("../views/notifications/Notifications.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/cotisationMensuelle",
     name: "cotisationMensuelle",
     component: () => import("../views/cotisations/CotisationMensuelle.vue"),
@@ -304,7 +323,7 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
   // Set page title
-  document.title = to.meta.title ? `${to.meta.title} | COSEMERIC` : "COSEMERIC";
+  document.title = to.meta.title ? `${to.meta.title} | CASOMIREC` : "CASOMIREC";
 
   // Check if route requires authentication
   if (to.meta.requiresAuth) {

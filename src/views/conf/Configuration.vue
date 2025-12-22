@@ -49,12 +49,12 @@
                   >
                     Modifier
                   </button>
-                  <!-- <button
+                  <button
                     class="btn btn-sm btn-outline-danger"
                     @click="removeConfig(c)"
                   >
                     Supprimer
-                  </button> -->
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -272,6 +272,7 @@ async function removeConfig(cfg) {
     configs.value = configs.value.filter(
       (c) => c.id !== cfg.id && c.key !== cfg.key
     );
+    await fetchConfigs();
   } catch (err) {
     console.error("removeConfig error", err);
     alert("Erreur lors de la suppression.");

@@ -116,7 +116,8 @@
 
                   <Datepicker
                     v-model="form.date_adhesion"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
               </div>

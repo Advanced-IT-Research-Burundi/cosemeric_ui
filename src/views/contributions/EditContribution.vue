@@ -103,9 +103,10 @@
                 >Date de Paiement <span class="text-danger">*</span></label
               >
 
-                         <Datepicker
+              <Datepicker
                 v-model="formData.date_paiement"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -240,7 +241,7 @@ const router = useRouter();
 const route = useRoute();
 const toast = useToast();
 
-const loading = ref(true);
+const loading = ref(false);
 const saving = ref(false);
 const loadingMembers = ref(true);
 const loadingPeriodes = ref(true);
@@ -275,10 +276,14 @@ const fetchMembers = async () => {
 };
 
 // Fetch periods
-const fetchPeriodes = async () => {
+const fetchPeriodes = async (devise) => {
   try {
-    const response = await api.get("/periodes");
-    periodes.value = response.data || [];
+    const response = await api.get("/periodes", {
+      params: {
+        type: devise,
+      },
+    });
+    periodes.value = response.data.data || [];
   } catch (err) {
     console.error("Error fetching periods:", err);
   } finally {
@@ -292,9 +297,17 @@ const fetchContribution = async () => {
     const response = await api.get(`/cotisations/${contributionId}`);
     const data = response.data;
     // Map API data to form data
+    let formattedDate = null;
+    if (data.date_paiement) {
+      const date = new Date(data.date_paiement);
+      if (!isNaN(date.getTime())) {
+        formattedDate = date.toISOString().split("T")[0];
+      }
+    }
+
     formData.value = {
       ...data,
-      date_paiement: new Date(data.date_paiement).toISOString().split("T")[0],
+      date_paiement: formattedDate,
     };
     console.log(formData.value);
   } catch (err) {
@@ -342,8 +355,9 @@ const handleSubmit = async () => {
 };
 
 // Fetch all required data on component mount
-onMounted(async () => {
-  await Promise.all([fetchMembers(), fetchPeriodes()]);
-  await fetchContribution();
+onMounted(() => {
+  fetchMembers();
+  fetchPeriodes(formData.value.devise);
+  fetchContribution();
 });
 </script>

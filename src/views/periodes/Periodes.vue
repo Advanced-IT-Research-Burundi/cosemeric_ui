@@ -21,6 +21,8 @@
         :show-filters="false"
         :has-actions="true"
         row-key="id"
+        details-endpoint="periodes"
+        details-title="Détails de la période"
         @edit="openEdit"
         @delete="handleDelete"
         @search="handleSearch"
@@ -58,7 +60,12 @@
                   <label class="form-label"
                     >Type <span class="text-danger">*</span></label
                   >
-                  <select class="form-select" v-model="form.type" required>
+                  <select
+                    class="form-select"
+                    v-model="form.type"
+                    required
+                    :disabled="isEdit"
+                  >
                     <option value="mensuel">Mensuel</option>
                     <option value="semestriel">Semestriel</option>
                   </select>
@@ -127,7 +134,8 @@
                   >
                   <Datepicker
                     v-model="form.date_debut"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
 
@@ -137,7 +145,8 @@
                   >
                   <Datepicker
                     v-model="form.date_fin"
-                    :enable-time-picker="true"
+                    :enable-time-picker="false"
+                    :auto-apply="true"
                   />
                 </div>
               </div>
@@ -173,7 +182,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
@@ -223,7 +232,12 @@ const columns = [
     },
   },
 
-  { key: "semestre", label: "Semestre", sortable: true },
+  {
+    key: "semestre",
+    label: "Semestre",
+    sortable: true,
+    formatter: (v) => semesterLabel(v),
+  },
   { key: "annee", label: "Année", sortable: true, filterable: true },
   { key: "statut", label: "Statut", sortable: true, filterable: true },
   { key: "type", label: "Type", sortable: true, filterable: true },
@@ -253,9 +267,37 @@ const form = ref({
   semestre: 1,
   annee: new Date().getFullYear(),
   statut: "ouvert",
-  date_debut: "",
-  date_fin: "",
+  date_debut: null,
+  date_fin: null,
 });
+
+watch(
+  () => [
+    form.value.type,
+    form.value.mois,
+    form.value.semestre,
+    form.value.annee,
+  ],
+  ([newType, newMois, newSemestre, newAnnee]) => {
+    if (!newAnnee) return;
+
+    const year = parseInt(newAnnee);
+
+    if (newType === "mensuel" && newMois) {
+      const monthIndex = parseInt(newMois) - 1;
+      form.value.date_debut = new Date(year, monthIndex, 1);
+      form.value.date_fin = new Date(year, monthIndex + 1, 0);
+    } else if (newType === "semestriel" && newSemestre) {
+      if (parseInt(newSemestre) === 1) {
+        form.value.date_debut = new Date(year, 0, 1);
+        form.value.date_fin = new Date(year, 5, 30);
+      } else if (parseInt(newSemestre) === 2) {
+        form.value.date_debut = new Date(year, 6, 1);
+        form.value.date_fin = new Date(year, 11, 31);
+      }
+    }
+  }
+);
 const showModal = ref(false);
 const isEdit = ref(false);
 
@@ -311,8 +353,8 @@ const openAdd = () => {
     semestre: 1,
     annee: new Date().getFullYear(),
     statut: "ouvert",
-    date_debut: "",
-    date_fin: "",
+    date_debut: null,
+    date_fin: null,
   };
   error.value = "";
   showModal.value = true;
@@ -339,8 +381,6 @@ const save = async () => {
     console.log(form.value);
     const payload = { ...form.value };
 
-    alert(payload.value);
-
     if (payload.type === "mensuel") {
       payload.semestre = null;
     }
@@ -350,13 +390,16 @@ const save = async () => {
 
     if (isEdit.value && payload.id) {
       await api.put(`/periodes/${payload.id}`, payload);
+      showModal.value = false;
+
       toast.success("Période modifiée avec succès");
     } else {
       await api.post("/periodes", payload);
+      showModal.value = false;
+
       toast.success("Période enregistrée avec succès");
     }
     await fetchPeriodes();
-    showModal.value = false;
   } catch (e) {
     console.error("Error saving periode:", e);
 

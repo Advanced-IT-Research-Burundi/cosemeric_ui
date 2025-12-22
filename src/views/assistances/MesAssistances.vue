@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0">Gestion des assistances</h2>
+      <h2 class="mb-0">Mes assistances</h2>
       <router-link to="/assistances/add" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Ajouter une assistance
       </router-link>
@@ -17,8 +17,6 @@
         :show-filters="true"
         :has-actions="true"
         row-key="id"
-        details-endpoint="assistances"
-        details-title="Détails de l'assistance"
         @edit="handleEdit"
         @delete="handleDelete"
         @search="handleSearch"
@@ -61,14 +59,20 @@ const queryParams = ref({
 
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
+  //   { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
   {
     key: "type_assistance.nom",
     label: "Type d'assistance",
     width: "100px",
     sortable: true,
   },
-  { key: "montant", label: "Montant", sortable: true, filterable: true },
+  {
+    key: "montant",
+    label: "Montant",
+    sortable: true,
+    filterable: true,
+    formatter: (value) => new Intl.NumberFormat("fr-FR").format(value),
+  },
   {
     key: "date_versement",
     label: "Date de versement",
@@ -117,7 +121,7 @@ const fetchAssistances = async () => {
       }
     });
 
-    const response = await api.get("/assistances", params);
+    const response = await api.get("/mes-assistances", params);
 
     // Handle your API response structure
     if (response.success) {

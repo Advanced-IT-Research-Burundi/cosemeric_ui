@@ -16,32 +16,6 @@
 
           <div class="row g-3">
             <!-- Membre -->
-            <div class="col-md-6">
-              <label for="membre_id" class="form-label"
-                >Membre <span class="text-danger">*</span></label
-              >
-              <select
-                id="membre_id"
-                class="form-select"
-                v-model="formData.membre_id"
-                required
-                :disabled="loadingMembers"
-              >
-                <option value="" disabled>Sélectionnez un membre</option>
-                <option
-                  v-for="membre in members"
-                  :key="membre.id"
-                  :value="membre.id"
-                >
-                  {{ membre.id }} | {{ membre.full_name }} |
-                  {{ membre.telephone }} | {{ membre.categorie.nom }}
-                </option>
-              </select>
-              <div v-if="loadingMembers" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
-                membres...
-              </div>
-            </div>
 
             <!-- Type d'Assistance -->
             <div class="col-md-6">
@@ -111,9 +85,9 @@
               >
               <Datepicker
                 v-model="formData.date_demande"
-                :enable-time-picker="true"
-                :minute-increment="1"
-                placeholder="Choisir une date et l'heure"
+                :enable-time-picker="false"
+                :auto-apply="true"
+                placeholder="Choisir une date"
               />
             </div>
 
@@ -124,7 +98,8 @@
               >
               <Datepicker
                 v-model="formData.date_approbation"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -135,7 +110,8 @@
               >
               <Datepicker
                 v-model="formData.date_versement"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -217,7 +193,7 @@ const formData = ref({
   membre_id: "",
   type_assistance_id: "",
   montant: 0,
-  date_demande: new Date().toISOString().slice(0, 16),
+  date_demande: new Date().toISOString().split("T")[0],
   date_approbation: null,
   date_versement: null,
   statut: "en_attente",
@@ -279,10 +255,10 @@ const handleSubmit = async () => {
     if (!payload.justificatif) delete payload.justificatif;
     if (!payload.motif_rejet) delete payload.motif_rejet;
 
-    await api.post("/assistances", payload);
+    await api.post("/demande-assistance", payload);
 
     toast.success("Demande d'assistance enregistrée avec succès");
-    router.push("/assistances");
+    router.push("/mesAssistances");
   } catch (err) {
     console.error("Error saving assistance:", err);
     error.value =
@@ -297,7 +273,7 @@ watch(
   () => formData.value.statut,
   (newVal) => {
     if (newVal === "approuve" && !formData.value.date_approbation) {
-      formData.value.date_approbation = new Date().toISOString().slice(0, 16);
+      formData.value.date_approbation = new Date().toISOString().split("T")[0];
     }
   }
 );

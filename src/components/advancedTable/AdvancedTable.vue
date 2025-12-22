@@ -35,7 +35,7 @@
     </div>
 
     <!-- Loading Skeleton -->
-    <div v-if="loading && tableData.length  == 0 " class="table-responsive">
+    <div v-if="loading && tableData.length == 0" class="table-responsive">
       <table class="table table-striped">
         <thead class="table-light">
           <tr>
@@ -106,7 +106,13 @@
             v-for="(item, index) in tableData"
             :key="getRowKey(item, index)"
           >
-            <td v-for="column in columns" :key="column.key" :style="{ maxWidth: `${column.width || 'fit-content'} !important` }">
+            <td
+              v-for="column in columns"
+              :key="column.key"
+              :style="{
+                maxWidth: `${column.width || 'fit-content'} !important`,
+              }"
+            >
               <slot
                 :name="`column-${column.key}`"
                 :item="item"
@@ -117,11 +123,16 @@
               </slot>
             </td>
             <td v-if="hasActions">
-              <slot name="actions" :item="item" :index="index">
+              <slot
+                name="actions"
+                :item="item"
+                :index="index"
+                :open-details="handleShow"
+              >
                 <div class="btn-group">
                   <button
                     class="btn btn-outline-secondary btn-sm"
-                    @click="$emit('show', item)"
+                    @click="handleShow(item)"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -150,6 +161,14 @@
       :pagination="paginationData"
       @page-change="handlePageChange"
     />
+
+    <DetailsModal
+      v-if="detailsEndpoint"
+      v-model="showDetailsModal"
+      :endpoint="detailsEndpoint"
+      :item-id="detailsItemId"
+      :title="detailsTitle"
+    />
   </div>
 </template>
 
@@ -158,6 +177,7 @@ import { ref, computed, watch, onMounted } from "vue";
 import TableSearch from "./TableSearch.vue";
 import TableFilters from "./TableFilters.vue";
 import TablePagination from "./TablePagination.vue";
+import DetailsModal from "../common/DetailsModal.vue";
 
 // Props
 const props = defineProps({
@@ -209,6 +229,14 @@ const props = defineProps({
   skeletonColumns: {
     type: Number,
     default: 4,
+  },
+  detailsEndpoint: {
+    type: String,
+    default: null,
+  },
+  detailsTitle: {
+    type: String,
+    default: "Détails",
   },
 });
 
@@ -308,11 +336,25 @@ const handlePerPageChange = () => {
 };
 
 // Watch for per_page changes from parent
-watch(() => props.data.per_page, (newPerPage) => {
+watch(
+  () => props.data.per_page,
+  (newPerPage) => {
     if (newPerPage) {
       itemsPerPage.value = newPerPage;
     }
-});
+  }
+);
+
+const showDetailsModal = ref(false);
+const detailsItemId = ref(null);
+
+const handleShow = (item) => {
+  if (props.detailsEndpoint) {
+    detailsItemId.value = getRowKey(item);
+    showDetailsModal.value = true;
+  }
+  emit("show", item);
+};
 </script>
 
 <style scoped>
@@ -366,8 +408,8 @@ watch(() => props.data.per_page, (newPerPage) => {
   width: 80%;
 }
 
-
-.table td, .table th {
+.table td,
+.table th {
   word-wrap: break-word;
   min-width: fit-content !important;
   overflow: hidden;
@@ -390,7 +432,7 @@ watch(() => props.data.per_page, (newPerPage) => {
   }
 }
 
-th{
-font-weight: 600 !important;
+th {
+  font-weight: 600 !important;
 }
 </style>

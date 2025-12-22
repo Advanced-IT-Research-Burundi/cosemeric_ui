@@ -21,6 +21,8 @@
         :show-filters="true"
         :has-actions="true"
         row-key="id"
+        details-endpoint="cotisations"
+        details-title="Détails de la cotisation"
         @edit="handleEdit"
         @delete="handleDelete"
         @search="handleSearch"

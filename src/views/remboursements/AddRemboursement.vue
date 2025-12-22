@@ -131,7 +131,8 @@
               >
               <Datepicker
                 v-model="form.date_echeance"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -139,7 +140,8 @@
               <label class="form-label">Date de paiement</label>
               <Datepicker
                 v-model="form.date_paiement"
-                :enable-time-picker="true"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 

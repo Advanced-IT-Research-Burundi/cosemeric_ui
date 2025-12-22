@@ -17,6 +17,8 @@
         :show-filters="true"
         :has-actions="true"
         row-key="id"
+        details-endpoint="remboursements"
+        details-title="Détails du remboursement"
         @edit="handleEdit"
         @delete="handleDelete"
         @search="handleSearch"
@@ -30,11 +32,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useStore } from 'vuex'; 
-import router from '../../router';
-import api from '../../services/api';
-import AdvancedTable from '../../components/advancedTable/AdvancedTable.vue';
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import router from "../../router";
+import api from "../../services/api";
+import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 
 const store = useStore();
 const remboursements = ref([]);
@@ -43,22 +45,37 @@ const loading = ref(false);
 const queryParams = ref({
   page: 1,
   per_page: 15,
-  search: '',
-  sort_field: '',
-  sort_order: 'asc',
+  search: "",
+  sort_field: "",
+  sort_order: "asc",
   filters: {},
 });
-
+3;
 const columns = [
-  { key: 'id', label: 'ID', sortable: true },
-  { key: 'credit_id', label: 'Crédit', sortable: true, filterable: true },
-  { key: 'numero_echeance', label: 'N° échéance', sortable: true, filterable: true },
-  { key: 'montant_prevu', label: 'Prévu', sortable: true, filterable: true },
-  { key: 'montant_paye', label: 'Payé', sortable: true, filterable: true },
-  { key: 'date_echeance', label: 'Échéance', sortable: true, formatter: v => v ? new Date(v).toLocaleDateString() : '' },
-  { key: 'date_paiement', label: 'Paiement', sortable: true, formatter: v => v ? new Date(v).toLocaleDateString() : '' },
-  { key: 'statut', label: 'Statut', sortable: true, filterable: true },
-  { key: 'penalite', label: 'Pénalité', sortable: true, filterable: true },
+  { key: "id", label: "ID", sortable: true },
+  { key: "credit_id", label: "Crédit", sortable: true, filterable: true },
+  {
+    key: "numero_echeance",
+    label: "N° échéance",
+    sortable: true,
+    filterable: true,
+  },
+  { key: "montant_prevu", label: "Prévu", sortable: true, filterable: true },
+  { key: "montant_paye", label: "Payé", sortable: true, filterable: true },
+  {
+    key: "date_echeance",
+    label: "Échéance",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
+  {
+    key: "date_paiement",
+    label: "Paiement",
+    sortable: true,
+    formatter: (v) => (v ? new Date(v).toLocaleDateString() : ""),
+  },
+  { key: "statut", label: "Statut", sortable: true, filterable: true },
+  { key: "penalite", label: "Pénalité", sortable: true, filterable: true },
 ];
 
 const fetchRemboursements = async () => {
@@ -77,7 +94,7 @@ const fetchRemboursements = async () => {
       if (v) params[`filter[${k}]`] = v;
     });
 
-    const res = await api.get('/remboursements', params);
+    const res = await api.get("/remboursements", params);
     if (res?.data) {
       console.log(res.data);
       remboursements.value = res.data || [];
@@ -90,22 +107,48 @@ const fetchRemboursements = async () => {
       store.state.remboursements = [];
     }
   } catch (e) {
-    console.error('Error fetching remboursements:', e);
+    console.error("Error fetching remboursements:", e);
   } finally {
     loading.value = false;
   }
 };
 
-const handleSearch = (term) => { queryParams.value.search = term; queryParams.value.page = 1; fetchRemboursements(); };
-const handleSort = ({ field, order }) => { queryParams.value.sort_field = field; queryParams.value.sort_order = order; queryParams.value.page = 1; fetchRemboursements(); };
-const handleFilter = (filters) => { queryParams.value.filters = filters; queryParams.value.page = 1; fetchRemboursements(); };
-const handlePageChange = (page) => { queryParams.value.page = page; fetchRemboursements(); };
-const handlePerPageChange = (per) => { queryParams.value.per_page = per; queryParams.value.page = 1; fetchRemboursements(); };
+const handleSearch = (term) => {
+  queryParams.value.search = term;
+  queryParams.value.page = 1;
+  fetchRemboursements();
+};
+const handleSort = ({ field, order }) => {
+  queryParams.value.sort_field = field;
+  queryParams.value.sort_order = order;
+  queryParams.value.page = 1;
+  fetchRemboursements();
+};
+const handleFilter = (filters) => {
+  queryParams.value.filters = filters;
+  queryParams.value.page = 1;
+  fetchRemboursements();
+};
+const handlePageChange = (page) => {
+  queryParams.value.page = page;
+  fetchRemboursements();
+};
+const handlePerPageChange = (per) => {
+  queryParams.value.per_page = per;
+  queryParams.value.page = 1;
+  fetchRemboursements();
+};
 
-const handleEdit = (row) => router.push({ name: 'remboursementsEdit', params: { id: row.id } });
+const handleEdit = (row) =>
+  router.push({ name: "remboursementsEdit", params: { id: row.id } });
 const handleDelete = async (row) => {
-  if (!confirm('Supprimer ce remboursement ?')) return;
-  try { await api.delete(`/remboursements/${row.id}`); fetchRemboursements(); } catch (e) { console.error(e); }
+  if (!confirm("Supprimer ce remboursement ?")) return;
+  try {
+    await api.delete(`/remboursements/${row.id}`);
+    fetchRemboursements();
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 const tableData = computed(() => {
