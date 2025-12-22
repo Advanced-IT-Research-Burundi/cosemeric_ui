@@ -503,8 +503,7 @@ const getNotificationIcon = (type) => {
 
 const handleNotificationClick = async (notification) => {
   // send request to chage to read true 
-  const response = await api.put(`notifications/${notification.id}/mark-read`);
- 
+  await api.put(`notifications/${notification.id}/mark-read`);
   notification.read = true;
 };
 
