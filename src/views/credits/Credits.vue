@@ -258,19 +258,19 @@ const handleModifier = async (item) => {
 };
 
 const handleAction = async (item, action) => {
-  if (action === "rejete") {
-    modalOpened.value = true;
-    return;
-  }
-  // if (
-  //   !confirm(
-  //     `Êtes-vous sûr de vouloir ${
-  //       action === "approuve" ? "accepter" : "refuser"
-  //     } ce crédit ?`
-  //   )
-  // ) {
+  // if (action === "rejete") {
+  //   modalOpened.value = true;
   //   return;
   // }
+  if (
+    !confirm(
+      `Êtes-vous sûr de vouloir ${
+        action === "approuve" ? "accepter" : "refuser"
+      } ce crédit ?`
+    )
+  ) {
+    return;
+  }
 
   try {
     // Assuming endpoint /credits/{id}/status or similar.

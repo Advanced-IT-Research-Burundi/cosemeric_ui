@@ -450,7 +450,7 @@ const menuItems = ref([
     icon: '<i class="bi bi-graph-up"></i>',
     title: "Rapports",
     path: "/reports",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value,
   },
   // {
   //   icon: '<i class="bi bi-shield-check"></i>',
