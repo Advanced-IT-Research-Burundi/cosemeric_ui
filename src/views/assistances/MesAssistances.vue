@@ -15,8 +15,9 @@
         search-placeholder="Rechercher des assistances..."
         no-data-message="Aucune assistance trouvée"
         :show-filters="true"
-        :has-actions="true"
+        :has-actions="false"
         row-key="id"
+        :has-show="false"
         @edit="handleEdit"
         @delete="handleDelete"
         @search="handleSearch"
@@ -73,19 +74,19 @@ const columns = [
     filterable: true,
     formatter: (value) => new Intl.NumberFormat("fr-FR").format(value),
   },
-  {
-    key: "date_versement",
-    label: "Date de versement",
-    sortable: true,
-    filterable: true,
-    formatter: (value) => new Date(value).toLocaleDateString(),
-  },
-  {
-    key: "statut",
-    label: "Statut",
-    sortable: true,
-    filterable: true,
-  },
+  // {
+  //   key: "date_versement",
+  //   label: "Date de versement",
+  //   sortable: true,
+  //   filterable: true,
+  //   formatter: (value) => new Date(value).toLocaleDateString(),
+  // },
+  // {
+  //   key: "statut",
+  //   label: "Statut",
+  //   sortable: true,
+  //   filterable: true,
+  // },
   {
     key: "created_at",
     label: "Créé le",

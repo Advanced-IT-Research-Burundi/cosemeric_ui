@@ -53,6 +53,13 @@
       </div>
     </div>
 
+    <BaseModal v-show="modalOpened" @close="modalOpened = false">
+      <div class="modal-content">
+        <span class="close" @click="modalOpened = false">&times;</span>
+        <p>Modal content...</p>
+      </div>
+    </BaseModal>
+
     <div class="card">
       <AdvancedTable
         :data="wrappedTableData"
@@ -127,12 +134,14 @@ import router from "../../router";
 import useAuthStore from "../../stores/auth";
 import { useToast } from "vue-toastification";
 import { value } from "@primeuix/themes/aura/knob";
+import BaseModal from "../../components/common/BaseModal.vue";
 
 const auth = useAuthStore();
 const isAdmin = auth.hasAnyRole("admin");
 const store = useStore();
 const toast = useToast();
 const loading = ref(false);
+const modalOpened = ref(true);
 
 // Filters
 const filters = ref({
@@ -249,15 +258,19 @@ const handleModifier = async (item) => {
 };
 
 const handleAction = async (item, action) => {
-  if (
-    !confirm(
-      `Êtes-vous sûr de vouloir ${
-        action === "approuve" ? "accepter" : "refuser"
-      } ce crédit ?`
-    )
-  ) {
+  if (action === "rejete") {
+    modalOpened.value = true;
     return;
   }
+  // if (
+  //   !confirm(
+  //     `Êtes-vous sûr de vouloir ${
+  //       action === "approuve" ? "accepter" : "refuser"
+  //     } ce crédit ?`
+  //   )
+  // ) {
+  //   return;
+  // }
 
   try {
     // Assuming endpoint /credits/{id}/status or similar.

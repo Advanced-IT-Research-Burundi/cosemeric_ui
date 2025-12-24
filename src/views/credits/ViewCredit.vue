@@ -8,16 +8,29 @@
             <i class="bi bi-person-badge me-2"></i>Information Membre
           </div>
           <div class="card-body text-center" v-if="credit.membre">
-            <div class="avatar-placeholder mb-3 mx-auto bg-primary text-white d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; font-size: 2rem;">
-              {{ credit.membre.nom.charAt(0) }}{{ credit.membre.prenom.charAt(0) }}
+            <div
+              class="avatar-placeholder mb-3 mx-auto bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
+              style="width: 80px; height: 80px; font-size: 2rem"
+            >
+              {{ credit.membre.nom.charAt(0)
+              }}{{ credit.membre.prenom.charAt(0) }}
             </div>
             <h5 class="card-title">{{ credit.membre.full_name }}</h5>
             <p class="text-muted mb-1">{{ credit.membre.matricule }}</p>
-            <hr>
+            <hr />
             <div class="text-start">
-              <p class="mb-2"><i class="bi bi-telephone me-2 text-muted"></i> {{ credit.membre.telephone }}</p>
-              <p class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i> {{ credit.membre.email }}</p>
-              <p class="mb-0"><i class="bi bi-geo-alt me-2 text-muted"></i> Catégorie: {{ credit.membre.categorie_id }}</p>
+              <p class="mb-2">
+                <i class="bi bi-telephone me-2 text-muted"></i>
+                {{ credit.membre.telephone }}
+              </p>
+              <p class="mb-2">
+                <i class="bi bi-envelope me-2 text-muted"></i>
+                {{ credit.membre.email }}
+              </p>
+              <p class="mb-0">
+                <i class="bi bi-geo-alt me-2 text-muted"></i> Catégorie:
+                {{ credit.membre.categorie_id }}
+              </p>
             </div>
           </div>
         </div>
@@ -26,11 +39,16 @@
       <!-- Credit Details Card -->
       <div class="col-md-8 mb-3">
         <div class="card shadow-sm border-0 h-100">
-          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <div
+            class="card-header bg-white py-3 d-flex justify-content-between align-items-center"
+          >
             <h5 class="mb-0 text-primary fw-bold">
               <i class="bi bi-cash-stack me-2"></i>Détails du Crédit
             </h5>
-            <span class="badge rounded-pill" :class="getStatusBadge(credit.statut)">
+            <span
+              class="badge rounded-pill"
+              :class="getStatusBadge(credit.statut)"
+            >
               {{ formatStatus(credit.statut) }}
             </span>
           </div>
@@ -38,17 +56,25 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="p-3 bg-light rounded">
-                  <small class="text-muted d-block uppercase">Montant Demandé</small>
-                  <span class="fw-bold fs-5">{{ formatCurrency(credit.montant_demande) }}</span>
+                  <small class="text-muted d-block uppercase"
+                    >Montant Demandé</small
+                  >
+                  <span class="fw-bold fs-5">{{
+                    formatCurrency(credit.montant_demande)
+                  }}</span>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="p-3 bg-light rounded">
-                  <small class="text-muted d-block uppercase">Montant Accordé</small>
-                  <span class="fw-bold fs-5 text-success">{{ formatCurrency(credit.montant_accorde) }}</span>
+                  <small class="text-muted d-block uppercase"
+                    >Montant Accordé</small
+                  >
+                  <span class="fw-bold fs-5 text-success">{{
+                    formatCurrency(credit.montant_accorde)
+                  }}</span>
                 </div>
               </div>
-              
+
               <div class="col-md-4">
                 <label class="text-muted text-small">Taux d'intérêt</label>
                 <p class="fw-bold">{{ credit.taux_interet }}%</p>
@@ -59,34 +85,63 @@
               </div>
               <div class="col-md-4">
                 <label class="text-muted text-small">Mensualité estimée</label>
-                <p class="fw-bold">{{ formatCurrency(credit.montant_mensualite) }}</p>
+                <p class="fw-bold">
+                  {{ formatCurrency(credit.montant_mensualite) }}
+                </p>
               </div>
 
-               <div class="col-md-6">
-                <label class="text-muted text-small">Montant Total à Rembourser</label>
-                <p class="fw-bold text-dark">{{ formatCurrency(credit.montant_total_rembourser) }}</p>
+              <div class="col-md-6">
+                <label class="text-muted text-small"
+                  >Montant Total à Rembourser</label
+                >
+                <p class="fw-bold text-dark">
+                  {{ formatCurrency(credit.montant_total_rembourser) }}
+                </p>
               </div>
               <div class="col-md-6">
-                 <label class="text-muted text-small">Montant Restant</label>
-                 <p class="fw-bold text-danger">{{ formatCurrency(credit.montant_restant) }}</p>
+                <label class="text-muted text-small">Montant Restant</label>
+                <p class="fw-bold text-danger">
+                  {{ formatCurrency(credit.montant_restant) }}
+                </p>
               </div>
 
               <div class="col-12">
-                <hr class="my-2">
+                <hr class="my-2" />
               </div>
 
               <div class="col-md-6">
-                <small class="text-muted"><i class="bi bi-calendar-event me-1"></i> Date Demande</small>
+                <small class="text-muted"
+                  ><i class="bi bi-calendar-event me-1"></i> Date Demande</small
+                >
                 <p>{{ formatDate(credit.date_demande) }}</p>
               </div>
-               <div class="col-md-6" v-if="credit.date_approbation">
-                <small class="text-muted"><i class="bi bi-check-circle me-1"></i> Date Approbation</small>
+              <div class="col-md-6" v-if="credit.date_approbation">
+                <small class="text-muted"
+                  ><i class="bi bi-check-circle me-1"></i> Date
+                  Approbation</small
+                >
                 <p>{{ formatDate(credit.date_approbation) }}</p>
               </div>
-              
+
+              <div class="col-md-6" v-if="credit.date_fin">
+                <small class="text-muted"
+                  ><i class="bi bi-check-circle me-1"></i> Date Fin</small
+                >
+                <p>{{ formatDate(credit.date_fin) }}</p>
+              </div>
+
               <div class="col-12" v-if="credit.motif">
-                 <label class="fw-bold mb-1">Motif</label>
-                 <p class="bg-light p-2 rounded fst-italic mb-0">{{ credit.motif }}</p>
+                <label class="fw-bold mb-1">Motif</label>
+                <p class="bg-light p-2 rounded fst-italic mb-0">
+                  {{ credit.motif }}
+                </p>
+              </div>
+
+              <div class="col-12" v-if="credit.commentaire">
+                <label class="fw-bold mb-1">Commentaire</label>
+                <p class="bg-light p-2 rounded fst-italic mb-0">
+                  {{ credit.commentaire }}
+                </p>
               </div>
             </div>
           </div>
@@ -94,7 +149,11 @@
       </div>
     </div>
 
-    <div v-else class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+    <div
+      v-else
+      class="d-flex justify-content-center align-items-center"
+      style="min-height: 200px"
+    >
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Chargement...</span>
       </div>
@@ -103,10 +162,10 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import api from '../../services/api';
-import { useStore } from 'vuex';
+import { onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
+import api from "../../services/api";
+import { useStore } from "vuex";
 
 const route = useRoute();
 const store = useStore();
@@ -114,36 +173,48 @@ const store = useStore();
 const credit = computed(() => store.state.credit);
 
 const formatCurrency = (value) => {
-  if (!value) return '0 FBU';
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'BIF' }).format(value);
+  if (!value) return "0 FBU";
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "BIF",
+  }).format(value);
 };
 
 const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  if (!dateString) return "-";
+  return new Date(dateString).toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
 const formatStatus = (status) => {
-  if (!status) return '';
-  return status.replace(/_/g, ' ').toUpperCase();
+  if (!status) return "";
+  return status.replace(/_/g, " ").toUpperCase();
 };
 
 const getStatusBadge = (status) => {
   switch (status) {
-    case 'en_attente': return 'bg-warning text-dark';
-    case 'approuve': return 'bg-success';
-    case 'rejete': return 'bg-danger';
-    case 'paye': return 'bg-info';
-    default: return 'bg-secondary';
+    case "en_attente":
+      return "bg-warning text-dark";
+    case "approuve":
+      return "bg-success";
+    case "rejete":
+      return "bg-danger";
+    case "paye":
+      return "bg-info";
+    default:
+      return "bg-secondary";
   }
 };
 
 onMounted(async () => {
   try {
-     const response = await api.get(`/credits/${route.params.id}`);
-     store.state.credit = response.data;
+    const response = await api.get(`/credits/${route.params.id}`);
+    store.state.credit = response.data;
   } catch (error) {
-    console.error('Erreur lors du chargement du crédit:', error);
+    console.error("Erreur lors du chargement du crédit:", error);
   }
 });
 </script>
@@ -153,6 +224,6 @@ onMounted(async () => {
   font-size: 0.85rem;
 }
 .avatar-placeholder {
-    background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+  background: linear-gradient(45deg, #0d6efd, #0dcaf0);
 }
 </style>

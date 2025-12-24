@@ -126,6 +126,13 @@ const columns = [
     sortable: true,
     formatter: (value) => new Date(value).toLocaleDateString(),
   },
+
+  {
+    key: "date_fin",
+    label: "Date Fin",
+    sortable: true,
+    type: "date",
+  },
 ];
 
 const fetchCredits = async () => {
