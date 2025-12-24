@@ -87,15 +87,24 @@
             </button>
 
             <button
-              v-if="item.statut === 'en_attente'"
+              v-if="item.statut !== 'approuve'"
               class="btn btn-success btn-sm"
               @click="handleAction(item, 'approuve')"
               title="Accepter"
             >
               <i class="fas fa-check"></i>
             </button>
+
             <button
-              v-if="item.statut === 'en_attente'"
+              v-if="item.statut !== 'approuve'"
+              class="btn btn-warning btn-sm"
+              @click="handleModifier(item)"
+              title="Modifier"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              v-if="item.statut !== 'approuve' && item.statut !== 'rejete'"
               class="btn btn-danger btn-sm"
               @click="handleAction(item, 'rejete')"
               title="Refuser"
@@ -117,6 +126,7 @@ import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
 import useAuthStore from "../../stores/auth";
 import { useToast } from "vue-toastification";
+import { value } from "@primeuix/themes/aura/knob";
 
 const auth = useAuthStore();
 const isAdmin = auth.hasAnyRole("admin");
@@ -147,6 +157,7 @@ const columns = [
     key: "membre.full_name",
     label: "Membre",
     sortable: true,
+    formatter: (value) => trimName(value),
   },
   {
     key: "montant_demande",
@@ -161,27 +172,22 @@ const columns = [
     formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
   },
   {
-    key: "taux_interet",
-    label: "Taux",
+    key: "date_demande",
+    label: "Date Demande",
     sortable: true,
-    formatter: (value) => value + " %",
+    formatter: (value) => new Date(value).toLocaleDateString(),
   },
+
   {
-    key: "duree_mois",
-    label: "Durée",
+    key: "date_fin",
+    label: "Date de Fin",
     sortable: true,
-    formatter: (value) => value + " mois",
+    type: "date",
   },
   {
     key: "statut",
     label: "Statut",
     sortable: true,
-  },
-  {
-    key: "date_demande",
-    label: "Date Demande",
-    sortable: true,
-    formatter: (value) => new Date(value).toLocaleDateString(),
   },
 ];
 
@@ -213,6 +219,33 @@ const fetchCredits = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+function trimName(value, maxLength = 15) {
+  if (!value) return ""; // Handle empty or null value
+
+  const trimmedValue = value.trim();
+  if (trimmedValue.length <= maxLength) {
+    return trimmedValue; // No need to trim further if it's already short
+  }
+
+  // Split the string by spaces and rebuild it until it reaches maxLength
+  const words = trimmedValue.split(" ");
+  let result = "";
+
+  for (let word of words) {
+    if ((result + word).length + 1 <= maxLength) {
+      result += (result ? " " : "") + word; // Add word with space
+    } else {
+      break; // Stop if adding this word exceeds maxLength
+    }
+  }
+
+  return result; // Return the trimmed value without cutting words in half
+}
+
+const handleModifier = async (item) => {
+  router.push(`/credits/${item.id}/edit`);
 };
 
 const handleAction = async (item, action) => {

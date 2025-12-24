@@ -154,6 +154,20 @@
                 v-model="formData.date_approbation"
                 :enable-time-picker="false"
                 :auto-apply="true"
+                :min-date="formData.date_demande"
+                @input="calculateDateFin"
+                @update:modelValue="calculateDateFin"
+              />
+            </div>
+
+            <!-- Date de Fin -->
+            <div class="col-md-6">
+              <label for="date_fin" class="form-label">Date de Fin</label>
+
+              <Datepicker
+                v-model="formData.date_fin"
+                :enable-time-picker="false"
+                :auto-apply="true"
               />
             </div>
 
@@ -234,14 +248,23 @@ const error = ref("");
 
 const members = ref([]);
 
+const today = new Date();
+
+function addMonths(date, months) {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + months);
+  return result.toISOString().split("T")[0];
+}
+
 const formData = ref({
   montant_demande: 0,
   taux_interet: 3,
   duree_mois: 12,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
-  date_demande: new Date().toISOString().split("T")[0],
-  date_approbation: new Date().toISOString().split("T")[0],
+  date_demande: today.toISOString().split("T")[0],
+  date_approbation: today.toISOString().split("T")[0],
+  date_fin: today.toISOString().split("T")[0],
   statut: "en_attente",
   motif: "",
 });
@@ -275,6 +298,14 @@ const calculatePayments = () => {
 
   formData.value.montant_total_rembourser = total.toFixed(0);
   formData.value.montant_mensualite = mensualite.toFixed(0);
+};
+
+const calculateDateFin = () => {
+  const dateFin = addMonths(
+    formData.value.date_demande,
+    formData.value.duree_mois
+  );
+  formData.value.date_fin = dateFin;
 };
 
 // Handle form submission

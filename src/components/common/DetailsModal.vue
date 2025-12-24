@@ -55,6 +55,7 @@
                   <label class="text-muted small">Date de paiement</label>
                   <p class="fw-bold">{{ formatDate(data.date_paiement) }}</p>
                 </div>
+
                 <div class="col-md-6">
                   <label class="text-muted small">Mode de paiement</label>
                   <p class="fw-bold">
@@ -212,6 +213,10 @@
                 <div class="col-md-6">
                   <label class="text-muted small">Date de demande</label>
                   <p class="fw-bold">{{ formatDate(data.date_demande) }}</p>
+                </div>
+                <div class="col-md-6">
+                  <label class="text-muted small">Date de fin</label>
+                  <p class="fw-bold">{{ formatDate(data.date_fin) }}</p>
                 </div>
                 <div class="col-md-6" v-if="data.date_remboursement_prevue">
                   <label class="text-muted small">Remboursement prévu</label>

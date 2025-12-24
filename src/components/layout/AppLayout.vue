@@ -264,6 +264,11 @@ import { useStore } from "vuex";
 import useAuthGuard from "../../utils/useAuthGuard.js";
 import api from "../../services/api.js";
 import { timeAgo } from "../../utils/useTimeFomat.js";
+import {
+  fetchNotifications,
+  startNotificationListener,
+  stopNotificationListener,
+} from "../../services/notificationService";
 
 defineOptions({
   name: "AppLayout",
@@ -300,17 +305,26 @@ const initSidebarState = () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("resize", handleResize);
   initSidebarState();
   document.addEventListener("click", onClickOutside);
 
-  getNotifications();
+  const userId = authStore.user?.id;
+  if (userId) {
+    await fetchNotifications(userId, store);
+    startNotificationListener(userId, store);
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   document.removeEventListener("click", onClickOutside);
+
+  const userId = authStore.user?.id;
+  if (userId) {
+    stopNotificationListener(userId);
+  }
 });
 
 const handleResize = () => {
@@ -323,15 +337,6 @@ const handleResize = () => {
 // Route matching helper
 const isRouteActive = (path) => {
   return route.path.startsWith(path);
-};
-
-const getNotifications = async (memberId) => {
-  const response = await api.get("/notifications", {
-    params: {
-      memberId: memberId,
-    },
-  });
-  store.state.data.notifications = response.data;
 };
 
 // Notifications (Mock Data)

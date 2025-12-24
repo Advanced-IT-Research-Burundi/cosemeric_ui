@@ -142,19 +142,28 @@
             </div>
 
             <!-- Justificatif -->
-            <div class="col-12">
+            <div class="col-md-6">
               <label for="justificatif" class="form-label">Justificatif</label>
+
+              <!--image preview-->
+              <div v-if="formData.justificatif" class="mt-2">
+                <img
+                  :src="formData.justificatif"
+                  alt="Justificatif"
+                  class="img-fluid"
+                />
+              </div>
               <input
-                type="text"
+                type="file"
                 class="form-control"
                 id="justificatif"
-                v-model="formData.justificatif"
+                @change="handleFileChange"
                 placeholder="Lien ou référence du justificatif"
               />
             </div>
 
             <!-- Motif de Rejet (required only when statut === 'rejete') -->
-            <div class="col-12">
+            <div class="col-md-6">
               <label for="motif_rejet" class="form-label"
                 >Motif du Rejet
                 <span v-if="isMotifRequired" class="text-danger">*</span></label

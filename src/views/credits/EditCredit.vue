@@ -104,6 +104,7 @@
                 min="1"
                 required
                 @input="calculatePayments"
+                disabled
               />
             </div>
 
@@ -138,9 +139,26 @@
 
             <!-- Date d'Approbation -->
             <div class="col-md-6">
-              <label class="form-label">Date d'Approbation</label>
+              <label for="date_approbation" class="form-label"
+                >Date d'Approbation</label
+              >
+
               <Datepicker
                 v-model="formData.date_approbation"
+                :enable-time-picker="false"
+                :auto-apply="true"
+                :min-date="formData.date_demande"
+                @input="calculateDateFin"
+                @update:modelValue="calculateDateFin"
+              />
+            </div>
+
+            <!-- Date de Fin -->
+            <div class="col-md-6">
+              <label for="date_fin" class="form-label">Date de Fin</label>
+
+              <Datepicker
+                v-model="formData.date_fin"
                 :enable-time-picker="false"
                 :auto-apply="true"
               />
@@ -224,6 +242,7 @@ const formData = ref({
   montant_mensualite: 0,
   date_demande: new Date().toISOString().split("T")[0],
   date_approbation: "",
+  date_fin: "",
   statut: "en_attente",
   motif: "",
 });
@@ -277,6 +296,14 @@ const calculatePayments = () => {
 
   formData.value.montant_total_rembourser = total.toFixed(2);
   formData.value.montant_mensualite = mensualite.toFixed(2);
+};
+
+const calculateDateFin = () => {
+  const dateFin = addMonths(
+    formData.value.date_demande,
+    formData.value.duree_mois
+  );
+  formData.value.date_fin = dateFin;
 };
 
 // Handle form submission
