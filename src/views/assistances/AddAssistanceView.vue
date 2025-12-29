@@ -16,30 +16,38 @@
 
           <div class="row g-3">
             <!-- Membre -->
-            <div class="col-md-6">
-              <label for="membre_id" class="form-label"
-                >Membre <span class="text-danger">*</span></label
+            <div class="col-md-6 position-relative">
+              <label class="form-label">
+                Membre <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                v-model="memberSearch"
+                @input="onMemberSearch"
+                placeholder="Rechercher un membre..."
+              />
+
+              <!-- Results dropdown -->
+              <ul
+                v-if="showResults"
+                class="list-group position-absolute w-100 z-3"
               >
-              <select
-                id="membre_id"
-                class="form-select"
-                v-model="formData.membre_id"
-                required
-                :disabled="loadingMembers"
-              >
-                <option value="" disabled>Sélectionnez un membre</option>
-                <option
+                <li
                   v-for="membre in members"
                   :key="membre.id"
-                  :value="membre.id"
+                  class="list-group-item list-group-item-action"
+                  @click="selectMember(membre)"
                 >
-                  {{ membre.id }} | {{ membre.full_name }} |
-                  {{ membre.telephone }} | {{ membre.categorie.nom }}
-                </option>
-              </select>
+                  {{ membre.matricule }} | {{ membre.nom }}
+                  {{ membre.prenom }} |
+                  {{ membre.telephone }}
+                </li>
+              </ul>
+
               <div v-if="loadingMembers" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
-                membres...
+                <i class="fas fa-spinner fa-spin me-1"></i> Chargement...
               </div>
             </div>
 
@@ -212,6 +220,7 @@ import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
+import debounce from "lodash/debounce";
 
 const router = useRouter();
 const toast = useToast();
@@ -221,8 +230,10 @@ const loadingMembers = ref(true);
 const loadingTypes = ref(true);
 const error = ref("");
 
-const members = ref([]);
 const assistanceTypes = ref([]);
+const memberSearch = ref("");
+const members = ref([]);
+const showResults = ref(false);
 
 const formData = ref({
   membre_id: "",
@@ -251,6 +262,39 @@ const handleSelectAssistance = () => {
     formData.value.montant = 0;
   }
 };
+
+const fetchMembers = async (query) => {
+  if (!query || query.length < 2) {
+    members.value = [];
+    showResults.value = false;
+    return;
+  }
+
+  loadingMembers.value = true;
+  try {
+    const res = await api.get("/membres/search", {
+      params: { q: query },
+    });
+    members.value = res.data;
+    showResults.value = true;
+  } catch (e) {
+    console.error(e);
+    members.value = [];
+  } finally {
+    loadingMembers.value = false;
+  }
+};
+
+const onMemberSearch = debounce(() => {
+  fetchMembers(memberSearch.value);
+}, 300);
+
+const selectMember = (membre) => {
+  formData.value.membre_id = membre.id;
+  memberSearch.value = `${membre.nom} ${membre.prenom}`;
+  showResults.value = false;
+};
+
 
 const fetchData = async () => {
   loadingMembers.value = loadingTypes.value = true;
