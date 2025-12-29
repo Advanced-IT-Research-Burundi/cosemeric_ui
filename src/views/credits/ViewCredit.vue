@@ -147,6 +147,83 @@
           </div>
         </div>
       </div>
+
+      <!-- Remboursements (nouveau) -->
+      <div class="col-12 mt-3" v-if="credit">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary fw-bold">
+              <i class="bi bi-wallet2 me-2"></i>Remboursements (nouveau)
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded h-100">
+                  <small class="text-muted d-block uppercase">Montant total endetté</small>
+                  <span class="fw-bold fs-6">{{
+                    formatCurrency(credit.montant_total_endette || credit.montant_total_rembourser)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded h-100">
+                  <small class="text-muted d-block uppercase">Montant déjà payé</small>
+                  <span class="fw-bold fs-6 text-success">{{
+                    formatCurrency(credit.montant_deja_paye)
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded h-100">
+                  <small class="text-muted d-block uppercase">Échéances restantes</small>
+                  <span class="fw-bold fs-6">{{ credit.echeances_restantes ?? '-' }}</span>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded h-100">
+                  <small class="text-muted d-block uppercase">Retards & pénalités</small>
+                  <span class="fw-bold fs-6 text-danger">
+                    {{ credit.echeances_en_retard ?? 0 }} /
+                    {{ formatCurrency(credit.total_penalites) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive" v-if="credit.remboursements && credit.remboursements.length">
+              <table class="table table-sm table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Date échéance</th>
+                    <th>Montant prévu</th>
+                    <th>Montant payé</th>
+                    <th>Date paiement</th>
+                    <th>Statut</th>
+                    <th>Pénalité</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="echeance in credit.remboursements" :key="echeance.id">
+                    <td>{{ echeance.numero_echeance }}</td>
+                    <td>{{ formatDate(echeance.date_echeance) }}</td>
+                    <td>{{ formatCurrency(echeance.montant_prevu) }}</td>
+                    <td>{{ formatCurrency(echeance.montant_paye) }}</td>
+                    <td>{{ echeance.date_paiement ? formatDate(echeance.date_paiement) : '-' }}</td>
+                    <td>
+                      <span class="badge rounded-pill" :class="getRemboursementStatusBadge(echeance.statut)">
+                        {{ echeance.statut.toUpperCase() }}
+                      </span>
+                    </td>
+                    <td>{{ formatCurrency(echeance.penalite) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
@@ -206,6 +283,19 @@ const getStatusBadge = (status) => {
       return "bg-info";
     default:
       return "bg-secondary";
+  }
+};
+
+const getRemboursementStatusBadge = (status) => {
+  switch (status) {
+    case "prevu":
+      return "bg-secondary";
+    case "paye":
+      return "bg-success";
+    case "en_retard":
+      return "bg-danger";
+    default:
+      return "bg-light text-dark";
   }
 };
 
