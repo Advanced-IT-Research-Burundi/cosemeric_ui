@@ -434,8 +434,8 @@ export default {
               membre: i.membre?.nom || `Membre #${i.membre_id}`,
               type: "credit",
               type_label: "Crédit Accordé",
-              montant: parseFloat(i.montant_accorde || 0), // Champ spécifique Credits.vue
-              date: i.created_at,
+              montant: parseFloat(i.montant_accorde || i.montant_demande || 0), // Fallback to montant_demande if accorde is 0
+              date: i.date_approbation || i.created_at, // Use date_approbation if available
               details: `${i.duree_mois} mois à ${i.taux_interet}%`,
             }))
           );
