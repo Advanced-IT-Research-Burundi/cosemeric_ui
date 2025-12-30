@@ -258,10 +258,7 @@ const handleModifier = async (item) => {
 };
 
 const handleAction = async (item, action) => {
-  // if (action === "rejete") {
-  //   modalOpened.value = true;
-  //   return;
-  // }
+
   if (
     !confirm(
       `Êtes-vous sûr de vouloir ${
@@ -273,18 +270,16 @@ const handleAction = async (item, action) => {
   }
 
   try {
-    // Assuming endpoint /credits/{id}/status or similar.
-    // If not, we might need to use PUT/PATCH on /credits/{id}
-    // Let's try a generic update first.
-
-    //alert(action);
-
-    //await api.put(`/credits/${item.id}`, { statut: action });
 
     if (action === "approuve") {
       await api.post(`/credits/approuve/${item.id}`);
     } else if (action === "rejete") {
-      await api.post(`/credits/rejete/${item.id}`);
+      const comment = prompt("Veuillez saisir le motif du rejet");
+      if (!comment) {
+        toast.warning("Veuillez saisir un motif de rejet.");
+        return;
+      }
+      await api.post(`/credits/rejete/${item.id}`, {  comment });
     }
 
     toast.success(
