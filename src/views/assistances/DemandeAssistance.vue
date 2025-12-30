@@ -60,88 +60,32 @@
               </div>
             </div>
 
-            <!-- Statut -->
-            <div class="col-md-6">
-              <label for="statut" class="form-label"
-                >Statut <span class="text-danger">*</span></label
-              >
-              <select
-                id="statut"
-                class="form-select"
-                v-model="formData.statut"
-                required
-              >
-                <option value="en_attente">En attente</option>
-                <option value="approuve">Approuvé</option>
-                <option value="rejete">Rejeté</option>
-                <option value="verse">Versé</option>
-              </select>
-            </div>
-
-            <!-- Date de Demande -->
-            <div class="col-md-4">
-              <label for="date_demande" class="form-label"
-                >Date de Demande <span class="text-danger">*</span></label
-              >
-              <Datepicker
-                v-model="formData.date_demande"
-                :enable-time-picker="false"
-                :auto-apply="true"
-                placeholder="Choisir une date"
-              />
-            </div>
-
             <!-- Date d'Approbation -->
-            <div class="col-md-4">
-              <label for="date_approbation" class="form-label"
-                >Date d'Approbation</label
-              >
-              <Datepicker
-                v-model="formData.date_approbation"
-                :enable-time-picker="false"
-                :auto-apply="true"
-              />
-            </div>
+           
 
             <!-- Date de Versement -->
-            <div class="col-md-4">
-              <label for="date_versement" class="form-label"
-                >Date de Versement</label
-              >
-              <Datepicker
-                v-model="formData.date_versement"
-                :enable-time-picker="false"
-                :auto-apply="true"
-              />
-            </div>
 
             <!-- Justificatif -->
             <div class="col-12">
-              <label for="justificatif" class="form-label">Justificatif</label>
-              <input
-                type="text"
-                class="form-control"
-                id="justificatif"
-                v-model="formData.justificatif"
-                placeholder="Lien ou référence du justificatif"
-              />
+              <label for="justificatif" class="form-label">Justification</label>
+              <textarea name="justificatif" id="justificatif" v-model="formData.justificatif" placeholder="Justification" class="form-control form-control-sm"></textarea>
+            </div>
+            <div class="col-6">
+              <label for="document_justificatif" class="form-label">Document Justificatif (PDF)</label>
+              <input 
+                type="file" 
+                name="document_justificatif" 
+                id="document_justificatif" 
+                @change="handleFileChange" 
+                accept=".pdf,application/pdf"
+                class="form-control form-control-sm"
+              >
+              <small v-if="formData.document_justificatif" class="text-success">
+                <i class="fas fa-check-circle me-1"></i>{{ formData.document_justificatif.name }}
+              </small>
             </div>
 
-            <!-- Motif de Rejet (required only when statut === 'rejete') -->
-            <div class="col-12">
-              <label for="motif_rejet" class="form-label"
-                >Motif du Rejet
-                <span v-if="isMotifRequired" class="text-danger">*</span></label
-              >
-              <textarea
-                class="form-control"
-                id="motif_rejet"
-                v-model="formData.motif_rejet"
-                rows="2"
-                :required="isMotifRequired"
-                placeholder="Raison du rejet de la demande"
-              ></textarea>
-            </div>
+           
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
@@ -190,18 +134,11 @@ const members = ref([]);
 const assistanceTypes = ref([]);
 
 const formData = ref({
-  membre_id: "",
   type_assistance_id: "",
   montant: 0,
-  date_demande: new Date().toISOString().split("T")[0],
-  date_approbation: null,
-  date_versement: null,
-  statut: "en_attente",
   justificatif: "",
-  motif_rejet: "",
+  document_justificatif: null,
 });
-
-const isMotifRequired = computed(() => formData.value.statut === "rejete");
 
 const handleSelectAssistance = () => {
   const selectedId = formData.value.type_assistance_id;
@@ -214,6 +151,30 @@ const handleSelectAssistance = () => {
     formData.value.montant = selectedType.montant_standard; // AUTO-FILL
   } else {
     formData.value.montant = 0;
+  }
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      toast.error('Veuillez sélectionner un fichier PDF');
+      event.target.value = ''; // Reset input
+      formData.value.document_justificatif = null;
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('Le fichier ne doit pas dépasser 5MB');
+      event.target.value = ''; // Reset input
+      formData.value.document_justificatif = null;
+      return;
+    }
+    
+    formData.value.document_justificatif = file;
   }
 };
 
@@ -247,15 +208,29 @@ const handleSubmit = async () => {
   error.value = "";
 
   try {
-    const payload = { ...formData.value };
+    // Create FormData for multipart/form-data submission
+    const formDataToSend = new FormData();
+    
+    // Append form fields
+    formDataToSend.append('type_assistance_id', formData.value.type_assistance_id);
+    formDataToSend.append('montant', formData.value.montant);
+    
+    // Append optional fields only if they have values
+    if (formData.value.justificatif) {
+      formDataToSend.append('justificatif', formData.value.justificatif);
+    }
+    
+    // Append file if selected
+    if (formData.value.document_justificatif) {
+      formDataToSend.append('document_justificatif', formData.value.document_justificatif);
+    }
 
-    // Remove empty optional fields
-    if (!payload.date_approbation) delete payload.date_approbation;
-    if (!payload.date_versement) delete payload.date_versement;
-    if (!payload.justificatif) delete payload.justificatif;
-    if (!payload.motif_rejet) delete payload.motif_rejet;
-
-    await api.post("/demande-assistance", payload);
+    // Send request with FormData
+    await api.post("/demande-assistance", formDataToSend, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
 
     toast.success("Demande d'assistance enregistrée avec succès");
     router.push("/mesAssistances");
