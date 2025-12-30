@@ -186,6 +186,9 @@ async function login() {
     if (authStore.user.role === "admin") {
       window.location.href = "/dashboard";
     }
+    if (authStore.user.role === "responsable") {
+      window.location.href = "/dashboard";
+    }
     // 2. Manager (Gestionnaire) -> Manager Dashboard
     else if (authStore.user.role === "gestionnaire") {
       window.location.href = "/manager/dashboard";
