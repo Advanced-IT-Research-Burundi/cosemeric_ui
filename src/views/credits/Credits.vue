@@ -94,7 +94,7 @@
             </button>
 
             <button
-              v-if="item.statut !== 'approuve'"
+              v-if="item.statut !== 'approuve' && item.statut !== 'rejete'"
               class="btn btn-success btn-sm"
               @click="handleAction(item, 'approuve')"
               title="Accepter"
@@ -103,7 +103,7 @@
             </button>
 
             <button
-              v-if="item.statut !== 'approuve'"
+              v-if="item.statut !== 'en_attente' && isMember"
               class="btn btn-warning btn-sm"
               @click="handleModifier(item)"
               title="Modifier"
@@ -258,7 +258,6 @@ const handleModifier = async (item) => {
 };
 
 const handleAction = async (item, action) => {
-
   if (
     !confirm(
       `Êtes-vous sûr de vouloir ${
@@ -270,7 +269,6 @@ const handleAction = async (item, action) => {
   }
 
   try {
-
     if (action === "approuve") {
       await api.post(`/credits/approuve/${item.id}`);
     } else if (action === "rejete") {
@@ -279,7 +277,7 @@ const handleAction = async (item, action) => {
         toast.warning("Veuillez saisir un motif de rejet.");
         return;
       }
-      await api.post(`/credits/rejete/${item.id}`, {  comment });
+      await api.post(`/credits/rejete/${item.id}`, { comment });
     }
 
     toast.success(
