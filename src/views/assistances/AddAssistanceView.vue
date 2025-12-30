@@ -21,30 +21,26 @@
                 Membre <span class="text-danger">*</span>
               </label>
 
-              <input
-                type="text"
-                class="form-control"
-                v-model="memberSearch"
-                @input="onMemberSearch"
-                placeholder="Rechercher un membre..."
-              />
-
-              <!-- Results dropdown -->
-              <ul
-                v-if="showResults"
-                class="list-group position-absolute w-100 z-3"
+              <AutoComplete
+                v-model="selectedMember"
+                :suggestions="members"
+                @complete="onMemberSearch"
+                optionLabel="display_name"
+                placeholder="Rechercher un membre (Nom, Matricule...)"
+                class="w-100"
+                inputClass="form-control"
+                @item-select="onMemberSelect"
+                forceSelection
               >
-                <li
-                  v-for="membre in members"
-                  :key="membre.id"
-                  class="list-group-item list-group-item-action"
-                  @click="selectMember(membre)"
-                >
-                  {{ membre.matricule }} | {{ membre.nom }}
-                  {{ membre.prenom }} |
-                  {{ membre.telephone }}
-                </li>
-              </ul>
+                <template #option="slotProps">
+                  <div class="flex align-items-center">
+                    <div>
+                      {{ slotProps.option.matricule }} -
+                      {{ slotProps.option.nom }} {{ slotProps.option.prenom }}
+                    </div>
+                  </div>
+                </template>
+              </AutoComplete>
 
               <div v-if="loadingMembers" class="form-text">
                 <i class="fas fa-spinner fa-spin me-1"></i> Chargement...
@@ -94,23 +90,50 @@
               </div>
             </div>
 
-            <!-- Statut -->
-            <div class="col-md-6">
-              <label for="statut" class="form-label"
-                >Statut <span class="text-danger">*</span></label
-              >
-              <select
-                id="statut"
-                class="form-select"
-                v-model="formData.statut"
-                required
-              >
-                <option value="en_attente">En attente</option>
-                <option value="approuve">Approuvé</option>
-                <option value="rejete">Rejeté</option>
-                <option value="verse">Versé</option>
-              </select>
-            </div>
+            <!-- Admin Only Fields -->
+            <template v-if="authStore.hasAnyRole(['admin', 'gestionnaire'])">
+              <!-- Statut -->
+              <div class="col-md-6">
+                <label for="statut" class="form-label"
+                  >Statut <span class="text-danger">*</span></label
+                >
+                <select
+                  id="statut"
+                  class="form-select"
+                  v-model="formData.statut"
+                  required
+                >
+                  <option value="en_attente">En attente</option>
+                  <option value="approuve">Approuvé</option>
+                  <option value="rejete">Rejeté</option>
+                  <option value="verse">Versé</option>
+                </select>
+              </div>
+
+              <!-- Date d'Approbation -->
+              <div class="col-md-4">
+                <label for="date_approbation" class="form-label"
+                  >Date d'Approbation</label
+                >
+                <Datepicker
+                  v-model="formData.date_approbation"
+                  :enable-time-picker="false"
+                  :auto-apply="true"
+                />
+              </div>
+
+              <!-- Date de Versement -->
+              <div class="col-md-4">
+                <label for="date_versement" class="form-label"
+                  >Date de Versement</label
+                >
+                <Datepicker
+                  v-model="formData.date_versement"
+                  :enable-time-picker="false"
+                  :auto-apply="true"
+                />
+              </div>
+            </template>
 
             <!-- Date de Demande -->
             <div class="col-md-4">
@@ -125,40 +148,18 @@
               />
             </div>
 
-            <!-- Date d'Approbation -->
-            <div class="col-md-4">
-              <label for="date_approbation" class="form-label"
-                >Date d'Approbation</label
-              >
-              <Datepicker
-                v-model="formData.date_approbation"
-                :enable-time-picker="false"
-                :auto-apply="true"
-              />
-            </div>
-
-            <!-- Date de Versement -->
-            <div class="col-md-4">
-              <label for="date_versement" class="form-label"
-                >Date de Versement</label
-              >
-              <Datepicker
-                v-model="formData.date_versement"
-                :enable-time-picker="false"
-                :auto-apply="true"
-              />
-            </div>
-
             <!-- Justificatif -->
             <div class="col-md-6">
-              <label for="justificatif" class="form-label">Justificatif</label>
+              <label for="justificatif" class="form-label"
+                >Justificatif <span class="text-danger">*</span></label
+              >
 
-              <!--image preview-->
-              <div v-if="formData.justificatif" class="mt-2">
+              <div v-if="justificatifPreview" class="mt-2 mb-2">
                 <img
-                  :src="formData.justificatif"
-                  alt="Justificatif"
-                  class="img-fluid"
+                  :src="justificatifPreview"
+                  alt="Justificatif Preview"
+                  class="img-thumbnail"
+                  style="max-height: 150px"
                 />
               </div>
               <input
@@ -166,12 +167,19 @@
                 class="form-control"
                 id="justificatif"
                 @change="handleFileChange"
-                placeholder="Lien ou référence du justificatif"
+                accept="image/*,.pdf"
+                required
               />
             </div>
 
             <!-- Motif de Rejet (required only when statut === 'rejete') -->
-            <div class="col-md-6">
+            <div
+              class="col-md-6"
+              v-if="
+                authStore.hasAnyRole(['admin', 'gestionnaire']) &&
+                isMotifRequired
+              "
+            >
               <label for="motif_rejet" class="form-label"
                 >Motif du Rejet
                 <span v-if="isMotifRequired" class="text-danger">*</span></label
@@ -221,9 +229,11 @@ import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
 import debounce from "lodash/debounce";
+import { useAuthStore } from "../../stores/auth";
 
 const router = useRouter();
 const toast = useToast();
+const authStore = useAuthStore();
 
 const loading = ref(false);
 const loadingMembers = ref(true);
@@ -231,9 +241,10 @@ const loadingTypes = ref(true);
 const error = ref("");
 
 const assistanceTypes = ref([]);
-const memberSearch = ref("");
+const selectedMember = ref(null);
 const members = ref([]);
-const showResults = ref(false);
+const justificatifFile = ref(null);
+const justificatifPreview = ref(null);
 
 const formData = ref({
   membre_id: "",
@@ -243,7 +254,6 @@ const formData = ref({
   date_approbation: null,
   date_versement: null,
   statut: "en_attente",
-  justificatif: "",
   motif_rejet: "",
 });
 
@@ -263,20 +273,35 @@ const handleSelectAssistance = () => {
   }
 };
 
-const fetchMembers = async (query) => {
-  if (!query || query.length < 2) {
-    members.value = [];
-    showResults.value = false;
-    return;
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    justificatifFile.value = file;
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        justificatifPreview.value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      justificatifPreview.value = null;
+    }
   }
+};
+
+const onMemberSearch = async (event) => {
+  const query = event.query;
+  if (!query || query.length < 2) return;
 
   loadingMembers.value = true;
   try {
-    const res = await api.get("/membres/search", {
-      params: { q: query },
-    });
-    members.value = res.data;
-    showResults.value = true;
+    const res = await api.post("/membres/search?q=" + query);
+    // res.data might be { success: true, data: [...] } or just [...]
+    const data = res.data?.data || res.data || [];
+    members.value = data.map((m) => ({
+      ...m,
+      display_name: `${m.nom} ${m.prenom} (${m.matricule})`,
+    }));
   } catch (e) {
     console.error(e);
     members.value = [];
@@ -285,56 +310,58 @@ const fetchMembers = async (query) => {
   }
 };
 
-const onMemberSearch = debounce(() => {
-  fetchMembers(memberSearch.value);
-}, 300);
-
-const selectMember = (membre) => {
-  formData.value.membre_id = membre.id;
-  memberSearch.value = `${membre.nom} ${membre.prenom}`;
-  showResults.value = false;
+const onMemberSelect = (event) => {
+  formData.value.membre_id = event.value.id;
 };
 
-
 const fetchData = async () => {
-  loadingMembers.value = loadingTypes.value = true;
+  loadingTypes.value = true;
   try {
-    // request all three and handle different shapes safely
-    const [membersRes, typesRes] = await Promise.all([
-      api.get("/membres"),
-      api.get("/type-assistances"),
-    ]);
-
-    // members: may be paginated
-    members.value = membersRes?.data?.data ?? membersRes?.data ?? [];
-
-    // types: try data or direct
+    const [typesRes] = await Promise.all([api.get("/type-assistances")]);
     assistanceTypes.value =
       typesRes?.data?.data ?? typesRes?.data ?? typesRes ?? [];
   } catch (err) {
     console.error("Error fetching data:", err);
     toast.error("Erreur lors du chargement des données");
-    members.value = assistanceTypes.value = [];
+    assistanceTypes.value = [];
   } finally {
-    loadingMembers.value = false;
     loadingTypes.value = false;
   }
 };
 
 const handleSubmit = async () => {
+  if (!formData.value.membre_id) {
+    toast.warning("Veuillez sélectionner un membre");
+    return;
+  }
+
   loading.value = true;
   error.value = "";
 
   try {
-    const payload = { ...formData.value };
+    const data = new FormData();
+    data.append("membre_id", formData.value.membre_id);
+    data.append("type_assistance_id", formData.value.type_assistance_id);
+    data.append("montant", formData.value.montant);
+    data.append("date_demande", formData.value.date_demande);
+    data.append("statut", formData.value.statut);
 
-    // Remove empty optional fields
-    if (!payload.date_approbation) delete payload.date_approbation;
-    if (!payload.date_versement) delete payload.date_versement;
-    if (!payload.justificatif) delete payload.justificatif;
-    if (!payload.motif_rejet) delete payload.motif_rejet;
+    if (formData.value.date_approbation)
+      data.append("date_approbation", formData.value.date_approbation);
+    if (formData.value.date_versement)
+      data.append("date_versement", formData.value.date_versement);
+    if (formData.value.motif_rejet)
+      data.append("motif_rejet", formData.value.motif_rejet);
 
-    await api.post("/assistances", payload);
+    if (justificatifFile.value) {
+      data.append("justificatif", justificatifFile.value);
+    }
+
+    await api.post("/assistances", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     toast.success("Demande d'assistance enregistrée avec succès");
     router.push("/assistances");
