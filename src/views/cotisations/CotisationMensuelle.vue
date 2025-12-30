@@ -25,35 +25,54 @@
 
       <div class="card-body">
         <!-- Filters -->
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
+        <div class="row g-3 mb-4 align-items-end">
+          <div class="col-md-3">
             <label class="form-label fw-semibold">Matricule</label>
             <input
               v-model="filters.matricule"
-              @input="seachOnMatricule"
               type="text"
               class="form-control"
               placeholder="Rechercher par matricule"
+              @keyup.enter="handleSearch"
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label fw-semibold">Nom</label>
             <input
               v-model="filters.name"
-              @change="getCotisationsMensuelles"
               type="text"
               class="form-control"
               placeholder="Rechercher par nom"
+              @keyup.enter="handleSearch"
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label fw-semibold">Mois</label>
             <input
               v-model="filters.date_cotisation"
-              @change="getCotisationsMensuelles"
               type="month"
               class="form-control"
             />
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex gap-2">
+              <button 
+                class="btn btn-primary flex-fill" 
+                @click="handleSearch"
+                :disabled="loadingData"
+              >
+                <i class="bi bi-search me-2"></i>
+                {{ loadingData ? 'Recherche...' : 'Rechercher' }}
+              </button>
+              <button 
+                class="btn btn-outline-secondary" 
+                @click="resetFilters"
+                :disabled="loadingData"
+                title="Réinitialiser les filtres"
+              >
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -280,7 +299,18 @@ async function getCotisationsMensuelles(url = "/cotisation-mensuelles") {
   }
 }
 
-function seachOnMatricule() {
+function handleSearch() {
+  currentPage.value = 1; // Reset to first page on new search
+  getCotisationsMensuelles();
+}
+
+function resetFilters() {
+  filters.value = {
+    matricule: "",
+    name: "",
+    date_cotisation: "",
+  };
+  currentPage.value = 1;
   getCotisationsMensuelles();
 }
 
