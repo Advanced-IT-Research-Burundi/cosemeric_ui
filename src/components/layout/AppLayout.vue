@@ -285,7 +285,8 @@ const route = useRoute();
 // Store composables
 const store = useStore();
 const authStore = useAuthStore();
-const { isAdmin, isMember, isManager, isGuest, isAuth } = useAuthGuard();
+const { isAdmin, isResponsable, isMember, isManager, isGuest, isAuth } =
+  useAuthGuard();
 
 // Responsive state
 const windowWidth = ref(window.innerWidth);
@@ -358,25 +359,25 @@ const menuItems = ref([
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/dashboard",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/manager/dashboard",
-    requireAdmin: isManager.value,
+    requireAdmin: isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-people-fill"></i>',
     title: "Membres",
     path: "/members",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-wallet-fill"></i>',
     title: "Cotisations",
     path: "/contributions",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-wallet-fill"></i>',
@@ -395,19 +396,19 @@ const menuItems = ref([
     icon: '<i class="bi bi-calendar-event-fill"></i>',
     title: "Périodes",
     path: "/periodes",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-credit-card-2-front-fill"></i>',
     title: "Crédits",
     path: "/credits",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-credit-card-2-front"></i>',
     title: "Mes Crédits",
     path: "/credits/mescredits",
-    requireAdmin: isMember.value || isManager.value,
+    requireAdmin: isMember.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-plus-square-dotted"></i>',
@@ -426,31 +427,31 @@ const menuItems = ref([
     icon: '<i class="bi bi-life-preserver"></i>',
     title: "Assistances",
     path: "/assistances",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-arrow-repeat"></i>',
     title: "Remboursements",
     path: "/remboursements",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-file-earmark-spreadsheet-fill"></i>',
     title: "Fiche Mensuel",
     path: "/importationMensuel",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-cash-stack"></i>',
     title: "Cotis. Mensuelle",
     path: "/cotisationMensuelle",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-graph-up"></i>',
     title: "Rapports",
     path: "/reports",
-    requireAdmin: isAdmin.value || isManager.value,
+    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   // {
   //   icon: '<i class="bi bi-shield-check"></i>',
@@ -462,7 +463,7 @@ const menuItems = ref([
     icon: '<i class="bi bi-person-badge-fill"></i>',
     title: "Utilisateurs",
     path: "/users",
-    requireAdmin: isAdmin.value,
+    requireAdmin: isAdmin.value || isResponsable.value,
   },
 ]);
 
