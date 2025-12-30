@@ -14,31 +14,59 @@
 
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Prénom <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" v-model.trim="form.prenom" required />
+          <label class="form-label"
+            >Prénom <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            v-model.trim="form.prenom"
+            required
+          />
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Nom <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" v-model.trim="form.nom" required />
+          <label class="form-label"
+            >Nom <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            v-model.trim="form.nom"
+            required
+          />
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Email <span class="text-danger">*</span></label>
-          <input type="email" class="form-control" v-model.trim="form.email" required />
+          <label class="form-label"
+            >Email <span class="text-danger">*</span></label
+          >
+          <input
+            type="email"
+            class="form-control"
+            v-model.trim="form.email"
+            required
+          />
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Téléphone</label>
-          <input type="tel" class="form-control" v-model.trim="form.telephone" />
+          <input
+            type="tel"
+            class="form-control"
+            v-model.trim="form.telephone"
+          />
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Rôle <span class="text-danger">*</span></label>
+          <label class="form-label"
+            >Rôle <span class="text-danger">*</span></label
+          >
           <select class="form-select" v-model="form.role" required>
             <option value="" disabled>Sélectionner un rôle</option>
             <option value="admin">Admin</option>
             <option value="gestionnaire">Gestionnaire</option>
+            <option value="responsable">Responsable</option>
             <option value="membre">Membre</option>
           </select>
         </div>
@@ -55,12 +83,23 @@
 
         <div class="col-md-6">
           <label class="form-label">Mot de passe</label>
-          <input type="password" class="form-control" v-model="form.password" minlength="6" placeholder="Au moins 6 caractères" />
+          <input
+            type="password"
+            class="form-control"
+            v-model="form.password"
+            minlength="6"
+            placeholder="Au moins 6 caractères"
+          />
         </div>
 
         <div class="col-md-6 d-flex align-items-center">
           <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" id="is_active" v-model="form.is_active">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="is_active"
+              v-model="form.is_active"
+            />
             <label class="form-check-label" for="is_active">
               Compte actif
             </label>
@@ -69,10 +108,20 @@
       </div>
 
       <div class="d-flex justify-content-end gap-2 mt-4">
-        <button type="button" class="btn btn-outline-secondary" @click="$router.push('/users')">Annuler</button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          @click="$router.push('/users')"
+        >
+          Annuler
+        </button>
         <button type="submit" class="btn btn-primary" :disabled="isLoading">
-          <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-          {{ isLoading ? 'Enregistrement...' : 'Créer' }}
+          <span
+            v-if="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+          ></span>
+          {{ isLoading ? "Enregistrement..." : "Créer" }}
         </button>
       </div>
     </form>
@@ -80,44 +129,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '../../services/api'
-import { useToast } from 'vue-toastification'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import api from "../../services/api";
+import { useToast } from "vue-toastification";
 
-const router = useRouter()
-const toast = useToast()
+const router = useRouter();
+const toast = useToast();
 
-const isLoading = ref(false)
-const error = ref('')
+const isLoading = ref(false);
+const error = ref("");
 
 const form = ref({
-  nom: '',
-  prenom: '',
-  email: '',
-  telephone: '',
-  password: '',
-  role: 'membre',
+  nom: "",
+  prenom: "",
+  email: "",
+  telephone: "",
+  password: "",
+  role: "membre",
   is_active: true,
-  statut: 'actif'
-})
+  statut: "actif",
+});
 
 async function handleSubmit() {
-  error.value = ''
-  isLoading.value = true
+  error.value = "";
+  isLoading.value = true;
   try {
-    const payload = { ...form.value }
-    if (!payload.password) delete payload.password
-    const res = await api.post('/users', payload)
-    const message = res?.message || 'Utilisateur créé avec succès'
-    toast.success(message)
-    router.push('/users')
+    const payload = { ...form.value };
+    if (!payload.password) delete payload.password;
+    const res = await api.post("/users", payload);
+    const message = res?.message || "Utilisateur créé avec succès";
+    toast.success(message);
+    router.push("/users");
   } catch (err) {
-    const msg = err?.response?.data?.message || err?.message || "Erreur lors de la création de l'utilisateur"
-    error.value = msg
-    toast.error(msg)
+    const msg =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Erreur lors de la création de l'utilisateur";
+    error.value = msg;
+    toast.error(msg);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
