@@ -33,6 +33,18 @@
             {{ getStatusLabel(value) }}
           </span>
         </template>
+
+        <template #actions="{ item, openDetails }">
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              @click="openDetails(item)"
+              title="Voir détails"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </template>
       </AdvancedTable>
     </div>
   </div>

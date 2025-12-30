@@ -2,7 +2,11 @@
   <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Mes assistances</h2>
-      <router-link to="/assistances/add" class="btn btn-primary">
+      <router-link
+        to="/assistances/add"
+        class="btn btn-primary"
+        v-if="!isMember"
+      >
         <i class="fas fa-plus me-2"></i>Ajouter une assistance
       </router-link>
     </div>
@@ -15,7 +19,7 @@
         search-placeholder="Rechercher des assistances..."
         no-data-message="Aucune assistance trouvée"
         :show-filters="true"
-        :has-actions="false"
+        :has-actions="true"
         row-key="id"
         :has-show="false"
         @edit="handleEdit"
@@ -32,6 +36,18 @@
             {{ getStatusLabel(value) }}
           </span>
         </template>
+
+        <template #actions="{ item, openDetails }">
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              @click="openDetails(item)"
+              title="Voir détails"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </template>
       </AdvancedTable>
     </div>
   </div>
@@ -43,7 +59,10 @@ import { useStore } from "vuex";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
+import useAuthStore from "../../stores/auth";
 
+const auth = useAuthStore();
+const isMember = auth.hasRole("membre");
 const store = useStore();
 const assistances = ref([]);
 const loading = ref(false);
