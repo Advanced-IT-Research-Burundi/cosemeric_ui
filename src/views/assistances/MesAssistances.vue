@@ -37,7 +37,7 @@
           </span>
         </template>
 
-        <template #actions="{ item, openDetails }">
+        <template #actions="{ item }">
           <div class="btn-group">
             <button
               class="btn btn-outline-secondary btn-sm"
@@ -113,6 +113,12 @@ const columns = [
     formatter: (value) => new Date(value).toLocaleDateString(),
   },
 ];
+
+const openDetails = (item) => {
+
+  //alert(item);
+  router.push({ name: "assistanceDetails", params: { id: item.id } });
+};
 
 // Fetch data from your API
 const fetchAssistances = async () => {

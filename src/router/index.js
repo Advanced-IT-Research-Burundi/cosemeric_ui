@@ -231,6 +231,13 @@ meta: { requiresAuth: true},
     meta: { requiresAuth: true },
   },
 
+  {
+    path: "/assistanceDetails/:id",
+    name: "assistanceDetails",
+    component: () => import("../views/assistances/AssistanceDetails.vue"),
+    meta: { requiresAuth: true },
+  },
+
   // Contributions
   {
     path: "/contributions",
