@@ -19,6 +19,7 @@ const vuexStore = createStore({
         notifications: [],
         configurations: [],
         searchedMember:[],
+        assistance:[],
       },
       isLoading: false,
       error: null,
