@@ -1,32 +1,109 @@
 <template>
     <div>
-        <h1>Contribution Mensuelle</h1>
-        {{ cotisations }}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Contribution Mensuelle</h1>
+        </div>
+
+        <div class="card">
+            <AdvancedTable
+                :data="tableData"
+                :columns="columns"
+                :loading="loading"
+                search-placeholder="Rechercher par nom, matricule..."
+                no-data-message="Aucune cotisation trouvée"
+                :show-filters="true"
+                :has-actions="false"
+                row-key="id"
+                @search="handleSearch"
+                @sort="handleSort"
+                @page-change="handlePageChange"
+                @per-page-change="handlePerPageChange"
+            >
+                <template #column-retenu="{ value }">
+                    {{ formatMoney(value) }}
+                </template>
+            </AdvancedTable>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '../../services/api';
 import { useStore } from 'vuex';
-import { computed } from 'vue';
+import AdvancedTable from '../../components/advancedTable/AdvancedTable.vue';
 
 const store = useStore();
-onMounted(() => {
-    fecthData();
-})
+const loading = ref(false);
 
-const fecthData = async () => {
-    api.get('cotisation_mensuelles')
-    .then(response => {
+const queryParams = ref({
+    page: 1,
+    per_page: 15,
+    search: "",
+    sort_field: "",
+    sort_order: "asc",
+});
+
+const columns = [
+    { key: "id", label: "ID", sortable: true },
+    { key: "name", label: "Nom & Prénom", sortable: true, filterable: true },
+    { key: "matricule", label: "Matricule", sortable: true, filterable: true },
+    { key: "retenu", label: "Retenu", sortable: true },
+    { key: "date_cotisation", label: "Date", sortable: true },
+];
+
+const fetchData = async () => {
+    loading.value = true;
+    try {
+        const params = {
+            page: queryParams.value.page,
+            per_page: queryParams.value.per_page,
+            search: queryParams.value.search,
+            sort_field: queryParams.value.sort_field,
+            sort_order: queryParams.value.sort_order,
+        };
+
+        const response = await api.get('cotisation_mensuelles', { params });
         store.state.data.cotisations_mensuelles = response.data;
-    })
-    .catch(error => {
-        console.error(error);
-    })
+    } catch (error) {
+        console.error("Erreur lors du chargement des cotisations:", error);
+    } finally {
+        loading.value = false;
+    }
 }
 
-const cotisations = computed(() => store.state.data.cotisations_mensuelles);
+const handleSearch = (searchTerm) => {
+    queryParams.value.search = searchTerm;
+    queryParams.value.page = 1;
+    fetchData();
+};
+
+const handleSort = (sortData) => {
+    queryParams.value.sort_field = sortData.field;
+    queryParams.value.sort_order = sortData.order;
+    fetchData();
+};
+
+const handlePageChange = (page) => {
+    queryParams.value.page = page;
+    fetchData();
+};
+
+const handlePerPageChange = (perPage) => {
+    queryParams.value.per_page = perPage;
+    queryParams.value.page = 1;
+    fetchData();
+};
+
+const formatMoney = (value) => {
+    if (!value) return '0 FBU';
+    return new Intl.NumberFormat('fr-BI', { style: 'currency', currency: 'BIF' }).format(value);
+};
+
+onMounted(() => {
+    fetchData();
+})
+
+const tableData = computed(() => store.state.data.cotisations_mensuelles || {});
 
 </script>
