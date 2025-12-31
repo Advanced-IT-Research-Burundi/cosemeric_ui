@@ -437,13 +437,13 @@ const menuItems = ref([
   },
   {
     icon: '<i class="bi bi-file-earmark-spreadsheet-fill"></i>',
-    title: "Fiche Mensuel",
+    title: "Importation Mensuelle",
     path: "/importationMensuel",
     requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
     icon: '<i class="bi bi-cash-stack"></i>',
-    title: "Cotis. Mensuelle",
+    title: "Fiche Mensuelle",
     path: "/cotisationMensuelle",
     requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },

@@ -20,6 +20,7 @@ const vuexStore = createStore({
         configurations: [],
         searchedMember:[],
         assistance:[],
+        cotisations_mensuelles:[],
       },
       isLoading: false,
       error: null,

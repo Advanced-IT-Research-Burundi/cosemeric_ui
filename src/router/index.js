@@ -249,6 +249,12 @@ meta: { requiresAuth: true},
         component: () => import("../views/contributions/ContributionView.vue"),
       },
       {
+        path: "mensuelle",
+        name: "contributionsMensuelleView",
+        component: () => import("../views/contributions/ContributionMensuelleView.vue"),
+      },
+      
+      {
         path: "add",
         name: "contributionsAdd",
         component: () => import("../views/contributions/AddContribution.vue"),

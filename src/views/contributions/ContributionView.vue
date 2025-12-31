@@ -3,6 +3,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Toutes les cotisations</h2>
       <router-link
+        to="/contributions/mensuelle"
+        class="btn btn-primary"
+        v-if="auth.hasAnyRole('admin')"
+      >
+        <i class="fas fa-list me-2"></i>Touts Cotisation Mensuelle
+      </router-link>
+      <router-link
         to="/contributions/add"
         class="btn btn-primary"
         v-if="auth.hasAnyRole('admin')"
