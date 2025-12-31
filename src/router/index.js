@@ -196,6 +196,11 @@ meta: { requiresAuth: true},
         component: () => import("../views/remboursements/Remboursements.vue"),
       },
       {
+        path: "mensuel",
+        name: "remboursementsMensuel",
+        component: () => import("../views/remboursements/RemboursementsMensuel.vue"),
+      },
+      {
         path: "add",
         name: "remboursementsAdd",
         component: () => import("../views/remboursements/AddRemboursement.vue"),

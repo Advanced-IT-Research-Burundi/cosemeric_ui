@@ -21,6 +21,7 @@ const vuexStore = createStore({
         searchedMember:[],
         assistance:[],
         cotisations_mensuelles:[],
+        remboursements_mensuels:[],
       },
       isLoading: false,
       error: null,
