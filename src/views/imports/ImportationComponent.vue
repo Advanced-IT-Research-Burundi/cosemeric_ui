@@ -224,6 +224,8 @@ function closeModalAndKeep() {
 }
 
 async function saveData() {
+
+  
   if (!cotisations.value.length) return;
   try {
     await api.post("importation", {
@@ -256,25 +258,34 @@ function readExcel(event) {
 
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
+      // function for return a number if is number or zero
+
+      function returnNumber(value) {
+        return parseFloat(value) || 0;
+      }
+     
+
       // original mapping logic preserved (skip header rows if file has them)
       const currentData = jsonData.slice(3);
-
+   
       const travail = currentData
         .map((row) => {
           const ligne = Object.entries(row);
+        
           return {
             name: ligne[0] ? ligne[0][1] : "",
             matricule: ligne[2] ? ligne[2][1] : "",
             nomero_dossier: ligne[2] ? ligne[2][1] : "",
-            global: ligne[9] ? ligne[9][1] : "",
-            regle: ligne[12] ? ligne[12][1] : "",
-            restant: ligne[12] ? ligne[12][1] : "",
-            retenu: ligne[18] ? ligne[18][1] : "",
+            global: ligne[9] ? returnNumber(ligne[9][1]) : 0,
+            regle: ligne[12] ? returnNumber(ligne[12][1]) : 0,
+            restant: ligne[15] ? returnNumber(ligne[15][1]) : 0,
+            retenu: ligne[18] ? returnNumber(ligne[18][1]) : 0,
           };
         })
         .filter((e) => e.matricule != "");
 
       cotisations.value = travail;
+  
       // simulate progress for UX
       simulateProgress();
     } catch (err) {

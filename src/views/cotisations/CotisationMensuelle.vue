@@ -10,17 +10,6 @@
             Liste des Cotisations Mensuelles
           </h5>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-          <button class="btn btn-success" @click="exportExcel">
-            <i class="bi bi-file-earmark-excel me-2"></i>Exporter Excel
-          </button>
-          <button class="btn btn-danger" @click="exportPDF">
-            <i class="bi bi-file-earmark-pdf me-2"></i>Exporter PDF
-          </button>
-          <button class="btn btn-secondary" @click="openImportModal">
-            <i class="bi bi-upload me-2"></i>Importer Excel
-          </button>
-        </div>
       </div>
 
       <div class="card-body">
@@ -86,7 +75,10 @@
                 <th>Matricule</th>
                 <th>Global</th>
                 <th>Retenu</th>
-                <th>Date cotisation</th>
+                <th>Restant</th>
+                <th>Regle</th>
+                <th>Type</th>
+                <th>Date </th>
               </tr>
             </thead>
             <tbody>
@@ -96,8 +88,11 @@
                 <td>{{ item.matricule }}</td>
                 <td class="fw-bold">{{ formatMontant(item.global) }}</td>
                 <td>{{ formatMontant(item.retenu) }}</td>
-                <td>{{ item.date_cotisation }}</td>
-              </tr>
+                <td>{{ formatMontant(item.restant) }}</td>
+                <td>{{ formatMontant(item.regle) }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.date_cotisation }}</td>             
+               </tr>
               <tr v-if="displayedRows.length === 0">
                 <td colspan="6" class="text-center text-muted">
                   Aucune cotisation trouvée.
@@ -346,9 +341,9 @@ function rowIndex(index) {
 }
 
 /* Formatting */
-function formatMontant(value) {
+function formatMontant(value ) {
   if (value === null || value === undefined || value === 0) return "-";
-  return Number(value).toLocaleString("fr-FR") + " FBu";
+  return Number(value).toLocaleString("fr-FR");
 }
 
 /* Export functions */

@@ -47,6 +47,9 @@
                   Crédit #{{ c.id }} — Membre:
                   {{ c.membre?.nom + " " + c.membre?.prenom || "N/A" }} —
                   Montant: {{ c.montant_accorde || c.montant || 0 }}
+                  ||
+                  Montant demande : {{ c.montant_demande }} 
+                  
                 </span>
                 <i v-if="form.credit_id === c.id" class="fas fa-check"></i>
               </li>
@@ -77,6 +80,15 @@
               {{ form.credit.membre?.nom + " " + form.credit.membre?.prenom }} |
               Montant:
               {{ form.credit.montant_accorde || form.credit.montant || 0 }}
+              |
+              Montant demande : {{ form.credit.montant_demande }} 
+              |
+              Montant restant : {{ form.credit.montant_restant }} 
+              <br>
+              Montant total à rembourser : {{ form.credit.montant_total_rembourser }}
+              | Mensualité : {{ form.credit.montant_mensualite }} 
+
+
             </div>
           </div>
 
