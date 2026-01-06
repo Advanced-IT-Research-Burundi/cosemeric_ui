@@ -365,7 +365,7 @@ const menuItems = ref([
     icon: '<i class="bi bi-grid-fill"></i>',
     title: "Tableau de bord",
     path: "/manager/dashboard",
-    requireAdmin: isManager.value || isResponsable.value,
+    requireAdmin: isManager.value,
   },
   {
     icon: '<i class="bi bi-people-fill"></i>',
@@ -408,20 +408,20 @@ const menuItems = ref([
     icon: '<i class="bi bi-credit-card-2-front"></i>',
     title: "Mes Crédits",
     path: "/credits/mescredits",
-    requireAdmin: isMember.value || isManager.value || isResponsable.value,
+    requireAdmin: isMember.value,
   },
   {
     icon: '<i class="bi bi-plus-square-dotted"></i>',
     title: "Demande Crédit",
     path: "/credits/demande",
-    requireAdmin: isMember.value || isManager.value,
+    requireAdmin: isMember.value,
   },
 
   {
     icon: '<i class="bi bi-plus-square-dotted"></i>',
     title: "Demande Assistance",
     path: "/assistance/demande",
-    requireAdmin: isMember.value || isManager.value,
+    requireAdmin: isMember.value,
   },
   {
     icon: '<i class="bi bi-life-preserver"></i>',

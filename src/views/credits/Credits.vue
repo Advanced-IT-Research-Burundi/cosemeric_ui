@@ -3,7 +3,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
       <router-link
-        :to="isAdmin ? '/credits/add' : '/credits/demande'"
+        :to="
+          isAdmin || isManager || isResponsable
+            ? '/credits/add'
+            : '/credits/demande'
+        "
         class="btn btn-primary"
       >
         <i class="fas fa-plus me-2"></i>Ajouter un crédit
@@ -138,6 +142,9 @@ import BaseModal from "../../components/common/BaseModal.vue";
 
 const auth = useAuthStore();
 const isAdmin = auth.hasAnyRole("admin");
+const isManager = auth.hasAnyRole("manager");
+const isResponsable = auth.hasAnyRole("responsable");
+const isMember = auth.hasAnyRole("member");
 const store = useStore();
 const toast = useToast();
 const loading = ref(false);
