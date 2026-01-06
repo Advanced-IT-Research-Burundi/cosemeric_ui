@@ -82,11 +82,11 @@ const columns = [
   },
   { key: "montant", label: "Montant", sortable: true, filterable: true },
   {
-    key: "date_versement",
-    label: "Date de versement",
+    key: "date_approbation",
+    label: "Date d'approbation",
     sortable: true,
     filterable: true,
-    formatter: (value) => new Date(value).toLocaleDateString(),
+    format: "date",
   },
   {
     key: "statut",
