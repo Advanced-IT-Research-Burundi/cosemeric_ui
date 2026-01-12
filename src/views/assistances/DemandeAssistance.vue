@@ -2,7 +2,7 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Nouvelle Demande d'Assistance</h2>
-      <router-link to="/assistances" class="btn btn-outline-secondary">
+      <router-link to="/mesAssistances" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i>Retour à la liste
       </router-link>
     </div>
@@ -61,31 +61,37 @@
             </div>
 
             <!-- Date d'Approbation -->
-           
 
             <!-- Date de Versement -->
 
             <!-- Justificatif -->
             <div class="col-12">
               <label for="justificatif" class="form-label">Justification</label>
-              <textarea name="justificatif" id="justificatif" v-model="formData.justificatif" placeholder="Justification" class="form-control form-control-sm"></textarea>
+              <textarea
+                name="justificatif"
+                id="justificatif"
+                v-model="formData.justificatif"
+                placeholder="Justification"
+                class="form-control form-control-sm"
+              ></textarea>
             </div>
             <div class="col-6">
-              <label for="document_justificatif" class="form-label">Document Justificatif (PDF)</label>
-              <input 
-                type="file" 
-                name="document_justificatif" 
-                id="document_justificatif" 
-                @change="handleFileChange" 
+              <label for="document_justificatif" class="form-label"
+                >Document Justificatif (PDF)</label
+              >
+              <input
+                type="file"
+                name="document_justificatif"
+                id="document_justificatif"
+                @change="handleFileChange"
                 accept=".pdf,application/pdf"
                 class="form-control form-control-sm"
-              >
+              />
               <small v-if="formData.document_justificatif" class="text-success">
-                <i class="fas fa-check-circle me-1"></i>{{ formData.document_justificatif.name }}
+                <i class="fas fa-check-circle me-1"></i
+                >{{ formData.document_justificatif.name }}
               </small>
             </div>
-
-           
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
@@ -158,22 +164,22 @@ const handleFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     // Validate file type
-    if (file.type !== 'application/pdf') {
-      toast.error('Veuillez sélectionner un fichier PDF');
-      event.target.value = ''; // Reset input
+    if (file.type !== "application/pdf") {
+      toast.error("Veuillez sélectionner un fichier PDF");
+      event.target.value = ""; // Reset input
       formData.value.document_justificatif = null;
       return;
     }
-    
+
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      toast.error('Le fichier ne doit pas dépasser 5MB');
-      event.target.value = ''; // Reset input
+      toast.error("Le fichier ne doit pas dépasser 5MB");
+      event.target.value = ""; // Reset input
       formData.value.document_justificatif = null;
       return;
     }
-    
+
     formData.value.document_justificatif = file;
   }
 };
@@ -210,26 +216,32 @@ const handleSubmit = async () => {
   try {
     // Create FormData for multipart/form-data submission
     const formDataToSend = new FormData();
-    
+
     // Append form fields
-    formDataToSend.append('type_assistance_id', formData.value.type_assistance_id);
-    formDataToSend.append('montant', formData.value.montant);
-    
+    formDataToSend.append(
+      "type_assistance_id",
+      formData.value.type_assistance_id
+    );
+    formDataToSend.append("montant", formData.value.montant);
+
     // Append optional fields only if they have values
     if (formData.value.justificatif) {
-      formDataToSend.append('justificatif', formData.value.justificatif);
+      formDataToSend.append("justificatif", formData.value.justificatif);
     }
-    
+
     // Append file if selected
     if (formData.value.document_justificatif) {
-      formDataToSend.append('document_justificatif', formData.value.document_justificatif);
+      formDataToSend.append(
+        "document_justificatif",
+        formData.value.document_justificatif
+      );
     }
 
     // Send request with FormData
     await api.post("/demande-assistance", formDataToSend, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     toast.success("Demande d'assistance enregistrée avec succès");

@@ -43,6 +43,48 @@
             >
               <i class="fas fa-eye"></i>
             </button>
+
+            <!-- Approve Button: 
+                 - Gestionnaire/Admin can approve if 'en_attente'
+                 - Responsable/Admin can approve if 'en_cours' 
+            -->
+            <button
+              v-if="
+                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+                (item.statut === 'en_cours' && (isResponsable || isAdmin))
+              "
+              class="btn btn-success btn-sm"
+              @click="handleAction(item, 'approuve')"
+              :title="
+                item.statut === 'en_attente'
+                  ? 'Valider (Gestionnaire)'
+                  : 'Approuver (Responsable)'
+              "
+            >
+              <i class="fas fa-check"></i>
+            </button>
+
+            <!-- <button
+              v-if="isAdmin || isManager || isResponsable"
+              class="btn btn-warning btn-sm"
+              @click="handleModifier(item)"
+              title="Modifier"
+            >
+              <i class="fas fa-edit"></i>
+            </button> -->
+
+            <button
+              v-if="
+                item.statut !== 'approuve' &&
+                item.statut !== 'rejete' &&
+                (isAdmin || isManager || isResponsable)
+              "
+              class="btn btn-danger btn-sm"
+              @click="handleAction(item, 'rejete')"
+              title="Refuser"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </template>
       </AdvancedTable>
@@ -56,8 +98,18 @@ import { useStore } from "vuex";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
+import useAuthStore from "../../stores/auth";
+import { useToast } from "vue-toastification";
 
 const store = useStore();
+const auth = useAuthStore();
+const toast = useToast();
+
+const isAdmin = auth.hasAnyRole(["admin"]);
+const isManager = auth.hasAnyRole(["manager", "gestionnaire"]);
+const isResponsable = auth.hasAnyRole(["responsable"]);
+const isMember = auth.hasAnyRole(["member", "membre"]);
+
 const assistances = ref([]);
 const loading = ref(false);
 
@@ -73,14 +125,20 @@ const queryParams = ref({
 
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  { key: "membre.nom", label: "Membre", width: "100px", sortable: true },
+  { key: "membre.full_name", label: "Membre", width: "150px", sortable: true },
   {
     key: "type_assistance.nom",
     label: "Type d'assistance",
-    width: "100px",
+    width: "150px",
     sortable: true,
   },
-  { key: "montant", label: "Montant", sortable: true, filterable: true },
+  {
+    key: "montant",
+    label: "Montant",
+    sortable: true,
+    filterable: true,
+    formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
+  },
   {
     key: "date_approbation",
     label: "Date d'approbation",
@@ -107,11 +165,10 @@ const fetchAssistances = async () => {
   loading.value = true;
 
   try {
-    const params = {};
-
-    // Add query parameters
-    params.page = queryParams.value.page;
-    params.per_page = queryParams.value.per_page;
+    const params = {
+      page: queryParams.value.page,
+      per_page: queryParams.value.per_page,
+    };
 
     if (queryParams.value.search) {
       params.search = queryParams.value.search;
@@ -129,7 +186,7 @@ const fetchAssistances = async () => {
       }
     });
 
-    const response = await api.get("/assistances", params);
+    const response = await api.get("/assistances", { params });
 
     // Handle your API response structure
     if (response.success) {
@@ -143,6 +200,41 @@ const fetchAssistances = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleAction = async (item, action) => {
+  if (
+    !confirm(
+      `Êtes-vous sûr de vouloir ${
+        action === "approuve" ? "accepter" : "refuser"
+      } cette assistance ?`
+    )
+  ) {
+    return;
+  }
+
+  try {
+    if (action === "approuve") {
+      await api.post(`/assistances/approuve/${item.id}`);
+      toast.success("Assistance approuvée avec succès.");
+    } else if (action === "rejete") {
+      const comment = prompt("Veuillez saisir le motif du rejet");
+      if (!comment) {
+        toast.warning("Veuillez saisir un motif de rejet.");
+        return;
+      }
+      await api.post(`/assistances/rejete/${item.id}`, { comment });
+      toast.success("Assistance rejetée avec succès.");
+    }
+    fetchAssistances();
+  } catch (error) {
+    console.error(`Error ${action} assistance:`, error);
+    toast.error(`Erreur lors de l'action sur l'assistance.`);
+  }
+};
+
+const handleModifier = (item) => {
+  router.push({ name: "assistancesEdit", params: { id: item.id } });
 };
 
 const getClassByStatut = (statut) => {
@@ -214,6 +306,7 @@ const handleDelete = (assistance) => {
       .delete(`/assistances/${assistance.id}`)
       .then((response) => {
         console.log("Assistance supprimée avec succès!");
+        toast.success("Assistance supprimée avec succès!");
         fetchAssistances();
       })
       .catch((error) => {
@@ -221,6 +314,7 @@ const handleDelete = (assistance) => {
           "Une erreur est survenue lors de la suppression de l'assistance:",
           error
         );
+        toast.error("Erreur lors de la suppression.");
       });
   }
 };
@@ -230,6 +324,15 @@ onMounted(() => {
 });
 
 const tableData = computed(() => {
-  return store.state.assistances || [];
+  const data = store.state.assistances || {};
+  return {
+    data: data.data || [],
+    current_page: data.current_page || 1,
+    last_page: data.last_page || 1,
+    per_page: data.per_page || 15,
+    total: data.total || 0,
+    from: data.from || 0,
+    to: data.to || 0,
+  };
 });
 </script>

@@ -216,6 +216,8 @@ const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 
+const authStore = useAuthStore();
+
 const assistanceId = route.params.id;
 const loading = ref(true);
 const saving = ref(false);
