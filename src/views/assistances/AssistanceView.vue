@@ -34,8 +34,22 @@
           </span>
         </template>
 
+        <!-- Justificatif column slot -->
+        <template #column-justificatif="{ item }">
+          <a
+            v-if="item.justificatif"
+            :href="getJustificatifUrl(item.justificatif)"
+            target="_blank"
+            class="btn btn-link btn-sm text-primary p-0"
+            title="Voir le document"
+          >
+            <i class="fas fa-file-pdf me-1"></i>Voir
+          </a>
+          <span v-else class="text-muted small">Aucun</span>
+        </template>
+
         <template #actions="{ item, openDetails }">
-          <div class="btn-group">
+          <div class="btn-group gap-1">
             <button
               class="btn btn-outline-secondary btn-sm"
               @click="openDetails(item)"
@@ -64,20 +78,21 @@
               <i class="fas fa-check"></i>
             </button>
 
-            <!-- <button
-              v-if="isAdmin || isManager || isResponsable"
+            <!-- Modify Button for Member: only if 'en_attente' -->
+            <button
+              v-if="item.statut === 'en_attente' && isMember"
               class="btn btn-warning btn-sm"
               @click="handleModifier(item)"
               title="Modifier"
             >
               <i class="fas fa-edit"></i>
-            </button> -->
+            </button>
 
+            <!-- Reject Button: Visible for Manager/Responsable/Admin if not finalized -->
             <button
               v-if="
-                item.statut !== 'approuve' &&
-                item.statut !== 'rejete' &&
-                (isAdmin || isManager || isResponsable)
+                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+                (item.statut === 'en_cours' && (isResponsable || isAdmin))
               "
               class="btn btn-danger btn-sm"
               @click="handleAction(item, 'rejete')"
@@ -106,9 +121,9 @@ const auth = useAuthStore();
 const toast = useToast();
 
 const isAdmin = auth.hasAnyRole(["admin"]);
-const isManager = auth.hasAnyRole(["manager", "gestionnaire"]);
+const isManager = auth.hasAnyRole(["gestionnaire"]);
 const isResponsable = auth.hasAnyRole(["responsable"]);
-const isMember = auth.hasAnyRole(["member", "membre"]);
+const isMember = auth.hasAnyRole(["membre"]);
 
 const assistances = ref([]);
 const loading = ref(false);
@@ -151,6 +166,12 @@ const columns = [
     label: "Statut",
     sortable: true,
     filterable: true,
+  },
+  {
+    key: "justificatif",
+    label: "Justificatif",
+    width: "100px",
+    sortable: false,
   },
   {
     key: "created_at",
@@ -263,6 +284,16 @@ const getStatusLabel = (statut) => {
   } else {
     return "Terminé";
   }
+};
+
+const getJustificatifUrl = (path) => {
+  if (!path) return "#";
+  // If it starts with 'uploads', it's usually in public/uploads
+  if (path.startsWith("uploads")) {
+    return `${path}`;
+  }
+  // If it's stored via Storage::disk('public'), it's in storage/
+  return `${path}`;
 };
 
 // Event handlers

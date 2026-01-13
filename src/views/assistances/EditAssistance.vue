@@ -16,6 +16,10 @@
     <div v-else class="card">
       <div class="card-body">
         <form @submit.prevent="handleSubmit">
+          <div v-if="!canEdit && !loading" class="alert alert-warning mb-4">
+            <i class="fas fa-info-circle me-2"></i>Cette assistance ne peut plus
+            être modifiée car elle est en cours de traitement ou finalisée.
+          </div>
           <div v-if="error" class="alert alert-danger mb-4">
             <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
           </div>
@@ -44,6 +48,7 @@
                 class="form-select"
                 v-model="formData.type_assistance_id"
                 required
+                :disabled="!canEdit"
               >
                 <option
                   v-for="type in assistanceTypes"
@@ -68,6 +73,7 @@
                   min="0"
                   step="1"
                   required
+                  :disabled="!canEdit"
                 />
                 <span class="input-group-text">FBU</span>
               </div>
@@ -104,6 +110,7 @@
                 class="form-control"
                 v-model="formData.date_demande"
                 required
+                :disabled="!canEdit"
               />
             </div>
 
@@ -144,6 +151,7 @@
                 id="justificatif"
                 @change="handleFileChange"
                 accept="image/*,.pdf,.doc,.docx"
+                :disabled="!canEdit"
               />
               <div v-if="previewUrl || formData.justificatif" class="mt-2">
                 <p class="small text-muted mb-1">
@@ -191,7 +199,11 @@
             >
               Annuler
             </button>
-            <button type="submit" class="btn btn-primary" :disabled="saving">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="saving || !canEdit"
+            >
               <span
                 v-if="saving"
                 class="spinner-border spinner-border-sm me-2"
@@ -206,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
@@ -226,6 +238,19 @@ const assistance = ref(null);
 const assistanceTypes = ref([]);
 const file = ref(null);
 const previewUrl = ref(null);
+
+const isMember = computed(() => authStore.hasAnyRole(["membre"]));
+const isAdminOrManager = computed(() =>
+  authStore.hasAnyRole(["admin", "gestionnaire"])
+);
+const isResponsable = computed(() => authStore.hasAnyRole(["responsable"]));
+
+const canEdit = computed(() => {
+  // Staff can always edit
+  if (isAdminOrManager.value || isResponsable.value) return true;
+  // Members can only edit if en_attente
+  return formData.value.statut === "en_attente";
+});
 
 const formData = ref({
   type_assistance_id: "",
@@ -252,9 +277,17 @@ const isImage = (path) => {
 const getFullUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  return `${
-    import.meta.env.VITE_API_URL || "http://localhost:8000"
-  }/storage/${path}`;
+
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL_FILE || "http://localhost:8000";
+
+  // If it starts with 'uploads', it's usually in public/uploads
+  if (path.startsWith("uploads")) {
+    return `${baseUrl}/${path}`;
+  }
+
+  // If it's stored via Storage::disk('public'), it's in storage/
+  return `${baseUrl}/storage/${path}`;
 };
 
 const getFileName = (path) => {
