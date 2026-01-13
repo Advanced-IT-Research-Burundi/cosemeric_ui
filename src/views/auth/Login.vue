@@ -181,20 +181,16 @@ async function login() {
     const success = await authStore.login(email.value, password.value);
     if (!success) throw new Error("Email ou mot de passe incorrect");
 
+    console.log(authStore.user);
     // Redirect based on User Role
-    // 1. Admin -> Main Dashboard
-    if (authStore.user.role === "admin") {
+    if (
+      authStore.user.role === "admin" ||
+      authStore.user.role === "responsable"
+    ) {
       window.location.href = "/dashboard";
-    }
-    if (authStore.user.role === "responsable") {
-      window.location.href = "/dashboard";
-    }
-    // 2. Manager (Gestionnaire) -> Manager Dashboard
-    else if (authStore.user.role === "gestionnaire") {
+    } else if (authStore.user.role === "gestionnaire") {
       window.location.href = "/manager/dashboard";
-    }
-    // 3. Regular Member or others -> Credits/Member Area
-    else {
+    } else {
       window.location.href = "/credits/mescredits";
     }
   } catch (err) {
