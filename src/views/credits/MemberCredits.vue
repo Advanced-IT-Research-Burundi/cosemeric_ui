@@ -147,7 +147,7 @@ const fetchCredits = async () => {
       date: queryParams.value.date,
     };
 
-    const response = await api.get("/mescredits");
+    const response = await api.get("/mescredits", params);
     store.state.mescredits = response.data;
   } catch (error) {
     console.error("Error fetching credits:", error);

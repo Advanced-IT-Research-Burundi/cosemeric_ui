@@ -65,8 +65,11 @@ apiClient.interceptors.response.use(
 );
 
 export default {
-  get(resource, params = {}) {
-    return apiClient.get(resource, { params });
+  get(resource, paramsOrConfig = {}) {
+    // If the argument already contains a 'params' key, treat it as an axios config object.
+    // Otherwise, treat it as the query parameters themselves and wrap it in a 'params' key.
+    const config = paramsOrConfig.params ? paramsOrConfig : { params: paramsOrConfig };
+    return apiClient.get(resource, config);
   },
 
   post(resource, data, config = {}) {
