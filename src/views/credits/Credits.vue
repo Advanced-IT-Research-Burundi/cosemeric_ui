@@ -181,12 +181,12 @@ const columns = [
     sortable: true,
     formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
   },
-  {
-    key: "montant_accorde",
-    label: "Montant Accordé",
-    sortable: true,
-    formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
-  },
+  // {
+  //   key: "montant_accorde",
+  //   label: "Montant Accordé",
+  //   sortable: true,
+  //   formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
+  // },
   {
     key: "date_demande",
     label: "Date Demande",
@@ -269,7 +269,7 @@ const handleAction = async (item, action) => {
     !confirm(
       `Êtes-vous sûr de vouloir ${
         action === "approuve" ? "accepter" : "refuser"
-      } ce crédit ?`
+      } ce crédit ?`,
     )
   ) {
     return;
@@ -288,7 +288,7 @@ const handleAction = async (item, action) => {
     }
 
     toast.success(
-      `Crédit ${action === "approuve" ? "accepté" : "refusé"} avec succès.`
+      `Crédit ${action === "approuve" ? "accepté" : "refusé"} avec succès.`,
     );
     fetchCredits();
   } catch (error) {

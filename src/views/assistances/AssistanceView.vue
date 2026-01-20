@@ -108,7 +108,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, watch, computed } from "vue";
+import { onMounted } from "vue";
 import { useStore } from "vuex";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
@@ -159,7 +160,7 @@ const columns = [
     label: "Date d'approbation",
     sortable: true,
     filterable: true,
-    format: "date",
+    formatter: (value) => (value ? new Date(value).toLocaleDateString() : ""),
   },
   {
     key: "statut",
