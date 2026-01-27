@@ -392,12 +392,7 @@ const menuItems = ref([
     path: "/mesAssistances",
     requireAdmin: isMember.value,
   },
-  {
-    icon: '<i class="bi bi-calendar-event-fill"></i>',
-    title: "Périodes",
-    path: "/periodes",
-    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
-  },
+
   {
     icon: '<i class="bi bi-credit-card-2-front-fill"></i>',
     title: "Crédits",
