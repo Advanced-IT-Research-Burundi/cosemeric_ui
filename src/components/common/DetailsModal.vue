@@ -40,12 +40,6 @@
                   </p>
                 </div>
                 <div class="col-md-6">
-                  <label class="text-muted small">Période</label>
-                  <p class="fw-bold">
-                    {{ data.periode?.libelle }} ({{ data.periode?.annee }})
-                  </p>
-                </div>
-                <div class="col-md-6">
                   <label class="text-muted small">Montant</label>
                   <p class="fw-bold fs-5 text-primary">
                     {{ formatCurrency(data.montant, data.devise) }}
@@ -79,48 +73,6 @@
                   <div class="p-3 bg-light rounded text-dark border">
                     {{ data.notes }}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Périodes -->
-            <div
-              v-else-if="endpoint.includes('periodes')"
-              class="details-section"
-            >
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="text-muted small">Libellé</label>
-                  <p class="fw-bold">{{ data.libelle }}</p>
-                </div>
-                <div class="col-md-6">
-                  <label class="text-muted small">Type</label>
-                  <p class="fw-bold text-capitalize">{{ data.type }}</p>
-                </div>
-                <div class="col-md-6">
-                  <label class="text-muted small">Année</label>
-                  <p class="fw-bold">{{ data.annee }}</p>
-                </div>
-                <div class="col-md-6">
-                  <label class="text-muted small">Statut</label>
-                  <div>
-                    <span
-                      class="badge"
-                      :class="
-                        data.statut === 'ouvert' ? 'bg-success' : 'bg-secondary'
-                      "
-                    >
-                      {{ data.statut === "ouvert" ? "Ouvert" : "Fermé" }}
-                    </span>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <label class="text-muted small">Date de début</label>
-                  <p class="fw-bold">{{ formatDate(data.date_debut) }}</p>
-                </div>
-                <div class="col-md-6">
-                  <label class="text-muted small">Date de fin</label>
-                  <p class="fw-bold">{{ formatDate(data.date_fin) }}</p>
                 </div>
               </div>
             </div>
@@ -352,7 +304,7 @@ watch(
     } else {
       data.value = null; // Clear on close
     }
-  }
+  },
 );
 
 watch(
@@ -361,7 +313,7 @@ watch(
     if (props.modelValue) {
       fetchData();
     }
-  }
+  },
 );
 
 // Formatters
@@ -441,8 +393,8 @@ const filteredData = computed(() => {
   return Object.fromEntries(
     Object.entries(data.value).filter(
       ([key]) =>
-        !ignoredKeys.includes(key) && typeof data.value[key] !== "object"
-    )
+        !ignoredKeys.includes(key) && typeof data.value[key] !== "object",
+    ),
   );
 });
 

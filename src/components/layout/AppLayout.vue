@@ -349,7 +349,7 @@ const notifications = computed(() =>
     message: notification.message,
     time: timeAgo(notification.created_at),
     read: notification.read,
-  }))
+  })),
 );
 
 const notificationCount = computed(() => notifications.value.length);
@@ -392,12 +392,6 @@ const menuItems = ref([
     path: "/mesAssistances",
     requireAdmin: isMember.value,
   },
-  // {
-  //   icon: '<i class="bi bi-calendar-event-fill"></i>',
-  //   title: "Périodes",
-  //   path: "/periodes",
-  //   requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
-  // },
   {
     icon: '<i class="bi bi-credit-card-2-front-fill"></i>',
     title: "Crédits",
@@ -991,7 +985,8 @@ const onClickOutside = (event) => {
   right: 0;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-color);
   z-index: 100;

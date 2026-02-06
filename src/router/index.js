@@ -216,13 +216,6 @@ meta: { requiresAuth: true},
     meta: { requiresAuth: true },
   },
 
-  // Periodes
-  {
-    path: "/periodes",
-    name: "periodes",
-    component: () => import("../views/periodes/Periodes.vue"),
-    meta: { requiresAuth: true },
-  },
   {
     path: "/notifications",
     name: "notifications",

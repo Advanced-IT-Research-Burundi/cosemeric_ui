@@ -22,36 +22,47 @@
     <!-- Content -->
     <div v-else>
       <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light fw-bold">
-          Informations principales
-        </div>
+        <div class="card-header bg-light fw-bold">Informations principales</div>
         <div class="card-body">
           <div class="row mb-2">
-            <div class="col-md-6"><strong>Membre :</strong> {{ contribution.membre?.nom || 'Non défini' }}</div>
-            <div class="col-md-6"><strong>Montant :</strong> {{ formatMontant(contribution.montant) }}</div>
+            <div class="col-md-6">
+              <strong>Membre :</strong>
+              {{ contribution.membre?.nom || "Non défini" }}
+            </div>
+            <div class="col-md-6">
+              <strong>Montant :</strong>
+              {{ formatMontant(contribution.montant) }}
+            </div>
           </div>
           <div class="row mb-2">
-            <div class="col-md-6"><strong>Mode de paiement :</strong> {{ getModePaiement(contribution.mode_paiement) }}</div>
-            <div class="col-md-6"><strong>Statut :</strong>
-              <span class="badge rounded-1" :class="getClassByStatut(contribution.statut)">
+            <div class="col-md-6">
+              <strong>Mode de paiement :</strong>
+              {{ getModePaiement(contribution.mode_paiement) }}
+            </div>
+            <div class="col-md-6">
+              <strong>Statut :</strong>
+              <span
+                class="badge rounded-1"
+                :class="getClassByStatut(contribution.statut)"
+              >
                 {{ ucFirst(contribution.statut) }}
               </span>
             </div>
           </div>
           <div class="row mb-2">
-            <div class="col-md-6"><strong>Période :</strong> {{ contribution.periode?.mois }}/{{ contribution.periode?.annee }}</div>
-            <div class="col-md-6"><strong>Date de création :</strong> {{ formatDate(contribution.created_at) }}</div>
+            <div class="col-md-6">
+              <strong>Date de création :</strong>
+              {{ formatDate(contribution.created_at) }}
+            </div>
           </div>
         </div>
       </div>
 
       <div class="card shadow-sm">
-        <div class="card-header bg-light fw-bold">
-          Détails supplémentaires
-        </div>
+        <div class="card-header bg-light fw-bold">Détails supplémentaires</div>
         <div class="card-body">
           <p><strong>Observations :</strong></p>
-          <p>{{ contribution.observations || 'Aucune observation' }}</p>
+          <p>{{ contribution.observations || "Aucune observation" }}</p>
         </div>
       </div>
     </div>
@@ -84,10 +95,10 @@ const formatDate = (date) => {
 
 const getModePaiement = (mode) => {
   const modes = {
-    "1": "Espèces",
-    "2": "Virement",
-    "3": "Chèque",
-    "4": "Mobile Money",
+    1: "Espèces",
+    2: "Virement",
+    3: "Chèque",
+    4: "Mobile Money",
   };
   return modes[mode] || "Inconnu";
 };

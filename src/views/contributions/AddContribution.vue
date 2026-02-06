@@ -108,33 +108,6 @@
             </div>
 
             <div class="col-md-6">
-              <label for="periode_id" class="form-label"
-                >Période <span class="text-danger">*</span></label
-              >
-              <select
-                id="periode_id"
-                class="form-select"
-                v-model="formData.periode_id"
-                required
-                :disabled="loadingPeriodes"
-              >
-                <option value="" disabled>Sélectionnez une période</option>
-                <option
-                  v-for="periode in periodes"
-                  :key="periode.id"
-                  :value="periode.id"
-                >
-                  {{ periode.libelle }} ({{ formatDate(periode.date_debut) }} -
-                  {{ formatDate(periode.date_fin) }})
-                </option>
-              </select>
-              <div v-if="loadingPeriodes" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
-                périodes...
-              </div>
-            </div>
-
-            <div class="col-md-6">
               <label for="montant" class="form-label"
                 >Montant <span class="text-danger">*</span></label
               >
@@ -281,7 +254,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary"
-                  :disabled="loading || loadingMembers || loadingPeriodes"
+                  :disabled="loading || loadingMembers"
                 >
                   <span
                     v-if="loading"
@@ -314,12 +287,9 @@ const toast = useToast();
 
 const loading = ref(false);
 const loadingMembers = ref(false);
-const loadingPeriodes = ref(true);
 
 const allMembers = ref([]);
 const filteredMembers = ref([]);
-
-const periodes = ref([]);
 
 const searchTimeout = ref(null);
 const searchMember = ref("");
@@ -328,7 +298,6 @@ const searchedMemberData = computed(() => store.state.searchedMember);
 const formData = ref({
   membre: null,
   membre_id: "",
-  periode_id: "",
   montant: 0,
   devise: "FBU",
   date_paiement: new Date().toISOString().split("T")[0],
@@ -448,45 +417,12 @@ const selectMember = (member) => {
   searchMember.value = member.full_name;
 
   currentStep.value = 2;
-
-  // Fetch the periodes immediately after selecting a member
-  fetchPeriodes();
-};
-
-const fetchPeriodes = async () => {
-  loadingPeriodes.value = true;
-
-  try {
-    let params = {};
-
-    const member = searchedMemberData.value; // <--- THE CORRECT ONE
-
-    if (member?.categorie?.nom) {
-      const cat = member.categorie.nom;
-
-      console.log(cat);
-
-      if (cat === "service_externe_5" || cat === "service_externe_10") {
-        params.type_membre = "semestriel";
-      } else {
-        params.type_membre = "mensuel";
-      }
-    }
-
-    const response = await api.get("/periodes", { params });
-    periodes.value = response.data.data || response.data || [];
-  } catch (err) {
-    console.error("Error fetching periods:", err);
-    toast.error("Erreur lors du chargement des périodes");
-  } finally {
-    loadingPeriodes.value = false;
-  }
 };
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(
-    dateString.includes("T") ? dateString : `${dateString}T00:00:00Z`
+    dateString.includes("T") ? dateString : `${dateString}T00:00:00Z`,
   );
   return date.toLocaleDateString("fr-FR");
 };
@@ -508,7 +444,7 @@ const handleSubmit = async () => {
     console.error("Error saving contribution:", err);
     toast.error(
       err.response?.data?.message ||
-        "Erreur lors de l'enregistrement de la cotisation"
+        "Erreur lors de l'enregistrement de la cotisation",
     );
   } finally {
     loading.value = false;
@@ -516,7 +452,6 @@ const handleSubmit = async () => {
 };
 
 onMounted(() => {
-  fetchPeriodes();
   fetchAllMembers();
 });
 </script>

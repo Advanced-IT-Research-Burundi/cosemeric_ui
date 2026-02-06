@@ -45,31 +45,6 @@
               </select>
             </div>
 
-            <!-- Période -->
-            <div class="col-md-6">
-              <label for="periode_id" class="form-label"
-                >Période <span class="text-danger">*</span></label
-              >
-              <select
-                id="periode_id"
-                class="form-select"
-                v-model="formData.periode_id"
-                required
-                :disabled="loadingPeriodes"
-              >
-                <option value="" disabled>Sélectionnez une période</option>
-                <option
-                  v-for="periode in periodes"
-                  :key="periode.id"
-                  :value="periode.id"
-                  :selected="periode.id === formData.periode_id"
-                >
-                  {{ periode.libelle }} ({{ formatDate(periode.date_debut) }} -
-                  {{ formatDate(periode.date_fin) }})
-                </option>
-              </select>
-            </div>
-
             <!-- Montant et Devise -->
             <div class="col-md-6">
               <label for="montant" class="form-label"
@@ -215,7 +190,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              :disabled="saving || loadingMembers || loadingPeriodes"
+              :disabled="saving || loadingMembers"
             >
               <span
                 v-if="saving"
@@ -244,16 +219,13 @@ const toast = useToast();
 const loading = ref(false);
 const saving = ref(false);
 const loadingMembers = ref(true);
-const loadingPeriodes = ref(true);
 const error = ref("");
 
 const members = ref([]);
-const periodes = ref([]);
 const contributionId = route.params.id;
 
 const formData = ref({
   membre_id: "",
-  periode_id: "",
   montant: 0,
   devise: null,
   date_paiement: null,
@@ -272,22 +244,6 @@ const fetchMembers = async () => {
     console.error("Error fetching members:", err);
   } finally {
     loadingMembers.value = false;
-  }
-};
-
-// Fetch periods
-const fetchPeriodes = async (devise) => {
-  try {
-    const response = await api.get("/periodes", {
-      params: {
-        type: devise,
-      },
-    });
-    periodes.value = response.data.data || [];
-  } catch (err) {
-    console.error("Error fetching periods:", err);
-  } finally {
-    loadingPeriodes.value = false;
   }
 };
 
@@ -354,10 +310,8 @@ const handleSubmit = async () => {
   }
 };
 
-// Fetch all required data on component mount
 onMounted(() => {
   fetchMembers();
-  fetchPeriodes(formData.value.devise);
   fetchContribution();
 });
 </script>

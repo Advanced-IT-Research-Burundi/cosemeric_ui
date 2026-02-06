@@ -14,7 +14,6 @@ const vuexStore = createStore({
         mescredits: [],
         assistances: [],
         remboursements: [],
-        periodes: [],
         dashboard: [],
         notifications: [],
         configurations: [],
