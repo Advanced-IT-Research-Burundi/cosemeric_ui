@@ -171,9 +171,7 @@
 import { ref, onMounted } from "vue";
 import api from "../../services/api";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { useStore } from "vuex";
 
-const store = useStore();
 const configs = ref([]);
 const error = ref("");
 const modalError = ref("");
@@ -182,13 +180,11 @@ let modalInstance = null;
 
 const editing = ref({
   id: null,
-  key: "",
-  value: "",
-  label: "",
-  //   extra1: null,
-  //   extra2: null,
+  nom: "",
+  montant_standard: null,
 });
 
+// Fetch initial configurations
 onMounted(() => {
   fetchConfigs();
 });
@@ -197,66 +193,66 @@ async function fetchConfigs() {
   error.value = "";
   try {
     const res = await api.get("/type-assistances");
-    // normalize possible shapes: res.data.data (paginated) or res.data
-    store.state.configurations = res.data ?? null;
-    configs.value = store.state.configurations;
-    console.log("Fetched configs", configs.value);
+    configs.value = res.data ?? [];
+
+    if(configs.value.length !== 0){
+
+      //make montant_standard  : 5000.00 like montant_standard  : 5000
+        configs.value.forEach(cfg => {
+            cfg.montant_standard = cfg.montant_standard ?? null;
+        });
+    }
   } catch (err) {
     console.error("fetchConfigs error", err);
     error.value = "Impossible de charger les configurations.";
-    configs.value = [];
   }
 }
 
+// Ouvre la modale pour créer ou modifier
 function openModal(cfg = null) {
   modalError.value = "";
+
   if (!modalInstance) {
-    const el = document.getElementById("configModal");
-    modalInstance = new bootstrap.Modal(el);
+    modalInstance = new bootstrap.Modal(modalEl.value);
   }
+
   if (cfg) {
     editing.value = {
       id: cfg.id,
-      key: cfg.key,
-      value: cfg.value,
-      label: cfg.label,
-      //   extra1: cfg.extra1 ?? null,
-      //   extra2: cfg.extra2 ?? null,
+      nom: cfg.nom ?? "",
+      montant_standard: cfg.montant_standard ?? null,
     };
   } else {
     editing.value = {
       id: null,
-      key: "",
-      value: "",
-      label: "",
-      //   extra1: null,
-      //   extra2: null,
+      nom: "",
+      montant_standard: null,
     };
   }
+
   modalInstance.show();
 }
 
+// Sauvegarde création ou édition
 async function saveConfig() {
   modalError.value = "";
-  try {
-    const payload = {
-      montant_standard: editing.value.montant_standard || null,
-      nom: editing.value.nom || null,
-      //   extra1: editing.value.extra1 || null,
-      //   extra2: editing.value.extra2 || null,
-    };
 
+  const payload = {
+    nom: editing.value.nom || null,
+    montant_standard: editing.value.montant_standard ?? null,
+  };
+
+  try {
     if (editing.value.id) {
-      // update
+      // Update
       await api.put(`/type-assistances/${editing.value.id}`, payload);
     } else {
-      // create
-      console.log(payload);
+      // Create
       await api.post("/type-assistances", payload);
     }
 
     await fetchConfigs();
-    if (modalInstance) modalInstance.hide();
+    modalInstance.hide();
   } catch (err) {
     console.error("saveConfig error", err);
     modalError.value =
@@ -264,15 +260,13 @@ async function saveConfig() {
   }
 }
 
+// Supprimer configuration
 async function removeConfig(cfg) {
-  if (!confirm(`Confirmer la suppression de "${cfg.key}" ?`)) return;
+  if (!confirm(`Confirmer la suppression de "${cfg.nom}" ?`)) return;
+
   try {
     if (cfg.id) await api.delete(`/type-assistances/${cfg.id}`);
-    // optimistic remove locally
-    configs.value = configs.value.filter(
-      (c) => c.id !== cfg.id && c.key !== cfg.key
-    );
-    await fetchConfigs();
+    configs.value = configs.value.filter((c) => c.id !== cfg.id);
   } catch (err) {
     console.error("removeConfig error", err);
     alert("Erreur lors de la suppression.");
