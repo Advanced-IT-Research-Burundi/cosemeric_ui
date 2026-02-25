@@ -7,7 +7,7 @@
         class="btn btn-primary"
         v-if="auth.hasAnyRole('admin')"
       >
-        <i class="fas fa-list me-2"></i>Touts Cotisation Mensuelle
+        <i class="fas fa-list me-2"></i>Toutes les cotisations Mensuelles
       </router-link>
       <router-link
         to="/contributions/add"
@@ -232,7 +232,7 @@ const handleDelete = (cotisation) => {
       .catch((error) => {
         console.error(
           "Une erreur est survenue lors de la suppression du membre:",
-          error
+          error,
         );
       });
   }

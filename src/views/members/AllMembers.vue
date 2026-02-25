@@ -124,7 +124,7 @@
                     </button>
                     <button
                       class="btn btn-sm btn-light text-info"
-                      @click="openModal('edit', member)"
+                      @click="editMember(member)"
                       title="Modifier"
                     >
                       <i class="bi bi-pencil"></i>
@@ -550,6 +550,11 @@ const routeToMember = (member) => {
   // Assuming you have a router setup
   window.location.href = `/members/${member.id}`;
 };
+
+const editMember = (member) => {
+  window.location.href = `/members/${member.id}/edit`;
+};
+
 const openModal = (type, member = null) => {
   selectedMember.value = member;
 

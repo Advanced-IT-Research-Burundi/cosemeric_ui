@@ -16,29 +16,34 @@
 
           <div class="row g-3">
             <div class="col-md-6">
-              <label for="membre_id" class="form-label"
-                >Membre <span class="text-danger">*</span></label
-              >
-              <select
-                id="membre_id"
-                class="form-select"
-                v-model="formData.membre_id"
+              <label for="membre_id" class="form-label">
+                Membre <span class="text-danger">*</span>
+              </label>
+
+              <AutoComplete
+                v-model="selectedMember"
+                :suggestions="members"
+                @complete="onMemberSearch"
+                optionLabel="display_name"
+                placeholder="Rechercher un membre (Nom, Matricule...)"
+                class="w-100"
+                inputClass="form-control"
+                @item-select="onMemberSelect"
+                forceSelection
                 required
-                :disabled="loadingMembers"
               >
-                <option value="" disabled>Sélectionnez un membre</option>
-                <option
-                  v-for="membre in members"
-                  :key="membre.id"
-                  :value="membre.id"
-                >
-                  {{ membre.id }} | {{ membre.full_name }} |
-                  {{ membre.telephone }} | {{ membre.categorie.nom }}
-                </option>
-              </select>
+                <template #option="slotProps">
+                  <div class="flex align-items-center">
+                    <div>
+                      {{ slotProps.option.matricule }} -
+                      {{ slotProps.option.nom }} {{ slotProps.option.prenom }}
+                    </div>
+                  </div>
+                </template>
+              </AutoComplete>
+
               <div v-if="loadingMembers" class="form-text">
-                <i class="fas fa-spinner fa-spin me-1"></i>Chargement des
-                membres...
+                <i class="fas fa-spinner fa-spin me-1"></i> Chargement...
               </div>
             </div>
 
@@ -247,6 +252,7 @@ const loadingMembers = ref(true);
 const error = ref("");
 
 const members = ref([]);
+const selectedMember = ref(null);
 
 const today = new Date();
 
@@ -269,17 +275,39 @@ const formData = ref({
   motif: "",
 });
 
-// Fetch members
-const fetchMembers = async () => {
+const onMemberSearch = async (event) => {
+  const query = event.query;
+  if (!query || query.length < 2) return;
+
+  loadingMembers.value = true;
   try {
-    const response = await api.get("/membres");
-    // Assurez-vous que members.value est bien un tableau
-    members.value = response.data?.data || [];
-  } catch (err) {
-    console.error("Error fetching members:", err);
-    toast.error("Erreur lors du chargement des membres");
+    const res = await api.post("/membres/search?q=" + query);
+    const data = res.data?.data || res.data || [];
+    members.value = data.map((m) => ({
+      ...m,
+      display_name: `${m.nom} ${m.prenom} (${m.matricule})`,
+    }));
+  } catch (e) {
+    console.error(e);
+    members.value = [];
   } finally {
     loadingMembers.value = false;
+  }
+};
+
+const onMemberSelect = (event) => {
+  formData.value.membre_id = event.value.id;
+};
+
+// Fetch members initially if needed, or leave it to search
+const fetchMembers = async () => {
+  try {
+    // We can either fetch all or just rely on search
+    // For consistency with AddAssistance, we might not need this anymore if we use AutoComplete only
+    // but Keeping it as a placeholder or removing it is fine.
+    loadingMembers.value = false;
+  } catch (err) {
+    console.error("Error fetching members:", err);
   }
 };
 
@@ -303,7 +331,7 @@ const calculatePayments = () => {
 const calculateDateFin = () => {
   const dateFin = addMonths(
     formData.value.date_demande,
-    formData.value.duree_mois
+    formData.value.duree_mois,
   );
   formData.value.date_fin = dateFin;
 };

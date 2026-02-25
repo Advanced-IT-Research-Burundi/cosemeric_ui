@@ -79,7 +79,13 @@
             Actions rapides
           </h3>
           <div class="action-buttons">
-            <button class="action-btn" @click="activeTab = 'info'">
+            <button
+              class="action-btn"
+              @click="
+                activeTab = 'info';
+                populateForm();
+              "
+            >
               <i class="bi bi-pencil-square"></i>
               Modifier le profil
             </button>
@@ -108,7 +114,10 @@
           </button>
           <button
             :class="['modern-tab', { active: activeTab === 'info' }]"
-            @click="activeTab = 'info'"
+            @click="
+              activeTab = 'info';
+              populateForm();
+            "
           >
             <i class="bi bi-pencil-square"></i>
             <span>Modifier</span>
@@ -760,8 +769,8 @@ const populateForm = () => {
 const updateProfile = async () => {
   isLoading.value = true;
   try {
-    const response = await api.put("/profiles", profileForm.value);
-    store.state.user = [response.data];
+    const response = await api.put("/profile", profileForm.value);
+    store.state.user = [response.data.user];
     activeTab.value = "view";
     showNotification("success", "Profil mis à jour avec succès !");
   } catch (error) {
@@ -784,8 +793,8 @@ const changePassword = async () => {
   try {
     await api.post("/change-password", {
       current_password: passwordForm.value.current_password,
-      new_password: passwordForm.value.new_password,
-      new_password_confirmation: passwordForm.value.confirm_password,
+      password: passwordForm.value.new_password,
+      password_confirmation: passwordForm.value.confirm_password,
     });
 
     resetPasswordForm();
@@ -816,15 +825,32 @@ const openAvatarUpload = () => {
   showNotification("info", "Fonctionnalité de téléchargement d'avatar à venir");
 };
 
+import jsPDF from "jspdf";
+
 const downloadProfile = () => {
-  const data = JSON.stringify(userData.value, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `profile-${userData.value.matricule || "data"}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const doc = new jsPDF();
+
+  const data = userData.value;
+  let y = 10;
+
+  doc.setFontSize(12);
+  doc.text("User Profile", 10, y);
+  y += 10;
+
+  Object.entries(data).forEach(([key, value]) => {
+    const text = `${key}: ${value ?? ""}`;
+    const lines = doc.splitTextToSize(text, 180); // Wrap text
+    doc.text(lines, 10, y);
+    y += lines.length * 7;
+
+    // Add new page if content exceeds page height
+    if (y > 270) {
+      doc.addPage();
+      y = 10;
+    }
+  });
+
+  doc.save(`profile-${data.matricule || "data"}.pdf`);
 };
 
 const showNotification = (type, message) => {
@@ -876,7 +902,8 @@ onMounted(() => {
   --accent-purple: #8b5cf6;
   --accent-orange: #f59e0b;
 
-  --bg-color: #f3f4f6;
+  --bg-color: #090c11;
+  /*--bg-color: #f3f4f6;*/
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --text-muted: #9ca3af;
@@ -1426,6 +1453,7 @@ onMounted(() => {
   transition: all 0.3s;
   background: var(--bg-color);
   font-family: inherit;
+  color: var(--text-primary);
 }
 
 .modern-input:focus {
