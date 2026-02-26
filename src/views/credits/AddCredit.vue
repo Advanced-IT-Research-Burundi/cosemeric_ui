@@ -302,7 +302,7 @@ const onMemberSelect = (event) => {
 const fetchDefaultSettings = async () => {
   try {
     const res = await api.get("/configurations");
-    const settings = res.data || [];
+    const settings = res.data.data || [];
     const interestRate = settings.find((s) => s.cle === "taux_interet_credit");
     if (interestRate) {
       formData.value.taux_interet = parseFloat(interestRate.valeur);

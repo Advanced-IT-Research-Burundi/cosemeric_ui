@@ -41,7 +41,6 @@
           :has-actions="true"
           row-key="id"
           @edit="openModal"
-          @delete="removeConfig"
         >
           <template #column-cle="{ value }">
             <span
@@ -65,13 +64,6 @@
                 title="Modifier"
               >
                 <i class="bi bi-pencil-square text-primary"></i>
-              </button>
-              <button
-                class="btn btn-white btn-sm px-3 hover-danger border-start"
-                @click="removeConfig(item)"
-                title="Supprimer"
-              >
-                <i class="bi bi-trash3 text-danger"></i>
               </button>
             </div>
           </template>
