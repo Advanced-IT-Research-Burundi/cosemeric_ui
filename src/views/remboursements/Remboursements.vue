@@ -45,20 +45,20 @@
             >
               <i class="fas fa-eye"></i>
             </button>
-            <button
+            <!-- <button
               class="btn btn-outline-primary btn-sm"
               @click="handleEdit(item)"
               title="Modifier"
             >
               <i class="fas fa-edit"></i>
-            </button>
-            <button
+            </button> -->
+            <!-- <button
               class="btn btn-outline-danger btn-sm"
               @click="handleDelete(item)"
               title="Supprimer"
             >
               <i class="fas fa-trash"></i>
-            </button>
+            </button> -->
           </div>
         </template>
       </AdvancedTable>

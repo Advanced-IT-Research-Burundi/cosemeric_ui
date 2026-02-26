@@ -105,10 +105,31 @@ const routes = [
   },
 
   {
-path: "/config",
-name : "Confinguration",
-component: () => import("../views/conf/ConfigGenerale.vue"),
-meta: { requiresAuth: true},
+    path: "/config",
+    name: "Configuration",
+    children: [
+      {
+        path: "",
+        name: "configHub",
+        component: () => import("../views/conf/ConfigHub.vue"),
+      },
+      {
+        path: "generale",
+        name: "configGenerale",
+        component: () => import("../views/conf/ConfigGenerale.vue"),
+      },
+      {
+        path: "categories",
+        name: "configCategories",
+        component: () => import("../views/conf/ConfigCategorieMembres.vue"),
+      },
+      {
+        path: "assistances",
+        name: "configAssistances",
+        component: () => import("../views/conf/ConfigTypesAssistances.vue"),
+      },
+    ],
+    meta: { requiresAuth: true },
   },
 
   // Credits

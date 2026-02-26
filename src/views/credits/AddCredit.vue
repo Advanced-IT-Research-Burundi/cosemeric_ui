@@ -264,7 +264,7 @@ function addMonths(date, months) {
 
 const formData = ref({
   montant_demande: 0,
-  taux_interet: 3,
+  taux_interet: 0,
   duree_mois: 12,
   montant_total_rembourser: 0,
   montant_mensualite: 0,
@@ -297,6 +297,23 @@ const onMemberSearch = async (event) => {
 
 const onMemberSelect = (event) => {
   formData.value.membre_id = event.value.id;
+};
+
+const fetchDefaultSettings = async () => {
+  try {
+    const res = await api.get("/configurations");
+    const settings = res.data || [];
+    const interestRate = settings.find((s) => s.cle === "taux_interet_credit");
+    if (interestRate) {
+      formData.value.taux_interet = parseFloat(interestRate.valeur);
+    } else {
+      formData.value.taux_interet = 3; // Default if not found
+    }
+    calculatePayments();
+  } catch (err) {
+    console.error("Error fetching settings:", err);
+    formData.value.taux_interet = 3;
+  }
 };
 
 // Fetch members initially if needed, or leave it to search
@@ -375,6 +392,6 @@ const handleSubmit = async () => {
 
 onMounted(() => {
   fetchMembers();
-  calculatePayments();
+  fetchDefaultSettings();
 });
 </script>
