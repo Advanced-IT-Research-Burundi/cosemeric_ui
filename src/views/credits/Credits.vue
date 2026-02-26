@@ -91,7 +91,7 @@
           <div class="btn-group">
             <button
               class="btn btn-outline-secondary btn-sm"
-              @click="openDetails(item)"
+              @click="handleShow(item)"
               title="Voir détails"
             >
               <i class="fas fa-eye"></i>

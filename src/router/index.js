@@ -107,7 +107,7 @@ const routes = [
   {
 path: "/config",
 name : "Confinguration",
-component: () => import("../views/conf/Configuration.vue"),
+component: () => import("../views/conf/ConfigGenerale.vue"),
 meta: { requiresAuth: true},
   },
 
@@ -210,6 +210,13 @@ meta: { requiresAuth: true},
         name: "remboursementsEdit",
         component: () =>
           import("../views/remboursements/EditRemboursement.vue"),
+        props: true,
+      },
+      {
+        path: "detail/:id",
+        name: "remboursementDetail",
+        component: () =>
+          import("../views/remboursements/DetailRemboursement.vue"),
         props: true,
       },
     ],

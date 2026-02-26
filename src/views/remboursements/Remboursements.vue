@@ -2,9 +2,6 @@
   <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Remboursements</h2>
-      <router-link to="/remboursements/mensuel">
-        <i class="fas fa-list me-2"></i>Remboursements Mensuel
-      </router-link>
       <router-link to="/remboursements/add" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Ajouter un remboursement
       </router-link>
@@ -24,12 +21,47 @@
         details-title="Détails du remboursement"
         @edit="handleEdit"
         @delete="handleDelete"
+        @show="handleShowDetail"
         @search="handleSearch"
         @sort="handleSort"
         @filter="handleFilter"
         @page-change="handlePageChange"
         @per-page-change="handlePerPageChange"
-      />
+      >
+        <template #actions="{ item }">
+          <div class="btn-group">
+            <button
+              v-if="item.statut !== 'paye'"
+              class="btn btn-outline-success btn-sm"
+              @click="handleApprove(item)"
+              title="Approuver (Marquer comme payé)"
+            >
+              <i class="fas fa-check"></i>
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              @click="handleShowDetail(item)"
+              title="Voir détails du crédit"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+            <button
+              class="btn btn-outline-primary btn-sm"
+              @click="handleEdit(item)"
+              title="Modifier"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click="handleDelete(item)"
+              title="Supprimer"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </template>
+      </AdvancedTable>
     </div>
   </div>
 </template>
@@ -38,10 +70,12 @@
 import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import router from "../../router";
+import { useToast } from "vue-toastification";
 import api from "../../services/api";
 import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 
 const store = useStore();
+const toast = useToast();
 const remboursements = ref([]);
 const loading = ref(false);
 
@@ -53,10 +87,10 @@ const queryParams = ref({
   sort_order: "asc",
   filters: {},
 });
-3;
 const columns = [
   { key: "id", label: "ID", sortable: true },
-  { key: "credit_id", label: "Crédit", sortable: true, filterable: true },
+  { key: "credit.membre.full_name", label: "Membre", sortable: true },
+  { key: "credit_id", label: "ID Crédit", sortable: true, filterable: true },
   {
     key: "numero_echeance",
     label: "N° échéance",
@@ -144,13 +178,34 @@ const handlePerPageChange = (per) => {
 
 const handleEdit = (row) =>
   router.push({ name: "remboursementsEdit", params: { id: row.id } });
+
+const handleShowDetail = (row) => {
+  router.push({ name: "remboursementDetail", params: { id: row.credit_id } });
+};
+const handleApprove = async (row) => {
+  if (!confirm("Voulez-vous marquer cette échéance comme payée ?")) return;
+  try {
+    loading.value = true;
+    await api.post(`/remboursements/${row.id}/approve`);
+    toast.success("Échéance approuvée avec succès");
+    fetchRemboursements();
+  } catch (e) {
+    console.error(e);
+    toast.error(e.response?.data?.message || "Erreur lors de l'approbation");
+  } finally {
+    loading.value = false;
+  }
+};
+
 const handleDelete = async (row) => {
   if (!confirm("Supprimer ce remboursement ?")) return;
   try {
     await api.delete(`/remboursements/${row.id}`);
+    toast.success("Remboursement supprimé");
     fetchRemboursements();
   } catch (e) {
     console.error(e);
+    toast.error("Erreur lors de la suppression");
   }
 };
 
