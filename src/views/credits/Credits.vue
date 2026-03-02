@@ -87,7 +87,7 @@
           </span>
         </template>
 
-        <template #actions="{ item, openDetails }">
+        <template #actions="{ item }">
           <div class="btn-group">
             <button
               class="btn btn-outline-secondary btn-sm"
@@ -97,31 +97,41 @@
               <i class="fas fa-eye"></i>
             </button>
 
-            <button
-              v-if="item.statut !== 'approuve' && item.statut !== 'rejete'"
-              class="btn btn-success btn-sm"
-              @click="handleAction(item, 'approuve')"
-              title="Accepter"
-            >
-              <i class="fas fa-check"></i>
-            </button>
+            <template v-if="['en_attente', 'en_cours'].includes(item.statut)">
+              <button
+                class="btn btn-success btn-sm"
+                @click="handleAction(item, 'approuve')"
+                title="Accepter"
+              >
+                <i class="fas fa-check"></i>
+              </button>
 
-            <button
-              v-if="item.statut !== 'en_attente' && isMember"
-              class="btn btn-warning btn-sm"
-              @click="handleModifier(item)"
-              title="Modifier"
-            >
-              <i class="fas fa-edit"></i>
-            </button>
-            <button
-              v-if="item.statut !== 'approuve' && item.statut !== 'rejete'"
-              class="btn btn-danger btn-sm"
-              @click="handleAction(item, 'rejete')"
-              title="Refuser"
-            >
-              <i class="fas fa-times"></i>
-            </button>
+              <button
+                class="btn btn-danger btn-sm"
+                @click="handleAction(item, 'rejete')"
+                title="Refuser"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </template>
+
+            <template v-if="item.statut === 'en_attente'">
+              <button
+                class="btn btn-warning btn-sm"
+                @click="handleModifier(item)"
+                title="Modifier"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+
+              <button
+                class="btn btn-outline-danger btn-sm"
+                @click="handleDelete(item)"
+                title="Supprimer"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </template>
           </div>
         </template>
       </AdvancedTable>

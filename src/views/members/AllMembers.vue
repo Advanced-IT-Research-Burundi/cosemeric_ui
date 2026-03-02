@@ -467,6 +467,7 @@ import api from "../../services/api";
 import _ from "lodash";
 import { useToast } from "vue-toastification";
 import useAuthStore from "../../stores/auth.js";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
 const isAdmin = ref(authStore.hasAnyRole["Admin"]);
@@ -484,6 +485,8 @@ const showFormModal = ref(false);
 const showDeleteModal = ref(false);
 const selectedMember = ref(null);
 const isEditing = ref(false);
+
+const router = useRouter();
 
 const formData = reactive({
   id: null,
