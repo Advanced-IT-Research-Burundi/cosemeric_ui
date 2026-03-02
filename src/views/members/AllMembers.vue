@@ -547,12 +547,11 @@ const pagination = computed(() => store.state.data?.membres || {});
 
 const routeToMember = (member) => {
   if (!member || !member.id) return;
-  // Assuming you have a router setup
-  window.location.href = `/members/${member.id}`;
+  router.push(`/members/${member.id}`);
 };
 
 const editMember = (member) => {
-  window.location.href = `/members/${member.id}/edit`;
+  router.push(`/members/${member.id}/edit`);
 };
 
 const openModal = (type, member = null) => {

@@ -23,9 +23,7 @@
           </div>
           <div class="mb-3">
             <h6 class="text-muted mb-1">Nom complet</h6>
-            <p class="mb-0 fw-600">
-              {{ member.nom || "Non défini" }}
-            </p>
+            <p class="mb-0 fw-600">{{ member.nom }} {{ member.prenom }}</p>
           </div>
           <div class="mb-3">
             <h6 class="text-muted mb-1">Prénom</h6>
@@ -126,10 +124,10 @@ const formatCategorieMontant = (montant) => {
   });
 };
 const formatCotisation = (member) => {
-  const name = formatCategorieNom(member.categorie_cotisation);
-  const amount = formatCategorieMontant(member.montant_cotisation);
-  const currency = member.categorie_devise || "Inconnu";
-  return `${name} ${amount} ${currency}`;
+  const name = member.categorie_nom || "Inconnu";
+  const amount = formatCategorieMontant(member.categorie_cotisation);
+  const currency = member.categorie_devise || "FBU";
+  return `${name}: ${amount} ${currency}`;
 };
 
 const getStatusClass = (status) => {

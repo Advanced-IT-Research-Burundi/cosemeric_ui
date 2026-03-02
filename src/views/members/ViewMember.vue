@@ -98,8 +98,8 @@ const mapMemberActivities = (memberData) => {
           c.statut === "paye"
             ? "Payé"
             : c.statut === "en_retard"
-            ? "En retard"
-            : c.statut,
+              ? "En retard"
+              : c.statut,
       });
     });
   }
@@ -118,10 +118,10 @@ const mapMemberActivities = (memberData) => {
           cr.statut === "en_attente"
             ? "En attente"
             : cr.statut === "accorde"
-            ? "Approuvée"
-            : cr.statut === "refuse"
-            ? "Refusée"
-            : cr.statut,
+              ? "Approuvée"
+              : cr.statut === "refuse"
+                ? "Refusée"
+                : cr.statut,
       });
     });
   }
@@ -159,26 +159,21 @@ const buildFinancialCards = (data) => {
     },
     {
       title: "État de remboursement des crédits ",
-      value: `${data.cotisations_manquantes ?? 0} mois`, // Handle missing value with ?? for default value
+      value: `${data.credit_restant || 0} ${data.devise || "FBU"}`,
       icon: "fas fa-exclamation-triangle",
       color: "text-warning",
     },
     {
       title: "Montants reçus en assistance ",
-      value: `${(data.credit_encours || 0).toLocaleString()} ${
+      value: `${(data.montant_recues_en_assistances || 0).toLocaleString()} ${
         data.devise || "FBU"
-      }`, // Use devise if available
-      subtext: data.credit_restant
-        ? `Reste: ${data.credit_restant.toLocaleString()} ${
-            data.devise || "FBU"
-          }` // Include remaining credit if available
-        : "",
+      }`,
       icon: "fas fa-hand-holding-usd",
       color: "text-info",
     },
     {
       title: "Retards de cotisation ",
-      value: `${data.retard ?? 0} `, // Default to 0 if value is missing
+      value: `${data.retard ?? 0} `,
       icon: "fas fa-hands-helping",
       color: "text-primary",
     },
