@@ -41,10 +41,12 @@
                   class="form-label fw-semibold text-muted small text-uppercase"
                   >Date début</label
                 >
-                <input
-                  type="date"
-                  class="form-control"
+                <Datepicker
                   v-model="filters.date_debut"
+                  :enable-time-picker="false"
+                  :auto-apply="true"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
                 />
               </div>
               <div class="col-md-2">
@@ -52,10 +54,12 @@
                   class="form-label fw-semibold text-muted small text-uppercase"
                   >Date fin</label
                 >
-                <input
-                  type="date"
-                  class="form-control"
+                <Datepicker
                   v-model="filters.date_fin"
+                  :enable-time-picker="false"
+                  :auto-apply="true"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
                 />
               </div>
               <div class="col-md-2">
