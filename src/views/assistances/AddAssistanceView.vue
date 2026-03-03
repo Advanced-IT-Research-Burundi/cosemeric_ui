@@ -251,8 +251,8 @@ const formData = ref({
   type_assistance_id: "",
   montant: 0,
   date_demande: new Date().toISOString().split("T")[0],
-  date_approbation: null,
-  date_versement: null,
+  date_approbation: new Date().toISOString().split("T")[0],
+  date_versement: new Date().toISOString().split("T")[0],
   statut: "en_attente",
   motif_rejet: "",
 });
@@ -263,7 +263,7 @@ const handleSelectAssistance = () => {
   const selectedId = formData.value.type_assistance_id;
 
   const selectedType = assistanceTypes.value.find(
-    (item) => item.id === selectedId
+    (item) => item.id === selectedId,
   );
 
   if (selectedType) {
@@ -381,7 +381,7 @@ watch(
     if (newVal === "approuve" && !formData.value.date_approbation) {
       formData.value.date_approbation = new Date().toISOString().split("T")[0];
     }
-  }
+  },
 );
 
 onMounted(() => {
