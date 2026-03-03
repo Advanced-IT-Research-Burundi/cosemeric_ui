@@ -343,13 +343,16 @@ const handleSubmit = async () => {
     data.append("membre_id", formData.value.membre_id);
     data.append("type_assistance_id", formData.value.type_assistance_id);
     data.append("montant", formData.value.montant);
-    data.append("date_demande", formData.value.date_demande);
+    data.append("date_demande", new Date(formData.value.date_demande));
     data.append("statut", formData.value.statut);
 
     if (formData.value.date_approbation)
-      data.append("date_approbation", formData.value.date_approbation);
+      data.append(
+        "date_approbation",
+        new Date(formData.value.date_approbation),
+      );
     if (formData.value.date_versement)
-      data.append("date_versement", formData.value.date_versement);
+      data.append("date_versement", new Date(formData.value.date_versement));
     if (formData.value.motif_rejet)
       data.append("motif_rejet", formData.value.motif_rejet);
 

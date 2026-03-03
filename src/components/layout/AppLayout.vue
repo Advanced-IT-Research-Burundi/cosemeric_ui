@@ -435,12 +435,12 @@ const menuItems = ref([
     path: "/importationMensuel",
     requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
-  {
-    icon: '<i class="bi bi-cash-stack"></i>',
-    title: "Fiche Mensuelle",
-    path: "/cotisationMensuelle",
-    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
-  },
+  // {
+  //   icon: '<i class="bi bi-cash-stack"></i>',
+  //   title: "Fiche Mensuelle",
+  //   path: "/cotisationMensuelle",
+  //   requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
+  // },
   {
     icon: '<i class="bi bi-graph-up"></i>',
     title: "Rapports",
@@ -453,12 +453,12 @@ const menuItems = ref([
   //   path: "/admin",
   //   requireAdmin: isAdmin.value,
   // },
-  {
-    icon: '<i class="bi bi-person-badge-fill"></i>',
-    title: "Utilisateurs",
-    path: "/users",
-    requireAdmin: isAdmin.value || isResponsable.value,
-  },
+  // {
+  //   icon: '<i class="bi bi-person-badge-fill"></i>',
+  //   title: "Utilisateurs",
+  //   path: "/users",
+  //   requireAdmin: isAdmin.value || isResponsable.value,
+  // },
 ]);
 
 // Computed properties
