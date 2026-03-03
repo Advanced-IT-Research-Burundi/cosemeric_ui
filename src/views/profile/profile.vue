@@ -165,55 +165,6 @@
                     </label>
                     <p>{{ userData.telephone || "Non renseigné" }}</p>
                   </div>
-                  <div class="info-item">
-                    <label>
-                      <i class="bi bi-gender-ambiguous"></i>
-                      Sexe
-                    </label>
-                    <p>{{ getSexeLabel }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Address Card -->
-            <div class="info-card">
-              <div class="card-header">
-                <div class="card-title">
-                  <i class="bi bi-geo-alt"></i>
-                  <h3>Adresse</h3>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="info-grid">
-                  <div class="info-item full-width">
-                    <label>
-                      <i class="bi bi-house"></i>
-                      Adresse complète
-                    </label>
-                    <p>{{ userData.adresse || "Non renseignée" }}</p>
-                  </div>
-                  <div class="info-item">
-                    <label>
-                      <i class="bi bi-building"></i>
-                      Ville
-                    </label>
-                    <p>{{ userData.ville || "Non renseignée" }}</p>
-                  </div>
-                  <div class="info-item">
-                    <label>
-                      <i class="bi bi-flag"></i>
-                      Pays
-                    </label>
-                    <p>{{ userData.pays || "Non renseigné" }}</p>
-                  </div>
-                  <div class="info-item">
-                    <label>
-                      <i class="bi bi-mailbox"></i>
-                      Code postal
-                    </label>
-                    <p>{{ userData.code_postal || "Non renseigné" }}</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -334,70 +285,6 @@
                       class="modern-input"
                       placeholder="+257 79 XX XX XX"
                       required
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label>
-                      <i class="bi bi-gender-ambiguous"></i>
-                      Sexe
-                    </label>
-                    <select v-model="profileForm.sexe" class="modern-input">
-                      <option value="">-- Sélectionner --</option>
-                      <option value="M">Masculin</option>
-                      <option value="F">Féminin</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group full-width">
-                    <label>
-                      <i class="bi bi-house"></i>
-                      Adresse
-                    </label>
-                    <input
-                      type="text"
-                      v-model="profileForm.adresse"
-                      class="modern-input"
-                      placeholder="Rue, numéro, quartier..."
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label>
-                      <i class="bi bi-building"></i>
-                      Ville
-                    </label>
-                    <input
-                      type="text"
-                      v-model="profileForm.ville"
-                      class="modern-input"
-                      placeholder="Votre ville"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label>
-                      <i class="bi bi-flag"></i>
-                      Pays
-                    </label>
-                    <input
-                      type="text"
-                      v-model="profileForm.pays"
-                      class="modern-input"
-                      placeholder="Votre pays"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label>
-                      <i class="bi bi-mailbox"></i>
-                      Code postal
-                    </label>
-                    <input
-                      type="text"
-                      v-model="profileForm.code_postal"
-                      class="modern-input"
-                      placeholder="Code postal"
                     />
                   </div>
                 </div>
@@ -647,11 +534,6 @@ const profileForm = ref({
   prenom: "",
   email: "",
   telephone: "",
-  sexe: "",
-  adresse: "",
-  ville: "",
-  pays: "",
-  code_postal: "",
 });
 
 const passwordForm = ref({
@@ -688,12 +570,6 @@ const getBadgeClass = computed(() => {
   if (statut === "actif" || userData.value.is_active) return "badge-success";
   if (statut === "inactif") return "badge-warning";
   return "badge-secondary";
-});
-
-const getSexeLabel = computed(() => {
-  if (userData.value.sexe === "M") return "Masculin";
-  if (userData.value.sexe === "F") return "Féminin";
-  return "Non renseigné";
 });
 
 const memberSince = computed(() => {
@@ -757,11 +633,6 @@ const populateForm = () => {
       prenom: userData.value.prenom || "",
       email: userData.value.email || "",
       telephone: userData.value.telephone || "",
-      sexe: userData.value.sexe || "",
-      adresse: userData.value.adresse || "",
-      ville: userData.value.ville || "",
-      pays: userData.value.pays || "",
-      code_postal: userData.value.code_postal || "",
     };
   }
 };

@@ -36,7 +36,7 @@
                   />
                 </div>
               </div>
-              <div class="col-md-2">
+              <!-- <div class="col-md-2">
                 <label
                   class="form-label fw-semibold text-muted small text-uppercase"
                   >Date début</label
@@ -61,7 +61,7 @@
                   format="yyyy-MM-dd"
                   value-format="yyyy-MM-dd"
                 />
-              </div>
+              </div> -->
               <div class="col-md-2">
                 <label
                   class="form-label fw-semibold text-muted small text-uppercase"
