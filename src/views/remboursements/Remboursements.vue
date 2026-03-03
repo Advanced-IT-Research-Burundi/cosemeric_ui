@@ -69,6 +69,80 @@
         </template>
       </AdvancedTable>
     </div>
+
+    <!-- Modal d'approbation avec preuve de paiement -->
+    <div v-if="showApproveModal" class="modal-backdrop fade show"></div>
+    <div
+      v-if="showApproveModal"
+      class="modal fade show"
+      style="display: block"
+      tabindex="-1"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Approuver le paiement</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="showApproveModal = false"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="selectedRemboursement" class="mb-3">
+              <p>
+                <strong>Membre:</strong>
+                {{ selectedRemboursement.credit?.membre?.full_name }}
+              </p>
+              <p>
+                <strong>Montant à payer:</strong>
+                {{ selectedRemboursement.montant_prevu }} BIF
+              </p>
+              <p>
+                <strong>N° Échéance:</strong>
+                {{ selectedRemboursement.numero_echeance }}
+              </p>
+            </div>
+
+            <div class="mb-3">
+              <label for="preuve_paiement" class="form-label"
+                >Preuve de paiement (Image ou PDF)
+                <span class="text-danger">*</span></label
+              >
+              <input
+                type="file"
+                class="form-control"
+                id="preuve_paiement"
+                @change="handleFileChange"
+                accept="image/*,.pdf"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showApproveModal = false"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              :disabled="loading || !preuveFile"
+              @click="confirmApprove"
+            >
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
+              Confirmer le paiement
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +158,9 @@ const store = useStore();
 const toast = useToast();
 const remboursements = ref([]);
 const loading = ref(false);
+const showApproveModal = ref(false);
+const selectedRemboursement = ref(null);
+const preuveFile = ref(null);
 
 const queryParams = ref({
   page: 1,
@@ -188,12 +265,44 @@ const handleEdit = (row) =>
 const handleShowDetail = (row) => {
   router.push({ name: "remboursementDetail", params: { id: row.credit_id } });
 };
-const handleApprove = async (row) => {
-  if (!confirm("Voulez-vous marquer cette échéance comme payée ?")) return;
+const handleApprove = (row) => {
+  selectedRemboursement.value = row;
+  preuveFile.value = null;
+  showApproveModal.value = true;
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    preuveFile.value = file;
+  }
+};
+
+const confirmApprove = async () => {
+  if (!preuveFile.value) {
+    toast.warning("Veuillez sélectionner une preuve de paiement");
+    return;
+  }
+
   try {
     loading.value = true;
-    await api.post(`/remboursements/${row.id}/approve`);
+    const formData = new FormData();
+    formData.append("preuve_paiement", preuveFile.value);
+    // Optionally add other fields expected by the backend
+    formData.append("montant_paye", selectedRemboursement.value.montant_prevu);
+
+    await api.post(
+      `/remboursements/${selectedRemboursement.value.id}/approve`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
     toast.success("Échéance approuvée avec succès");
+    showApproveModal.value = false;
     fetchRemboursements();
   } catch (e) {
     console.error(e);

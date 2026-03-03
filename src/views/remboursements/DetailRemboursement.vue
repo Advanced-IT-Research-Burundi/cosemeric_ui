@@ -285,6 +285,7 @@ const activityItems = computed(() => {
           : r.statut === "en_retard"
             ? "Refusée"
             : "En attente",
+      preuvePaiementUrl: r.preuve_paiement_url,
     }))
     .sort((a, b) => a.numero_echeance - b.numero_echeance);
 });

@@ -5,23 +5,50 @@
     </div>
     <div class="card-body p-4">
       <div v-if="items.length > 0" class="list-group list-group-flush">
-        <div v-for="(item, index) in items" :key="index" class="list-group-item px-0 border-0">
+        <div
+          v-for="(item, index) in items"
+          :key="index"
+          class="list-group-item px-0 border-0"
+        >
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <h6 class="mb-1 fw-semibold">{{ item.title || item.type || `${item.month} ${item.year}` }}</h6>
+              <h6 class="mb-1 fw-semibold">
+                {{ item.title || item.type || `${item.month} ${item.year}` }}
+              </h6>
               <small class="text-muted">
-                {{ item.date ? `Le ${formatDate(item.date)}` : '' }}
-                {{ item.paymentDate ? `Payé le ${formatDate(item.paymentDate)}` : '' }}
+                {{ item.date ? `Le ${formatDate(item.date)}` : "" }}
+                {{
+                  item.paymentDate
+                    ? `Payé le ${formatDate(item.paymentDate)}`
+                    : ""
+                }}
               </small>
             </div>
             <div class="text-end">
-              <div v-if="item.amount" class="fw-semibold">{{ item.amount }}</div>
-              <span v-if="statusField && item[statusField]" 
-                    class="badge" 
-                    :class="getStatusClass(item[statusField])">
+              <div v-if="item.amount" class="fw-semibold">
+                {{ item.amount }}
+              </div>
+              <span
+                v-if="statusField && item[statusField]"
+                class="badge"
+                :class="getStatusClass(item[statusField])"
+              >
                 {{ item[statusField] }}
               </span>
-              <span v-else-if="item.paymentDate" class="badge bg-success">Payé</span>
+              <span v-else-if="item.paymentDate" class="badge bg-success"
+                >Payé</span
+              >
+            </div>
+            <div v-if="item.preuvePaiementUrl" class="mt-1">
+              <a
+                :href="item.preuvePaiementUrl"
+                target="_blank"
+                class="btn btn-sm btn-outline-info py-0 px-2"
+                title="Voir la preuve de paiement"
+              >
+                <i class="fas fa-file-invoice me-1"></i>
+                <small>Preuve</small>
+              </a>
             </div>
           </div>
         </div>
@@ -31,54 +58,54 @@
       </div>
     </div>
     <div class="card-footer border-top-0 bg-white d-none">
-        <div v-if="showViewAll" class="text-end mt-2">
-            <button class="btn btn-sm btn-light text-decoration-none">
-            Voir tout <i class="fas fa-arrow-right ms-1"></i>
-            </button>
-        </div>
+      <div v-if="showViewAll" class="text-end mt-2">
+        <button class="btn btn-sm btn-light text-decoration-none">
+          Voir tout <i class="fas fa-arrow-right ms-1"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps } from "vue";
 
 const props = defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   items: {
     type: Array,
-    
-    default: () => []
+
+    default: () => [],
   },
   emptyMessage: {
     type: String,
-    default: 'Aucun élément récent'
+    default: "Aucun élément récent",
   },
   statusField: {
     type: String,
-    default: ''
+    default: "",
   },
   showViewAll: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 });
 
 const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('fr-FR', options);
+  if (!dateString) return "";
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateString).toLocaleDateString("fr-FR", options);
 };
 
 const getStatusClass = (status) => {
   const statusMap = {
-    'Approuvée': 'bg-success',
-    'En attente': 'bg-warning',
-    'Refusée': 'bg-danger'
+    Approuvée: "bg-success",
+    "En attente": "bg-warning",
+    Refusée: "bg-danger",
   };
-  return statusMap[status] || 'bg-secondary';
+  return statusMap[status] || "bg-secondary";
 };
 </script>
