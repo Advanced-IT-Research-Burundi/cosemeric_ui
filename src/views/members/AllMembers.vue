@@ -187,9 +187,27 @@
                   <span aria-hidden="true">&laquo;</span>
                 </button>
               </li>
-              <li class="page-item active">
-                <span class="page-link">{{ pagination.current_page }}</span>
+
+              <li
+                v-for="(page, index) in getPageNumbers"
+                :key="index"
+                class="page-item"
+                :class="{
+                  active: page === pagination.current_page,
+                  disabled: page === '...',
+                }"
+              >
+                <button
+                  v-if="page !== '...'"
+                  class="page-link"
+                  @click="fetchMembers(page)"
+                  :disabled="page === pagination.current_page"
+                >
+                  {{ page }}
+                </button>
+                <span v-else class="page-link">{{ page }}</span>
               </li>
+
               <li
                 class="page-item"
                 :class="{ disabled: !pagination.next_page_url }"
@@ -528,8 +546,8 @@ const fetchMembers = async (page = 1) => {
       params.search = searchQuery.value;
     }
 
-    const response = await api.get("/membres", params);
-    store.state.data.membres = response.data || response;
+    const response = await api.get("/membres", { params });
+    store.state.data.membres = response.data?.data ? response.data : response;
   } catch (error) {
     console.error("Error fetching members:", error);
     toast.error("Erreur lors du chargement des membres.");
@@ -544,7 +562,54 @@ const handleSearch = _.debounce(() => {
 }, 500);
 
 const membersData = computed(() => store.state.data?.membres?.data || []);
-const pagination = computed(() => store.state.data?.membres || {});
+
+const pagination = computed(() => {
+  const paginationData = store.state.data?.membres || {};
+  return {
+    current_page: paginationData.current_page || 1,
+    last_page: paginationData.last_page || 1,
+    per_page: paginationData.per_page || 15,
+    total: paginationData.total || 0,
+    from: paginationData.from || 0,
+    to: paginationData.to || 0,
+    next_page_url: paginationData.next_page_url || null,
+    prev_page_url: paginationData.prev_page_url || null,
+  };
+});
+
+const getPageNumbers = computed(() => {
+  const current = pagination.value.current_page;
+  const last = pagination.value.last_page;
+  const pages = [];
+  const maxVisible = 5;
+
+  if (last <= maxVisible) {
+    // Show all pages if 5 or fewer
+    for (let i = 1; i <= last; i++) {
+      pages.push(i);
+    }
+  } else {
+    // Show current page and surrounding pages
+    const start = Math.max(1, current - 2);
+    const end = Math.min(last, current + 2);
+
+    if (start > 1) {
+      pages.push(1);
+      if (start > 2) pages.push("...");
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (end < last) {
+      if (end < last - 1) pages.push("...");
+      pages.push(last);
+    }
+  }
+
+  return pages;
+});
 
 // Actions
 
