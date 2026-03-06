@@ -1,108 +1,180 @@
 <template>
-  <div class="">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0">Gestion des assistances</h2>
-      <router-link to="/assistances/add" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter une assistance
-      </router-link>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Gestion des assistances</h2>
+    <router-link to="/assistances/add" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>Ajouter une assistance
+    </router-link>
+  </div>
 
-    <div class="card">
-      <AdvancedTable
-        :data="tableData"
-        :columns="columns"
-        :loading="loading"
-        search-placeholder="Rechercher des assistances..."
-        no-data-message="Aucune assistance trouvée"
-        :show-filters="true"
-        :has-actions="true"
-        row-key="id"
-        details-endpoint="assistances"
-        details-title="Détails de l'assistance"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @search="handleSearch"
-        @sort="handleSort"
-        @filter="handleFilter"
-        @page-change="handlePageChange"
-        @per-page-change="handlePerPageChange"
-      >
-        <!-- Custom column slot -->
-        <template #column-statut="{ value }">
-          <span class="badge rounded-1" :class="getClassByStatut(value)">
-            {{ getStatusLabel(value) }}
-          </span>
-        </template>
+  <div class="card">
+    <AdvancedTable
+      :data="tableData"
+      :columns="columns"
+      :loading="loading"
+      search-placeholder="Rechercher des assistances..."
+      no-data-message="Aucune assistance trouvée"
+      :show-filters="true"
+      :has-actions="true"
+      row-key="id"
+      details-endpoint="assistances"
+      details-title="Détails de l'assistance"
+      @edit="handleEdit"
+      @delete="handleDelete"
+      @search="handleSearch"
+      @sort="handleSort"
+      @filter="handleFilter"
+      @page-change="handlePageChange"
+      @per-page-change="handlePerPageChange"
+    >
+      <!-- Custom column slot -->
+      <template #column-statut="{ value }">
+        <span class="badge rounded-1" :class="getClassByStatut(value)">
+          {{ getStatusLabel(value) }}
+        </span>
+      </template>
 
-        <!-- Justificatif column slot -->
-        <template #column-justificatif="{ item }">
-          <a
-            v-if="item.justificatif"
-            :href="getJustificatifUrl(item.justificatif)"
-            target="_blank"
-            class="btn btn-link btn-sm text-primary p-0"
-            title="Voir le document"
+      <!-- Justificatif column slot -->
+      <template #column-justificatif="{ item }">
+        <a
+          v-if="item.justificatif"
+          :href="getJustificatifUrl(item.justificatif)"
+          target="_blank"
+          class="btn btn-link btn-sm text-primary p-0"
+          title="Voir le document"
+        >
+          <i class="fas fa-file-pdf me-1"></i>Voir
+        </a>
+        <span v-else class="text-muted small">Aucun</span>
+      </template>
+
+      <template #actions="{ item, openDetails }">
+        <div class="btn-group gap-1">
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            @click="openDetails(item)"
+            title="Voir détails"
           >
-            <i class="fas fa-file-pdf me-1"></i>Voir
-          </a>
-          <span v-else class="text-muted small">Aucun</span>
-        </template>
+            <i class="fas fa-eye"></i>
+          </button>
 
-        <template #actions="{ item, openDetails }">
-          <div class="btn-group gap-1">
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              @click="openDetails(item)"
-              title="Voir détails"
-            >
-              <i class="fas fa-eye"></i>
-            </button>
-
-            <!-- Approve Button: 
+          <!-- Approve Button: 
                  - Gestionnaire/Admin can approve if 'en_attente'
                  - Responsable/Admin can approve if 'en_cours' 
             -->
-            <button
-              v-if="
-                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
-                (item.statut === 'en_cours' && (isResponsable || isAdmin))
-              "
-              class="btn btn-success btn-sm"
-              @click="handleAction(item, 'approuve')"
-              :title="
-                item.statut === 'en_attente'
-                  ? 'Valider (Gestionnaire)'
-                  : 'Approuver (Responsable)'
-              "
-            >
-              <i class="fas fa-check"></i>
-            </button>
+          <button
+            v-if="
+              (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+              (item.statut === 'en_cours' && (isResponsable || isAdmin))
+            "
+            class="btn btn-success btn-sm"
+            @click="handleAction(item, 'approuve')"
+            :title="
+              item.statut === 'en_attente'
+                ? 'Valider (Gestionnaire)'
+                : 'Approuver (Responsable)'
+            "
+          >
+            <i class="fas fa-check"></i>
+          </button>
 
-            <!-- Modify Button for Member: only if 'en_attente' -->
-            <button
-              v-if="item.statut === 'en_attente' && isMember"
-              class="btn btn-warning btn-sm"
-              @click="handleModifier(item)"
-              title="Modifier"
-            >
-              <i class="fas fa-edit"></i>
-            </button>
+          <!-- Modify Button for Member: only if 'en_attente' -->
+          <button
+            v-if="item.statut === 'en_attente' && isMember"
+            class="btn btn-warning btn-sm"
+            @click="handleModifier(item)"
+            title="Modifier"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
 
-            <!-- Reject Button: Visible for Manager/Responsable/Admin if not finalized -->
-            <button
-              v-if="
-                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
-                (item.statut === 'en_cours' && (isResponsable || isAdmin))
-              "
-              class="btn btn-danger btn-sm"
-              @click="handleAction(item, 'rejete')"
-              title="Refuser"
+          <!-- Reject Button: Visible for Manager/Responsable/Admin if not finalized -->
+          <button
+            v-if="
+              (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+              (item.statut === 'en_cours' && (isResponsable || isAdmin))
+            "
+            class="btn btn-danger btn-sm"
+            @click="handleAction(item, 'rejete')"
+            title="Refuser"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </template>
+    </AdvancedTable>
+  </div>
+
+  <!-- Approval Modal -->
+  <div
+    class="modal fade"
+    id="approveModal"
+    tabindex="-1"
+    aria-labelledby="approveModalLabel"
+    aria-hidden="true"
+    ref="approveModalRef"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approveModalLabel">
+            Approbation d'Assistance
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p v-if="selectedItem">
+            Vous allez approuver l'assistance pour
+            <strong>{{ selectedItem.membre?.full_name }}</strong> d'un montant
+            de
+            <strong
+              >{{
+                parseFloat(selectedItem.montant).toLocaleString()
+              }}
+              FBU</strong
+            >.
+          </p>
+          <div class="mb-3">
+            <label for="justificatifFile" class="form-label"
+              >Justificatif de paiement (Chèque/Bordereau)
+              <span class="text-danger">*</span></label
             >
-              <i class="fas fa-times"></i>
-            </button>
+            <input
+              type="file"
+              class="form-control"
+              id="justificatifFile"
+              @change="handleFileChange"
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+            <div class="form-text">Formats acceptés: PDF, JPG, PNG.</div>
           </div>
-        </template>
-      </AdvancedTable>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            @click="confirmApprobation"
+            :disabled="submitting || !justificatifFile"
+          >
+            <span
+              v-if="submitting"
+              class="spinner-border spinner-border-sm me-1"
+            ></span>
+            Confirmer l'approbation
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -116,6 +188,7 @@ import AdvancedTable from "../../components/advancedTable/AdvancedTable.vue";
 import router from "../../router";
 import useAuthStore from "../../stores/auth";
 import { useToast } from "vue-toastification";
+import { Modal } from "bootstrap";
 
 const store = useStore();
 const auth = useAuthStore();
@@ -128,6 +201,11 @@ const isMember = auth.hasAnyRole(["membre"]);
 
 const assistances = ref([]);
 const loading = ref(false);
+const submitting = ref(false);
+const selectedItem = ref(null);
+const justificatifFile = ref(null);
+const approveModalRef = ref(null);
+let modalInstance = null;
 
 // Query parameters for API
 const queryParams = ref({
@@ -224,22 +302,27 @@ const fetchAssistances = async () => {
   }
 };
 
+const handleFileChange = (event) => {
+  justificatifFile.value = event.target.files[0];
+};
+
 const handleAction = async (item, action) => {
-  if (
-    !confirm(
-      `Êtes-vous sûr de vouloir ${
-        action === "approuve" ? "accepter" : "refuser"
-      } cette assistance ?`
-    )
-  ) {
+  if (action === "approuve") {
+    selectedItem.value = item;
+    justificatifFile.value = null;
+    if (!modalInstance) {
+      modalInstance = new Modal(approveModalRef.value);
+    }
+    modalInstance.show();
+    return;
+  }
+
+  if (!confirm(`Êtes-vous sûr de vouloir refuser cette assistance ?`)) {
     return;
   }
 
   try {
-    if (action === "approuve") {
-      await api.post(`/assistances/approuve/${item.id}`);
-      toast.success("Assistance approuvée avec succès.");
-    } else if (action === "rejete") {
+    if (action === "rejete") {
       const comment = prompt("Veuillez saisir le motif du rejet");
       if (!comment) {
         toast.warning("Veuillez saisir un motif de rejet.");
@@ -252,6 +335,33 @@ const handleAction = async (item, action) => {
   } catch (error) {
     console.error(`Error ${action} assistance:`, error);
     toast.error(`Erreur lors de l'action sur l'assistance.`);
+  }
+};
+
+const confirmApprobation = async () => {
+  if (!justificatifFile.value) {
+    toast.warning("Veuillez sélectionner un fichier justificatif.");
+    return;
+  }
+
+  submitting.value = true;
+  const formData = new FormData();
+  formData.append("justificatif", justificatifFile.value);
+
+  try {
+    await api.post(`/assistances/approuve/${selectedItem.value.id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success("Assistance approuvée avec succès.");
+    modalInstance.hide();
+    fetchAssistances();
+  } catch (error) {
+    console.error("Error approving assistance:", error);
+    toast.error("Erreur lors de l'approbation de l'assistance.");
+  } finally {
+    submitting.value = false;
   }
 };
 
@@ -344,7 +454,7 @@ const handleDelete = (assistance) => {
       .catch((error) => {
         console.error(
           "Une erreur est survenue lors de la suppression de l'assistance:",
-          error
+          error,
         );
         toast.error("Erreur lors de la suppression.");
       });

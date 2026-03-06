@@ -480,8 +480,6 @@ onMounted(async () => {
         montantsAssistancesRecus: data.stats.montantsAssistancesRecus || 0,
       };
 
-      console.log("Données du dashboard reçues:", data);
-
       // Initialiser les graphiques avec les données
       initChartsWithData(data.charts);
     } else {
@@ -490,7 +488,7 @@ onMounted(async () => {
   } catch (err) {
     console.error(
       "Erreur lors de la récupération des données du dashboard:",
-      err
+      err,
     );
   }
 });

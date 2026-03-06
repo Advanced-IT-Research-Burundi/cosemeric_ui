@@ -181,7 +181,7 @@ async function login() {
     const success = await authStore.login(email.value, password.value);
     if (!success) throw new Error("Email ou mot de passe incorrect");
 
-    console.log(authStore.user);
+
     // Redirect based on User Role
     if (
       authStore.user.role === "admin" ||

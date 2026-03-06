@@ -291,6 +291,8 @@ const loadingMembers = ref(false);
 const allMembers = ref([]);
 const filteredMembers = ref([]);
 
+const members = ref([]);
+
 const searchTimeout = ref(null);
 const searchMember = ref("");
 const searchedMemberData = computed(() => store.state.searchedMember);

@@ -226,7 +226,11 @@
                     <i class="bi bi-people-fill"></i>
                     <span>Gestion des Utilisateurs</span>
                   </div>
-                  <div class="menu-item" @click="navigateToConfig">
+                  <div
+                    class="menu-item"
+                    @click="navigateToConfig"
+                    v-if="isAdmin"
+                  >
                     <i class="bi bi-gear"></i>
                     <span>Configuration</span>
                   </div>

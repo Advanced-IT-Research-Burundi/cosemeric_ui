@@ -368,11 +368,15 @@ const handleSubmit = async () => {
       data.append("justificatif", justificatifFile.value);
     }
 
+    console.log("=====================");
+
     await api.post("/assistances", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+
+    console.log("=====================");
 
     toast.success("Demande d'assistance enregistrée avec succès");
     router.push("/assistances");

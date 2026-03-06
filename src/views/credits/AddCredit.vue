@@ -263,6 +263,7 @@ function addMonths(date, months) {
 }
 
 const formData = ref({
+  membre_id: null,
   montant_demande: 0,
   taux_interet: 0,
   duree_mois: 12,

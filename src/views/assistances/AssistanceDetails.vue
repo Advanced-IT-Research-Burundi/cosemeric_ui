@@ -39,7 +39,10 @@
               <div class="col-md-6">
                 <label class="form-label fw-bold text-muted">Statut</label>
                 <div>
-                  <span class="badge rounded-1" :class="getStatusClass(assistance.statut)">
+                  <span
+                    class="badge rounded-1"
+                    :class="getStatusClass(assistance.statut)"
+                  >
                     {{ getStatusLabel(assistance.statut) }}
                   </span>
                 </div>
@@ -47,8 +50,12 @@
 
               <!-- Type d'Assistance -->
               <div class="col-md-6">
-                <label class="form-label fw-bold text-muted">Type d'Assistance</label>
-                <p class="mb-0">{{ assistance.type_assistance?.nom || 'N/A' }}</p>
+                <label class="form-label fw-bold text-muted"
+                  >Type d'Assistance</label
+                >
+                <p class="mb-0">
+                  {{ assistance.type_assistance?.nom || "N/A" }}
+                </p>
               </div>
 
               <!-- Montant -->
@@ -61,78 +68,139 @@
 
               <!-- Date de Demande -->
               <div class="col-md-6">
-                <label class="form-label fw-bold text-muted">Date de Demande</label>
+                <label class="form-label fw-bold text-muted"
+                  >Date de Demande</label
+                >
                 <p class="mb-0">
-                  <i class="far fa-calendar me-2"></i>{{ formatDate(assistance.date_demande) }}
+                  <i class="far fa-calendar me-2"></i
+                  >{{ formatDate(assistance.date_demande) }}
                 </p>
               </div>
 
               <!-- Date d'Approbation -->
               <div class="col-md-6">
-                <label class="form-label fw-bold text-muted">Date d'Approbation</label>
+                <label class="form-label fw-bold text-muted"
+                  >Date d'Approbation</label
+                >
                 <p class="mb-0">
                   <i class="far fa-calendar-check me-2"></i>
-                  {{ assistance.date_approbation ? formatDate(assistance.date_approbation) : 'Non approuvée' }}
+                  {{
+                    assistance.date_approbation
+                      ? formatDate(assistance.date_approbation)
+                      : "Non approuvée"
+                  }}
                 </p>
               </div>
 
               <!-- Date de Versement -->
               <div class="col-md-6">
-                <label class="form-label fw-bold text-muted">Date de Versement</label>
+                <label class="form-label fw-bold text-muted"
+                  >Date de Versement</label
+                >
                 <p class="mb-0">
                   <i class="far fa-calendar-check me-2"></i>
-                  {{ assistance.date_versement ? formatDate(assistance.date_versement) : 'Non versée' }}
+                  {{
+                    assistance.date_versement
+                      ? formatDate(assistance.date_versement)
+                      : "Non versée"
+                  }}
                 </p>
               </div>
 
               <!-- Motif de Rejet -->
               <div v-if="assistance.motif_rejet" class="col-12">
-                <label class="form-label fw-bold text-muted">Motif de Rejet</label>
+                <label class="form-label fw-bold text-muted"
+                  >Motif de Rejet</label
+                >
                 <div class="alert alert-danger mb-0">
-                  <i class="fas fa-exclamation-triangle me-2"></i>{{ assistance.motif_rejet }}
+                  <i class="fas fa-exclamation-triangle me-2"></i
+                  >{{ assistance.motif_rejet }}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Document Justificatif Card -->
+        <!-- Document de Demande (Justificatif) -->
         <div v-if="assistance.justificatif" class="card shadow-sm mt-4">
           <div class="card-header bg-secondary text-white">
             <h5 class="mb-0">
-              <i class="fas fa-file-pdf me-2"></i>Document Justificatif
+              <i class="fas fa-file-alt me-2"></i>Justificatif de Demande
             </h5>
           </div>
           <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center justify-content-between mb-3">
               <div>
                 <i class="fas fa-file-pdf text-danger fs-1 me-3"></i>
-                <span class="fw-semibold">Document PDF</span>
+                <span class="fw-semibold">Document de Demande</span>
               </div>
               <div class="btn-group">
-                <a 
-                  :href="assistance.justificatif" 
-                  target="_blank" 
-                  class="btn btn-outline-primary"
+                <a
+                  :href="getJustificatifUrl(assistance.justificatif)"
+                  target="_blank"
+                  class="btn btn-outline-primary btn-sm"
                 >
-                  <i class="fas fa-eye me-2"></i>Voir
+                  <i class="fas fa-eye me-1"></i>Voir
                 </a>
-                <a 
-                  :href="assistance.justificatif" 
-                  download 
-                  class="btn btn-primary"
+                <a
+                  :href="getJustificatifUrl(assistance.justificatif)"
+                  download
+                  class="btn btn-primary btn-sm"
                 >
-                  <i class="fas fa-download me-2"></i>Télécharger
+                  <i class="fas fa-download me-1"></i>Télécharger
                 </a>
               </div>
             </div>
-            
-            <!-- PDF Viewer -->
-            <div class="mt-3">
-              <iframe 
-                :src="assistance.justificatif" 
-                width="100%" 
-                height="500px" 
+
+            <!-- Viewer -->
+            <div class="ratio ratio-16x9">
+              <iframe
+                :src="getJustificatifUrl(assistance.justificatif)"
+                class="border rounded"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preuve de Paiement -->
+        <div v-if="assistance.preuve_paiement" class="card shadow-sm mt-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-check-double me-2"></i>Preuve de Paiement
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <i
+                  class="fas fa-file-invoice-dollar text-success fs-1 me-3"
+                ></i>
+                <span class="fw-semibold"
+                  >Preuve de Paiement (Chèque/Bordereau)</span
+                >
+              </div>
+              <div class="btn-group">
+                <a
+                  :href="getJustificatifUrl(assistance.preuve_paiement)"
+                  target="_blank"
+                  class="btn btn-outline-success btn-sm"
+                >
+                  <i class="fas fa-eye me-1"></i>Voir
+                </a>
+                <a
+                  :href="getJustificatifUrl(assistance.preuve_paiement)"
+                  download
+                  class="btn btn-success btn-sm"
+                >
+                  <i class="fas fa-download me-1"></i>Télécharger
+                </a>
+              </div>
+            </div>
+
+            <!-- Viewer -->
+            <div class="ratio ratio-16x9">
+              <iframe
+                :src="getJustificatifUrl(assistance.preuve_paiement)"
                 class="border rounded"
               ></iframe>
             </div>
@@ -152,34 +220,42 @@
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Nom Complet</label>
-              <p class="mb-0">{{ assistance.membre?.full_name || 'N/A' }}</p>
+              <p class="mb-0">{{ assistance.membre?.full_name || "N/A" }}</p>
             </div>
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Matricule</label>
               <p class="mb-0">
-                <span class="badge bg-secondary">{{ assistance.membre?.matricule || 'N/A' }}</span>
+                <span class="badge bg-secondary">{{
+                  assistance.membre?.matricule || "N/A"
+                }}</span>
               </p>
             </div>
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Email</label>
               <p class="mb-0">
-                <i class="fas fa-envelope me-2"></i>{{ assistance.membre?.email || 'N/A' }}
+                <i class="fas fa-envelope me-2"></i
+                >{{ assistance.membre?.email || "N/A" }}
               </p>
             </div>
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Téléphone</label>
               <p class="mb-0">
-                <i class="fas fa-phone me-2"></i>{{ assistance.membre?.telephone || 'N/A' }}
+                <i class="fas fa-phone me-2"></i
+                >{{ assistance.membre?.telephone || "N/A" }}
               </p>
             </div>
             <div class="mb-0">
               <label class="form-label fw-bold text-muted">Statut Membre</label>
               <p class="mb-0">
-                <span 
-                  class="badge" 
-                  :class="assistance.membre?.statut === 'actif' ? 'bg-success' : 'bg-warning'"
+                <span
+                  class="badge"
+                  :class="
+                    assistance.membre?.statut === 'actif'
+                      ? 'bg-success'
+                      : 'bg-warning'
+                  "
                 >
-                  {{ assistance.membre?.statut || 'N/A' }}
+                  {{ assistance.membre?.statut || "N/A" }}
                 </span>
               </p>
             </div>
@@ -196,21 +272,32 @@
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Nom</label>
-              <p class="mb-0">{{ assistance.type_assistance?.nom || 'N/A' }}</p>
+              <p class="mb-0">{{ assistance.type_assistance?.nom || "N/A" }}</p>
             </div>
             <div class="mb-3">
-              <label class="form-label fw-bold text-muted">Montant Standard</label>
+              <label class="form-label fw-bold text-muted"
+                >Montant Standard</label
+              >
               <p class="mb-0 fs-5 text-success fw-bold">
-                {{ formatMontant(assistance.type_assistance?.montant_standard) }}
+                {{
+                  formatMontant(assistance.type_assistance?.montant_standard)
+                }}
               </p>
             </div>
             <div v-if="assistance.type_assistance?.conditions" class="mb-3">
               <label class="form-label fw-bold text-muted">Conditions</label>
               <p class="mb-0">{{ assistance.type_assistance.conditions }}</p>
             </div>
-            <div v-if="assistance.type_assistance?.documents_requis" class="mb-0">
-              <label class="form-label fw-bold text-muted">Documents Requis</label>
-              <p class="mb-0">{{ assistance.type_assistance.documents_requis }}</p>
+            <div
+              v-if="assistance.type_assistance?.documents_requis"
+              class="mb-0"
+            >
+              <label class="form-label fw-bold text-muted"
+                >Documents Requis</label
+              >
+              <p class="mb-0">
+                {{ assistance.type_assistance.documents_requis }}
+              </p>
             </div>
           </div>
         </div>
@@ -218,21 +305,21 @@
         <!-- Timestamps Card -->
         <div class="card shadow-sm mt-4">
           <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">
-              <i class="fas fa-clock me-2"></i>Historique
-            </h5>
+            <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Historique</h5>
           </div>
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold text-muted">Créé le</label>
               <p class="mb-0">
-                <i class="far fa-calendar-plus me-2"></i>{{ formatDateTime(assistance.created_at) }}
+                <i class="far fa-calendar-plus me-2"></i
+                >{{ formatDateTime(assistance.created_at) }}
               </p>
             </div>
             <div class="mb-0">
               <label class="form-label fw-bold text-muted">Modifié le</label>
               <p class="mb-0">
-                <i class="far fa-calendar-alt me-2"></i>{{ formatDateTime(assistance.updated_at) }}
+                <i class="far fa-calendar-alt me-2"></i
+                >{{ formatDateTime(assistance.updated_at) }}
               </p>
             </div>
           </div>
@@ -249,11 +336,11 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router';
-import api from '../../services/api';
-import { useStore } from 'vuex';
-import { onMounted, computed, ref } from 'vue';
-import { useToast } from 'vue-toastification';
+import { useRouter, useRoute } from "vue-router";
+import api from "../../services/api";
+import { useStore } from "vuex";
+import { onMounted, computed, ref } from "vue";
+import { useToast } from "vue-toastification";
 
 const route = useRoute();
 const router = useRouter();
@@ -272,8 +359,8 @@ const getAssistance = async () => {
     const response = await api.get(`/assistances/${id}`);
     store.state.data.assistance = response.data;
   } catch (error) {
-    console.error('Error fetching assistance:', error);
-    toast.error('Erreur lors du chargement des détails de l\'assistance');
+    console.error("Error fetching assistance:", error);
+    toast.error("Erreur lors du chargement des détails de l'assistance");
   } finally {
     loading.value = false;
   }
@@ -283,57 +370,64 @@ const assistance = computed(() => store.state.data.assistance);
 
 // Helper functions
 const formatMontant = (value) => {
-  if (!value) return 'N/A';
-  return parseFloat(value).toLocaleString('fr-FR') + ' FBU';
+  if (!value) return "N/A";
+  return parseFloat(value).toLocaleString("fr-FR") + " FBU";
 };
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
+  if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  return date.toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 };
 
 const formatDateTime = (dateString) => {
-  if (!dateString) return 'N/A';
+  if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return date.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
+};
+
+const getJustificatifUrl = (path) => {
+  if (!path) return "";
+  // If it's already a full URL (from the backend accessor), return it
+  if (path.toString().startsWith("http")) return path;
+  return path;
 };
 
 const getStatusClass = (statut) => {
   switch (statut) {
-    case 'en_attente':
-      return 'bg-warning';
-    case 'approuve':
-      return 'bg-success';
-    case 'rejete':
-      return 'bg-danger';
-    case 'verse':
-      return 'bg-info';
+    case "en_attente":
+      return "bg-warning";
+    case "approuve":
+      return "bg-success";
+    case "rejete":
+      return "bg-danger";
+    case "verse":
+      return "bg-info";
     default:
-      return 'bg-secondary';
+      return "bg-secondary";
   }
 };
 
 const getStatusLabel = (statut) => {
   switch (statut) {
-    case 'en_attente':
-      return 'En attente';
-    case 'approuve':
-      return 'Approuvé';
-    case 'rejete':
-      return 'Rejeté';
-    case 'verse':
-      return 'Versé';
+    case "en_attente":
+      return "En attente";
+    case "approuve":
+      return "Approuvé";
+    case "rejete":
+      return "Rejeté";
+    case "verse":
+      return "Versé";
     default:
       return statut;
   }
