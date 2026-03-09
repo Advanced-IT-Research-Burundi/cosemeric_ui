@@ -511,6 +511,7 @@
 import { useStore } from "vuex";
 import api from "../../services/api";
 import { computed, onMounted, ref } from "vue";
+import { useToast } from "vue-toastification";
 
 const store = useStore();
 const activeTab = ref("view");
@@ -527,6 +528,9 @@ const notification = ref({
   type: "success",
   message: "",
 });
+
+//toast
+const toast = useToast();
 
 // Forms
 const profileForm = ref({
@@ -641,13 +645,14 @@ const updateProfile = async () => {
   isLoading.value = true;
   try {
     const response = await api.put("/profile", profileForm.value);
-    store.state.user = [response.data.user];
+    store.state.user = response.user;
     activeTab.value = "view";
-    showNotification("success", "Profil mis à jour avec succès !");
+    toast.success("Profil mis à jour avec succès !");
+    
   } catch (error) {
     const message =
       error.response?.data?.message || "Erreur lors de la mise à jour";
-    showNotification("error", message);
+    toast.error(message);
     console.error(error);
   } finally {
     isLoading.value = false;
