@@ -648,7 +648,7 @@ const updateProfile = async () => {
     store.state.user = response.user;
     activeTab.value = "view";
     toast.success("Profil mis à jour avec succès !");
-    
+    window.location.reload();
   } catch (error) {
     const message =
       error.response?.data?.message || "Erreur lors de la mise à jour";
