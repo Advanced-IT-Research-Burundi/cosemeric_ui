@@ -377,6 +377,12 @@ router.beforeEach(async (to, from, next) => {
 
   // Redirect to dashboard if user is already authenticated and trying to access guest pages
   if (to.meta.guest && authStore.isAuthenticated) {
+
+
+    //if it a simple membre redirect him to mescredits
+    if(authStore.user.role === "membre"){
+      return next({ name: "mescredits" });
+    }
     return next({ name: "dashboard" });
   }
 
