@@ -181,7 +181,6 @@ async function login() {
     const success = await authStore.login(email.value, password.value);
     if (!success) throw new Error("Email ou mot de passe incorrect");
 
-
     // Redirect based on User Role
     if (
       authStore.user.role === "admin" ||
@@ -195,7 +194,8 @@ async function login() {
     }
   } catch (err) {
     console.error("Login error:", err);
-    error.value = err.message || "Erreur de connexion";
+    error.value =
+      err.response?.data?.message || err.message || "Erreur de connexion";
     toast.error(error.value);
   } finally {
     isLoading.value = false;
