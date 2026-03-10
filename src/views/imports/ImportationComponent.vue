@@ -31,13 +31,6 @@
       </div>
 
       <div class="card-body">
-        <div v-if="successMessage" class="alert alert-success">
-          {{ successMessage }}
-        </div>
-        <div v-if="errorMessage" class="alert alert-danger">
-          {{ errorMessage }}
-        </div>
-
         <div class="row g-3 mb-4 align-items-end">
           <div class="col-md-4">
             <label class="form-label fw-semibold">Date de cotisation</label>
@@ -204,7 +197,9 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const cotisations = ref([]);
 const date_cotisation = ref("");
 const successMessage = ref("");
@@ -234,12 +229,13 @@ async function saveData() {
       cotisations: cotisations.value,
       date_cotisation: date_cotisation.value,
     });
-    successMessage.value = "Données importées avec succès";
+    toast.success("Données importées avec succès");
     // keep data visible; optionally clear after success
   } catch (err) {
-    errorMessage.value =
+    toast.error(
       "Erreur lors de l'importation : " +
-      (err?.response?.data?.message || err.message);
+        (err?.response?.data?.message || err.message),
+    );
     console.error(err);
   }
 }
