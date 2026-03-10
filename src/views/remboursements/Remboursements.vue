@@ -4,11 +4,13 @@
       <h2 class="mb-0">Gestion des Remboursements</h2>
 
       <div class="d-flex gap-2">
+        <router-link to="/remboursements/mensuel" class="btn btn-primary">
+          <i class="fas fa-calendar me-2"></i>Remboursements mensuelles
+        </router-link>
+      </div>
+      <div class="d-flex gap-2">
         <router-link to="/remboursements/add" class="btn btn-primary">
           <i class="fas fa-plus me-2"></i>Ajouter un remboursement
-        </router-link>
-        <router-link to="/remboursements/mensuelles" class="btn btn-primary">
-          <i class="fas fa-plus me-2"></i>Remboursements mensuelles
         </router-link>
       </div>
     </div>
