@@ -31,8 +31,11 @@
       </div>
 
       <div class="card-body">
-        <div v-if="message" class="alert alert-danger">
-          {{ message }}
+        <div v-if="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+        <div v-if="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
         </div>
 
         <div class="row g-3 mb-4 align-items-end">
@@ -204,7 +207,8 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const cotisations = ref([]);
 const date_cotisation = ref("");
-const message = ref("");
+const successMessage = ref("");
+const errorMessage = ref("");
 const uploadProgress = ref(0);
 const importModal = ref(null);
 
@@ -224,18 +228,16 @@ function closeModalAndKeep() {
 }
 
 async function saveData() {
-
-  
   if (!cotisations.value.length) return;
   try {
     await api.post("importation", {
       cotisations: cotisations.value,
       date_cotisation: date_cotisation.value,
     });
-    message.value = "Données importées avec succès";
+    successMessage.value = "Données importées avec succès";
     // keep data visible; optionally clear after success
   } catch (err) {
-    message.value =
+    errorMessage.value =
       "Erreur lors de l'importation : " +
       (err?.response?.data?.message || err.message);
     console.error(err);
@@ -263,15 +265,14 @@ function readExcel(event) {
       function returnNumber(value) {
         return parseFloat(value) || 0;
       }
-     
 
       // original mapping logic preserved (skip header rows if file has them)
       const currentData = jsonData.slice(3);
-   
+
       const travail = currentData
         .map((row) => {
           const ligne = Object.entries(row);
-        
+
           return {
             name: ligne[0] ? ligne[0][1] : "",
             matricule: ligne[2] ? ligne[2][1] : "",
@@ -285,12 +286,12 @@ function readExcel(event) {
         .filter((e) => e.matricule != "");
 
       cotisations.value = travail;
-  
+
       // simulate progress for UX
       simulateProgress();
     } catch (err) {
       console.error("Erreur lors de la lecture du fichier :", err);
-      message.value = "Impossible de lire le fichier Excel.";
+      errorMessage.value = "Impossible de lire le fichier Excel.";
     }
   };
 
@@ -318,7 +319,8 @@ function simulateProgress() {
 
 function clearData() {
   cotisations.value = [];
-  message.value = "";
+  successMessage.value = "";
+  errorMessage.value = "";
   date_cotisation.value = "";
 }
 
@@ -331,7 +333,7 @@ function exportExcel() {
   const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   saveAs(
     new Blob([wbout], { type: "application/octet-stream" }),
-    "import_cotisations.xlsx"
+    "import_cotisations.xlsx",
   );
 }
 
