@@ -1,178 +1,180 @@
 <template>
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Gestion des assistances</h2>
-    <router-link to="/assistances/add" class="btn btn-primary">
-      <i class="fas fa-plus me-2"></i>Ajouter une assistance
-    </router-link>
-  </div>
+  <div class="assistances-view">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Gestion des assistances</h2>
+      <router-link to="/assistances/add" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Ajouter une assistance
+      </router-link>
+    </div>
 
-  <div class="card">
-    <AdvancedTable
-      :data="tableData"
-      :columns="columns"
-      :loading="loading"
-      search-placeholder="Rechercher des assistances..."
-      no-data-message="Aucune assistance trouvée"
-      :show-filters="true"
-      :has-actions="true"
-      row-key="id"
-      details-endpoint="assistances"
-      details-title="Détails de l'assistance"
-      @edit="handleEdit"
-      @delete="handleDelete"
-      @search="handleSearch"
-      @sort="handleSort"
-      @filter="handleFilter"
-      @page-change="handlePageChange"
-      @per-page-change="handlePerPageChange"
-    >
-      <!-- Custom column slot -->
-      <template #column-statut="{ value }">
-        <span class="badge rounded-1" :class="getClassByStatut(value)">
-          {{ getStatusLabel(value) }}
-        </span>
-      </template>
+    <div class="card">
+      <AdvancedTable
+        :data="tableData"
+        :columns="columns"
+        :loading="loading"
+        search-placeholder="Rechercher des assistances..."
+        no-data-message="Aucune assistance trouvée"
+        :show-filters="true"
+        :has-actions="true"
+        row-key="id"
+        details-endpoint="assistances"
+        details-title="Détails de l'assistance"
+        @edit="handleEdit"
+        @delete="handleDelete"
+        @search="handleSearch"
+        @sort="handleSort"
+        @filter="handleFilter"
+        @page-change="handlePageChange"
+        @per-page-change="handlePerPageChange"
+      >
+        <!-- Custom column slot -->
+        <template #column-statut="{ value }">
+          <span class="badge rounded-1" :class="getClassByStatut(value)">
+            {{ getStatusLabel(value) }}
+          </span>
+        </template>
 
-      <!-- Justificatif column slot -->
-      <template #column-justificatif="{ item }">
-        <a
-          v-if="item.justificatif"
-          :href="getJustificatifUrl(item.justificatif)"
-          target="_blank"
-          class="btn btn-link btn-sm text-primary p-0"
-          title="Voir le document"
-        >
-          <i class="fas fa-file-pdf me-1"></i>Voir
-        </a>
-        <span v-else class="text-muted small">Aucun</span>
-      </template>
-
-      <template #actions="{ item, openDetails }">
-        <div class="btn-group gap-1">
-          <button
-            class="btn btn-outline-secondary btn-sm"
-            @click="openDetails(item)"
-            title="Voir détails"
+        <!-- Justificatif column slot -->
+        <template #column-justificatif="{ item }">
+          <a
+            v-if="item.justificatif"
+            :href="getJustificatifUrl(item.justificatif)"
+            target="_blank"
+            class="btn btn-link btn-sm text-primary p-0"
+            title="Voir le document"
           >
-            <i class="fas fa-eye"></i>
-          </button>
+            <i class="fas fa-file-pdf me-1"></i>Voir
+          </a>
+          <span v-else class="text-muted small">Aucun</span>
+        </template>
 
-          <!-- Approve Button: 
-                 - Gestionnaire/Admin can approve if 'en_attente'
-                 - Responsable/Admin can approve if 'en_cours' 
-            -->
-          <button
-            v-if="
-              (item.statut === 'en_attente' && (isManager || isAdmin)) ||
-              (item.statut === 'en_cours' && (isResponsable || isAdmin))
-            "
-            class="btn btn-success btn-sm"
-            @click="handleAction(item, 'approuve')"
-            :title="
-              item.statut === 'en_attente'
-                ? 'Valider (Gestionnaire)'
-                : 'Approuver (Responsable)'
-            "
-          >
-            <i class="fas fa-check"></i>
-          </button>
-
-          <!-- Modify Button for Member: only if 'en_attente' -->
-          <button
-            v-if="item.statut === 'en_attente' && isMember"
-            class="btn btn-warning btn-sm"
-            @click="handleModifier(item)"
-            title="Modifier"
-          >
-            <i class="fas fa-edit"></i>
-          </button>
-
-          <!-- Reject Button: Visible for Manager/Responsable/Admin if not finalized -->
-          <button
-            v-if="
-              (item.statut === 'en_attente' && (isManager || isAdmin)) ||
-              (item.statut === 'en_cours' && (isResponsable || isAdmin))
-            "
-            class="btn btn-danger btn-sm"
-            @click="handleAction(item, 'rejete')"
-            title="Refuser"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </template>
-    </AdvancedTable>
-  </div>
-
-  <!-- Approval Modal -->
-  <div
-    class="modal fade"
-    id="approveModal"
-    tabindex="-1"
-    aria-labelledby="approveModalLabel"
-    aria-hidden="true"
-    ref="approveModalRef"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="approveModalLabel">
-            Approbation d'Assistance
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <p v-if="selectedItem">
-            Vous allez approuver l'assistance pour
-            <strong>{{ selectedItem.membre?.full_name }}</strong> d'un montant
-            de
-            <strong
-              >{{
-                parseFloat(selectedItem.montant).toLocaleString()
-              }}
-              FBU</strong
-            >.
-          </p>
-          <div class="mb-3">
-            <label for="justificatifFile" class="form-label"
-              >Justificatif de paiement (Chèque/Bordereau)
-              <span class="text-danger">*</span></label
+        <template #actions="{ item, openDetails }">
+          <div class="btn-group gap-1">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              @click="openDetails(item)"
+              title="Voir détails"
             >
-            <input
-              type="file"
-              class="form-control"
-              id="justificatifFile"
-              @change="handleFileChange"
-              accept=".pdf,.jpg,.jpeg,.png"
-            />
-            <div class="form-text">Formats acceptés: PDF, JPG, PNG.</div>
+              <i class="fas fa-eye"></i>
+            </button>
+
+            <!-- Approve Button: 
+                   - Gestionnaire/Admin can approve if 'en_attente'
+                   - Responsable/Admin can approve if 'en_cours' 
+              -->
+            <button
+              v-if="
+                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+                (item.statut === 'en_cours' && (isResponsable || isAdmin))
+              "
+              class="btn btn-success btn-sm"
+              @click="handleAction(item, 'approuve')"
+              :title="
+                item.statut === 'en_attente'
+                  ? 'Valider (Gestionnaire)'
+                  : 'Approuver (Responsable)'
+              "
+            >
+              <i class="fas fa-check"></i>
+            </button>
+
+            <!-- Modify Button for Member: only if 'en_attente' -->
+            <button
+              v-if="item.statut === 'en_attente' && isMember"
+              class="btn btn-warning btn-sm"
+              @click="handleModifier(item)"
+              title="Modifier"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+
+            <!-- Reject Button: Visible for Manager/Responsable/Admin if not finalized -->
+            <button
+              v-if="
+                (item.statut === 'en_attente' && (isManager || isAdmin)) ||
+                (item.statut === 'en_cours' && (isResponsable || isAdmin))
+              "
+              class="btn btn-danger btn-sm"
+              @click="handleAction(item, 'rejete')"
+              title="Refuser"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Annuler
-          </button>
-          <button
-            type="button"
-            class="btn btn-success"
-            @click="confirmApprobation"
-            :disabled="submitting || !justificatifFile"
-          >
-            <span
-              v-if="submitting"
-              class="spinner-border spinner-border-sm me-1"
-            ></span>
-            Confirmer l'approbation
-          </button>
+        </template>
+      </AdvancedTable>
+    </div>
+
+    <!-- Approval Modal -->
+    <div
+      class="modal fade"
+      id="approveModal"
+      tabindex="-1"
+      aria-labelledby="approveModalLabel"
+      aria-hidden="true"
+      ref="approveModalRef"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="approveModalLabel">
+              Approbation d'Assistance
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p v-if="selectedItem">
+              Vous allez approuver l'assistance pour
+              <strong>{{ selectedItem.membre?.full_name }}</strong> d'un montant
+              de
+              <strong
+                >{{
+                  parseFloat(selectedItem.montant).toLocaleString()
+                }}
+                FBU</strong
+              >.
+            </p>
+            <div class="mb-3">
+              <label for="justificatifFile" class="form-label"
+                >Justificatif de paiement (Chèque/Bordereau)
+                <span class="text-danger">*</span></label
+              >
+              <input
+                type="file"
+                class="form-control"
+                id="justificatifFile"
+                @change="handleFileChange"
+                accept=".pdf,.jpg,.jpeg,.png"
+              />
+              <div class="form-text">Formats acceptés: PDF, JPG, PNG.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              @click="confirmApprobation"
+              :disabled="submitting || !justificatifFile"
+            >
+              <span
+                v-if="submitting"
+                class="spinner-border spinner-border-sm me-1"
+              ></span>
+              Confirmer l'approbation
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -47,7 +47,7 @@
                   Nom :<strong>{{ member.full_name }}</strong> | Matricule :
                   <strong>{{ member.matricule }}</strong> | Téléphone :
                   <strong>{{ member.telephone }}</strong> | Catégorie :
-                  <strong> {{ member.categorie.nom }}</strong>
+                  <strong> {{ member.categorie_nom }}</strong>
                 </span>
                 <i
                   v-if="formData.membre_id === member.id"
@@ -411,8 +411,8 @@ const selectMember = (member) => {
   store.commit("SET_SEARCHED_MEMBER", member);
 
   // Automatically fill montant + devise
-  formData.value.montant = member.categorie?.montant_cotisation || 0;
-  formData.value.devise = member.categorie?.devise || "FBU";
+  formData.value.montant = member.categorie_cotisation || 0;
+  formData.value.devise = member.categorie_devise || "FBU";
 
   // Clear list and move forward
   filteredMembers.value = [];
