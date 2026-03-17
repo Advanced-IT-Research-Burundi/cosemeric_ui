@@ -2,6 +2,7 @@
   <div class="">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
+
       <router-link
         :to="
           isAdmin || isManager || isResponsable
@@ -10,7 +11,7 @@
         "
         class="btn btn-primary"
       >
-        <i class="fas fa-plus me-2"></i>Ajouter un crédit
+        <i class="fas fa-plus me-2"></i>Demande de crédit
       </router-link>
     </div>
 
