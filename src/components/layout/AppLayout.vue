@@ -428,12 +428,6 @@ const menuItems = ref([
     requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
   },
   {
-    icon: '<i class="bi bi-arrow-repeat"></i>',
-    title: "Remboursements",
-    path: "/remboursements",
-    requireAdmin: isAdmin.value || isManager.value || isResponsable.value,
-  },
-  {
     icon: '<i class="bi bi-file-earmark-spreadsheet-fill"></i>',
     title: "Importation Mensuelle",
     path: "/importationMensuel",

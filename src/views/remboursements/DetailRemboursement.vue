@@ -2,9 +2,14 @@
   <div class="container py-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Détails du remboursement</h2>
-      <button @click="$router.back()" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Retour
-      </button>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" @click="handleFreePay">
+          <i class="fas fa-hand-holding-usd me-2"></i>Payer un montant libre
+        </button>
+        <button @click="$router.back()" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Retour
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="text-center py-5">
@@ -18,162 +23,164 @@
     </div>
 
     <div v-else-if="credit">
-      <!-- Top Summary Cards -->
-      <div class="row mb-4">
-        <div
-          class="col-md-3"
-          v-for="(card, index) in summaryCards"
-          :key="index"
-        >
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-2">
-                <div :class="['rounded-circle p-2 me-3', card.bgIcon]">
-                  <i :class="[card.icon, card.textColor, 'fa-lg']"></i>
-                </div>
-                <small class="text-muted fw-bold text-uppercase">{{
-                  card.title
-                }}</small>
-              </div>
-              <h4 class="mb-0 fw-bold">{{ card.value }}</h4>
-              <small v-if="card.subtext" class="text-muted">{{
-                card.subtext
-              }}</small>
-            </div>
+      <!-- Simple Summary Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="p-3 bg-white shadow-sm rounded h-100 border-start border-primary border-4">
+            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Montant total endetté</small>
+            <span class="fw-bold fs-5">{{ formatCurrency(credit.montant_total_rembourser) }}</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-white shadow-sm rounded h-100 border-start border-success border-4">
+            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Montant déjà payé</small>
+            <span class="fw-bold fs-5 text-success">{{ formatCurrency(credit.montant_deja_paye) }}</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-white shadow-sm rounded h-100 border-start border-info border-4">
+            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Échéances restantes</small>
+            <span class="fw-bold fs-5">{{ totalRemainingCount }} / {{ totalCount }}</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-white shadow-sm rounded h-100 border-start border-danger border-4">
+            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">En retard</small>
+            <span class="fw-bold fs-5 text-danger">{{ lateCount }}</span>
           </div>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Credit Info Card -->
-        <div class="col-lg-7 mb-4">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white py-3 border-0">
-              <h5 class="mb-0 fw-bold">Informations sur le crédit</h5>
-            </div>
-            <div class="card-body p-4 pt-0">
-              <div class="row g-4">
-                <div class="col-md-6 text-start">
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1">Membre</label>
-                    <span class="fw-bold"
-                      >{{ credit.membre?.nom }}
-                      {{ credit.membre?.prenom }}</span
-                    >
-                    <small class="d-block text-muted"
-                      >Matricule: {{ credit.membre?.matricule }}</small
-                    >
-                  </div>
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1"
-                      >Montant Accordé</label
-                    >
-                    <span class="fw-bold text-success fs-5">{{
-                      formatCurrency(credit.montant_accorde)
-                    }}</span>
-                  </div>
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1"
-                      >Taux d'intérêt</label
-                    >
-                    <span class="fw-bold">{{ credit.taux_interet }}%</span>
-                  </div>
-                </div>
-                <div class="col-md-6 text-start">
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1">Durée</label>
-                    <span class="fw-bold">{{ credit.duree_mois }} mois</span>
-                  </div>
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1"
-                      >Mensualité</label
-                    >
-                    <span class="fw-bold">{{
-                      formatCurrency(credit.montant_mensualite)
-                    }}</span>
-                  </div>
-                  <div class="mb-3">
-                    <label class="text-muted small d-block mb-1"
-                      >Date d'approbation</label
-                    >
-                    <span class="fw-bold">{{
-                      formatDate(credit.date_approbation)
-                    }}</span>
-                  </div>
-                </div>
-                <div class="col-12 text-start" v-if="credit.motif">
-                  <label class="text-muted small d-block mb-1">Motif</label>
-                  <p class="mb-0 p-2 bg-light rounded fst-italic">
-                    {{ credit.motif }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- Repayments Table -->
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0 text-primary fw-bold">
+            <i class="fas fa-calendar-alt me-2"></i>Échéancier des remboursements
+          </h5>
         </div>
-
-        <!-- Status Card -->
-        <div class="col-lg-5 mb-4">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white py-3 border-0">
-              <h5 class="mb-0 fw-bold">Statut du remboursement</h5>
-            </div>
-            <div
-              class="card-body p-4 pt-0 d-flex flex-column justify-content-center align-items-center"
-            >
-              <div class="mb-3">
-                <span
-                  class="badge rounded-pill px-4 py-2 fs-6"
-                  :class="getStatusBadgeClass(credit.statut)"
-                >
-                  {{ formatStatus(credit.statut) }}
-                </span>
-              </div>
-              <div class="w-100 mt-3">
-                <div class="d-flex justify-content-between mb-1">
-                  <small class="text-muted">Progression</small>
-                  <small class="fw-bold">{{ progressPercentage }}%</small>
-                </div>
-                <div class="progress" style="height: 10px">
-                  <div
-                    class="progress-bar bg-success"
-                    role="progressbar"
-                    :style="{ width: progressPercentage + '%' }"
-                    aria-valuenow="progressPercentage"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div>
-              </div>
-              <div class="row w-100 mt-4 text-center">
-                <div class="col-6">
-                  <div class="p-2 border rounded bg-light">
-                    <small class="d-block text-muted">Payé</small>
-                    <span class="fw-bold"
-                      >{{ paidCount }} / {{ totalCount }}</span
-                    >
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="p-2 border rounded bg-light">
-                    <small class="d-block text-muted">En retard</small>
-                    <span class="fw-bold text-danger">{{ lateCount }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="card-body">
+          <div class="table-responsive" v-if="credit.remboursements && credit.remboursements.length">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Date échéance</th>
+                  <th>Montant prévu</th>
+                  <th>Montant payé</th>
+                  <th>Date paiement</th>
+                  <th>Statut</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="echeance in sortedRemboursements" :key="echeance.id">
+                  <td>{{ echeance.numero_echeance }}</td>
+                  <td>{{ formatDateShort(echeance.date_echeance) }}</td>
+                  <td>{{ formatCurrency(echeance.montant_prevu) }}</td>
+                  <td>{{ echeance.montant_paye ? formatCurrency(echeance.montant_paye) : '-' }}</td>
+                  <td>{{ echeance.date_paiement ? formatDateShort(echeance.date_paiement) : '-' }}</td>
+                  <td>
+                    <span class="badge rounded-pill" :class="getRemboursementStatusBadge(echeance.statut)">
+                      {{ formatStatus(echeance.statut) }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <div class="btn-group">
+                      <a v-if="echeance.preuve_paiement_url" 
+                         :href="echeance.preuve_paiement_url" 
+                         target="_blank" 
+                         class="btn btn-sm btn-outline-info"
+                         title="Voir preuve">
+                        <i class="fas fa-file-invoice"></i>
+                      </a>
+                      <button v-if="echeance.statut !== 'paye'" 
+                              class="btn btn-sm btn-success"
+                              @click="handleApprove(echeance)"
+                              title="Marquer comme payé">
+                        <i class="fas fa-check-circle me-1"></i>Payer
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else class="text-center py-4 text-muted">
+            Aucune échéance trouvée pour ce crédit.
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="col-12 mb-4">
-          <ActivityList
-            title="Calendrier des remboursements"
-            :items="activityItems"
-            emptyMessage="Aucune échéance générée"
-            statusField="statusLabel"
-          />
+    <!-- Modal d'approbation pour une échéance spécifique -->
+    <div v-if="showApproveModal" class="modal-backdrop fade show"></div>
+    <div v-if="showApproveModal" class="modal fade show" style="display: block" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Valider cette échéance</h5>
+            <button type="button" class="btn-close btn-close-white" @click="showApproveModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="selectedRemboursement" class="mb-4 p-3 bg-light rounded">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Échéance N°:</span>
+                <span class="fw-bold">{{ selectedRemboursement.numero_echeance }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Montant à payer:</span>
+                <span class="fw-bold text-success">{{ formatCurrency(selectedRemboursement.montant_prevu) }}</span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="preuve_paiement" class="form-label fw-bold">
+                Preuve de paiement <span class="text-danger">*</span>
+              </label>
+              <input type="file" class="form-control" id="preuve_paiement" @change="handleFileChange" accept="image/*,.pdf" required />
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" @click="showApproveModal = false">Annuler</button>
+            <button type="button" class="btn btn-success px-4" :disabled="submitting || !preuveFile" @click="confirmApprove">
+              <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
+              Confirmer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour Paiement Libre (Montant Libre) -->
+    <div v-if="showFreePayModal" class="modal-backdrop fade show"></div>
+    <div v-if="showFreePayModal" class="modal fade show" style="display: block" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Paiement Libre / Global</h5>
+            <button type="button" class="btn-close btn-close-white" @click="showFreePayModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Montant à payer (BIF) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" v-model="freePayAmount" placeholder="Ex: 50000" required />
+              <small class="text-muted">Ce montant sera automatiquement distribué sur les prochaines échéances.</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="preuve_paiement_free" class="form-label fw-bold">
+                Preuve de paiement <span class="text-danger">*</span>
+              </label>
+              <input type="file" class="form-control" id="preuve_paiement_free" @change="handleFileChange" accept="image/*,.pdf" required />
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" @click="showFreePayModal = false">Annuler</button>
+            <button type="button" class="btn btn-primary px-4" :disabled="submitting || !preuveFile || !freePayAmount" @click="confirmFreePay">
+              <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
+              Valider le paiement
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -184,13 +191,21 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import api from "../../services/api";
-import ActivityList from "../../components/members/ActivityList.vue";
+import { useToast } from "vue-toastification";
 
 const route = useRoute();
+const toast = useToast();
 const creditId = route.params.id;
 const loading = ref(true);
+const submitting = ref(false);
 const error = ref(null);
 const credit = ref(null);
+
+const showApproveModal = ref(false);
+const showFreePayModal = ref(false);
+const selectedRemboursement = ref(null);
+const freePayAmount = ref(null);
+const preuveFile = ref(null);
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat("fr-FR", {
@@ -199,13 +214,9 @@ const formatCurrency = (value) => {
   }).format(value || 0);
 };
 
-const formatDate = (dateString) => {
+const formatDateShort = (dateString) => {
   if (!dateString) return "-";
-  return new Date(dateString).toLocaleDateString("fr-FR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return new Date(dateString).toLocaleDateString("fr-FR");
 };
 
 const formatStatus = (status) => {
@@ -213,99 +224,28 @@ const formatStatus = (status) => {
   return status.replace(/_/g, " ").toUpperCase();
 };
 
-const getStatusBadgeClass = (status) => {
+const getRemboursementStatusBadge = (status) => {
   switch (status) {
-    case "approuve":
-      return "bg-success-subtle text-success border border-success";
-    case "en_cours":
-      return "bg-primary-subtle text-primary border border-primary";
-    case "termine":
-      return "bg-info-subtle text-info border border-info";
+    case "paye":
+      return "bg-success";
     case "en_retard":
-      return "bg-danger-subtle text-danger border border-danger";
+      return "bg-danger";
+    case "en_attente":
+      return "bg-warning text-dark";
     default:
-      return "bg-secondary-subtle text-secondary border border-secondary";
+      return "bg-secondary";
   }
 };
 
-const summaryCards = computed(() => {
-  if (!credit.value) return [];
-
-  return [
-    {
-      title: "Montant Total",
-      value: formatCurrency(credit.value.montant_total_rembourser),
-      icon: "fas fa-money-bill-wave",
-      textColor: "text-primary",
-      bgIcon: "bg-primary-subtle",
-    },
-    {
-      title: "Montant Payé",
-      value: formatCurrency(credit.value.montant_deja_paye),
-      icon: "fas fa-check-circle",
-      textColor: "text-success",
-      bgIcon: "bg-success-subtle",
-      subtext: "Total des échéances payées",
-    },
-    {
-      title: "Reste à payer",
-      value: formatCurrency(credit.value.montant_restant),
-      icon: "fas fa-clock",
-      textColor: "text-warning",
-      bgIcon: "bg-warning-subtle",
-    },
-    {
-      title: "Pénalités",
-      value: formatCurrency(credit.value.total_penalites),
-      icon: "fas fa-exclamation-triangle",
-      textColor: "text-danger",
-      bgIcon: "bg-danger-subtle",
-    },
-  ];
-});
-
-const activityItems = computed(() => {
+const sortedRemboursements = computed(() => {
   if (!credit.value || !credit.value.remboursements) return [];
-
-  return credit.value.remboursements
-    .map((r) => ({
-      title: `Échéance N°${r.numero_echeance}`,
-      date: r.date_echeance,
-      paymentDate: r.date_paiement,
-      amount: formatCurrency(r.montant_prevu),
-      statusLabel:
-        r.statut === "paye"
-          ? "Payée"
-          : r.statut === "en_retard"
-            ? "En retard"
-            : "Prévue",
-      status:
-        r.statut === "paye"
-          ? "Approuvée"
-          : r.statut === "en_retard"
-            ? "Refusée"
-            : "En attente",
-      preuvePaiementUrl: r.preuve_paiement_url,
-    }))
-    .sort((a, b) => a.numero_echeance - b.numero_echeance);
+  return [...credit.value.remboursements].sort((a, b) => a.numero_echeance - b.numero_echeance);
 });
 
-const paidCount = computed(
-  () =>
-    credit.value?.remboursements?.filter((r) => r.statut === "paye").length ||
-    0,
-);
+const paidCount = computed(() => credit.value?.remboursements?.filter((r) => r.statut === "paye").length || 0);
 const totalCount = computed(() => credit.value?.remboursements?.length || 0);
-const lateCount = computed(
-  () =>
-    credit.value?.remboursements?.filter((r) => r.statut === "en_retard")
-      .length || 0,
-);
-const progressPercentage = computed(() =>
-  totalCount.value > 0
-    ? Math.round((paidCount.value / totalCount.value) * 100)
-    : 0,
-);
+const lateCount = computed(() => credit.value?.remboursements?.filter((r) => r.statut === "en_retard").length || 0);
+const totalRemainingCount = computed(() => credit.value?.remboursements?.filter((r) => r.statut !== 'paye').length || 0);
 
 const fetchCreditDetails = async () => {
   try {
@@ -314,9 +254,82 @@ const fetchCreditDetails = async () => {
     credit.value = response.data;
   } catch (err) {
     console.error("Error fetching credit details:", err);
-    error.value = "Impossible de charger les détails du crédit.";
+    error.value = "Impossible de charger les détails du remboursement.";
   } finally {
     loading.value = false;
+  }
+};
+
+const handleApprove = (row) => {
+  selectedRemboursement.value = row;
+  preuveFile.value = null;
+  showApproveModal.value = true;
+};
+
+const handleFreePay = () => {
+  freePayAmount.value = null;
+  preuveFile.value = null;
+  showFreePayModal.value = true;
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    preuveFile.value = file;
+  }
+};
+
+const confirmApprove = async () => {
+  if (!preuveFile.value) {
+    toast.warning("Veuillez sélectionner une preuve de paiement");
+    return;
+  }
+
+  try {
+    submitting.value = true;
+    const formData = new FormData();
+    formData.append("preuve_paiement", preuveFile.value);
+    formData.append("montant_paye", selectedRemboursement.value.montant_prevu);
+
+    await api.post(`/remboursements/${selectedRemboursement.value.id}/approve`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    toast.success("Remboursement validé avec succès");
+    showApproveModal.value = false;
+    fetchCreditDetails();
+  } catch (e) {
+    console.error(e);
+    toast.error(e.response?.data?.message || "Erreur lors de la validation du paiement");
+  } finally {
+    submitting.value = false;
+  }
+};
+
+const confirmFreePay = async () => {
+  if (!preuveFile.value || !freePayAmount.value) {
+    toast.warning("Veuillez remplir tous les champs obligatoires");
+    return;
+  }
+
+  try {
+    submitting.value = true;
+    const formData = new FormData();
+    formData.append("preuve_paiement", preuveFile.value);
+    formData.append("montant_paye", freePayAmount.value);
+
+    await api.post(`/credits/${creditId}/payer`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    toast.success("Paiement global effectué et distribué avec succès");
+    showFreePayModal.value = false;
+    fetchCreditDetails();
+  } catch (e) {
+    console.error(e);
+    toast.error(e.response?.data?.message || "Erreur lors du traitement du paiement");
+  } finally {
+    submitting.value = false;
   }
 };
 
@@ -324,22 +337,16 @@ onMounted(fetchCreditDetails);
 </script>
 
 <style scoped>
-.bg-primary-subtle {
-  background-color: #e7f1ff;
+.container {
+  max-width: 1200px;
 }
-.bg-success-subtle {
-  background-color: #e6fcf5;
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
 }
-.bg-warning-subtle {
-  background-color: #fff9db;
-}
-.bg-danger-subtle {
-  background-color: #fff5f5;
-}
-.bg-info-subtle {
-  background-color: #e3fafc;
-}
-.bg-secondary-subtle {
-  background-color: #f8f9fa;
+.badge {
+  font-weight: 500;
 }
 </style>

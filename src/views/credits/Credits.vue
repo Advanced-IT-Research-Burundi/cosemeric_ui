@@ -3,6 +3,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-0">Gestion des Crédits</h2>
 
+      <div class="d-flex gap-2">
+        <router-link to="/remboursements/mensuel" class="btn btn-primary">
+          <i class="fas fa-calendar me-2"></i>Remboursements mensuelles
+        </router-link>
+      </div>
+
       <router-link
         :to="
           isAdmin || isManager || isResponsable
@@ -96,6 +102,14 @@
               title="Voir détails"
             >
               <i class="fas fa-eye"></i>
+            </button>
+
+            <button
+              class="btn btn-outline-info btn-sm"
+              @click="handleRemboursements(item)"
+              title="Remboursements"
+            >
+              <i class="fas fa-history"></i>
             </button>
 
             <template v-if="['en_attente'].includes(item.statut)">
@@ -373,6 +387,10 @@ const handlePerPageChange = (perPage) => {
 
 const handleShow = (item) => {
   router.push({ name: "creditsShow", params: { id: item.id } });
+};
+
+const handleRemboursements = (item) => {
+  router.push({ name: "remboursementDetail", params: { id: item.id } });
 };
 
 // Computed Data for AdvancedTable
