@@ -177,7 +177,7 @@
               />
             </div>
 
-            <div class="col-md-6">
+            <!--<div class="col-md-6">
               <label for="statut" class="form-label"
                 >Statut <span class="text-danger">*</span></label
               >
@@ -220,7 +220,7 @@
                   >
                 </div>
               </div>
-            </div>
+            </div>-->
 
             <div class="col-12">
               <label for="notes" class="form-label">Notes</label>
@@ -305,7 +305,7 @@ const formData = ref({
   date_paiement: new Date().toISOString().split("T")[0],
   mode_paiement: "1",
   reference_paiement: "",
-  statut: "en_attente",
+  statut: "paye",
   notes: "",
   categorie: [],
 });
