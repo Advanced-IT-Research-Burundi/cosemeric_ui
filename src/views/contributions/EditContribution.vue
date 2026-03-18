@@ -119,7 +119,7 @@
 
             <!-- Statut -->
             <!-- Statut -->
-            <div class="col-12">
+            <!-- <div class="col-12">
               <label for="statut" class="form-label"
                 >Statut <span class="text-danger">*</span></label
               >
@@ -163,7 +163,7 @@
                   >
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Notes -->
             <div class="col-12">
@@ -231,7 +231,7 @@ const formData = ref({
   date_paiement: null,
   mode_paiement: null,
   reference_paiement: "",
-  statut: null,
+  statut: "paye",
   notes: "",
 });
 
