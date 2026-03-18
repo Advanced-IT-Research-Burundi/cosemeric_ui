@@ -98,7 +98,7 @@
               <i class="fas fa-eye"></i>
             </button>
 
-            <template v-if="['en_attente', 'en_cours'].includes(item.statut)">
+            <template v-if="['en_attente'].includes(item.statut)">
               <button
                 class="btn btn-success btn-sm"
                 @click="handleAction(item, 'approuve')"
