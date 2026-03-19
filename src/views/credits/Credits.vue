@@ -200,18 +200,33 @@ const columns = [
     sortable: true,
     formatter: (value) => trimName(value),
   },
+  //{
+  //  key: "montant_demande",
+  //  label: "Montant Demandé",
+  //  sortable: true,
+  //  formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
+  //},
   {
-    key: "montant_demande",
-    label: "Montant Demandé",
+    key: "montant_accorde",
+    label: "Montant Accordé",
     sortable: true,
     formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
   },
-  // {
-  //   key: "montant_accorde",
-  //   label: "Montant Accordé",
-  //   sortable: true,
-  //   formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
-  // },
+
+  {
+    key: "montant_total_rembourser",
+    label: "Montant Remboursé",
+    sortable: true,
+    formatter: (value) => parseFloat(value).toLocaleString() + " FBU",
+  },
+
+  {
+    key: "montant_restant",
+    label: "Montant Restant",
+    sortable: true,
+    //fait arrondissement de 1000 en haut if the value is NAN
+    formatter: (value) => Math.ceil(parseFloat(value) / 1000) * 1000 + " FBU",
+  },
   {
     key: "date_demande",
     label: "Date Demande",
