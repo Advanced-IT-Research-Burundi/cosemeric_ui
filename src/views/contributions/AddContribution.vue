@@ -120,7 +120,6 @@
                   step="0.01"
                   required
                   v-model="formData.montant"
-                  disabled
                 />
                 <select
                   class="form-select"
