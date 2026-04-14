@@ -46,10 +46,8 @@
                 <span>
                   Crédit #{{ c.id }} — Membre:
                   {{ c.membre?.nom + " " + c.membre?.prenom || "N/A" }} —
-                  Montant: {{ c.montant_accorde || c.montant || 0 }}
-                  ||
-                  Montant demande : {{ c.montant_demande }} 
-                  
+                  Montant: {{ c.montant_accorde || c.montant || 0 }} || Montant
+                  demande : {{ c.montant_demande }}
                 </span>
                 <i v-if="form.credit_id === c.id" class="fas fa-check"></i>
               </li>
@@ -80,49 +78,16 @@
               {{ form.credit.membre?.nom + " " + form.credit.membre?.prenom }} |
               Montant:
               {{ form.credit.montant_accorde || form.credit.montant || 0 }}
-              |
-              Montant demande : {{ form.credit.montant_demande }} 
-              |
-              Montant restant : {{ form.credit.montant_restant }} 
-              <br>
-              Montant total à rembourser : {{ form.credit.montant_total_rembourser }}
-              | Mensualité : {{ form.credit.montant_mensualite }} 
-
-
+              | Montant demande : {{ form.credit.montant_demande }} | Montant
+              restant : {{ form.credit.montant_restant }}
+              <br />
+              Montant total à rembourser :
+              {{ form.credit.montant_total_rembourser }} | Mensualité :
+              {{ form.credit.montant_mensualite }}
             </div>
           </div>
 
           <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label"
-                >N° échéance <span class="text-danger">*</span></label
-              >
-              <input
-                type="number"
-                class="form-control"
-                v-model.number="form.numero_echeance"
-                min="1"
-                required
-              />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label"
-                >Montant prévu <span class="text-danger">*</span></label
-              >
-              <div class="input-group">
-                <input
-                  type="number"
-                  class="form-control"
-                  v-model.number="form.montant_prevu"
-                  min="0"
-                  step="1"
-                  required
-                />
-                <span class="input-group-text">FBU</span>
-              </div>
-            </div>
-
             <div class="col-md-6">
               <label class="form-label">Montant payé</label>
               <div class="input-group">
@@ -217,12 +182,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useToast } from "vue-toastification";
 import api from "../../services/api";
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 const saving = ref(false);
@@ -362,4 +328,16 @@ const handleSubmit = async () => {
     saving.value = false;
   }
 };
+
+onMounted(async () => {
+  if (route.query.credit_id) {
+    await fetchAllCredits();
+    const cId = Number(route.query.credit_id);
+    const list = Array.isArray(allCredits.value) ? allCredits.value : [];
+    const found = list.find((c) => c.id === cId);
+    if (found) {
+      selectCredit(found);
+    }
+  }
+});
 </script>

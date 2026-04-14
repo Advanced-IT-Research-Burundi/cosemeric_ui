@@ -19,6 +19,10 @@
       >
         <i class="fas fa-plus me-2"></i>Demande de crédit
       </router-link>
+
+      <router-link to="/remboursements/add" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Remboursement manuel
+      </router-link>
     </div>
 
     <!-- Filters Section -->
@@ -110,6 +114,14 @@
               title="Remboursements"
             >
               <i class="fas fa-history"></i>
+            </button>
+
+            <button
+              class="btn btn-outline-primary btn-sm"
+              @click="handleManualRemboursement(item)"
+              title="Remboursement Manuel"
+            >
+              <i class="fas fa-hand-holding-usd"></i>
             </button>
 
             <template v-if="['en_attente'].includes(item.statut)">
@@ -406,6 +418,10 @@ const handleShow = (item) => {
 
 const handleRemboursements = (item) => {
   router.push({ name: "remboursementDetail", params: { id: item.id } });
+};
+
+const handleManualRemboursement = (item) => {
+  router.push({ path: "/remboursements/add", query: { credit_id: item.id } });
 };
 
 // Computed Data for AdvancedTable
